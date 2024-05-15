@@ -28,15 +28,19 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne' , 
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
@@ -44,7 +48,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'api',
     'channels',
-    'daphne' , 
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 REST_FRAMEWORK = {
@@ -102,11 +105,12 @@ DATABASES = {
         'PASSWORD':'postgres.psql',
         'HOST': '127.0.0.1', 
         'PORT': '5432',
-    }
+    },
+    
 }
 SIMPLE_JWT = {
      'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+     'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
 }
 
 # Password validation

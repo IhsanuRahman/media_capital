@@ -1,21 +1,21 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../axios';
 
 const initialState = {
-    user:{},
-    loading:false,
-    isAuthenticated:false
+    user: {},
+    loading: false,
+    isAuthenticated: false
 }
 // export const setAuthed =state=>{
 //     state.isAuthenticated=true
 // }
-export  const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
-    if (!(localStorage.getItem('refresh') && localStorage.getItem('access'))){
+export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
+    if (!(localStorage.getItem('refresh') && localStorage.getItem('access'))) {
         return thunkAPI.rejectWithValue('no token');
     }
     try {
         console.log();
-        const res = await api.post('/user',{
+        const res = await api.post('/user', {
             'token': localStorage.getItem('refresh')
         }, {
             headers: {
@@ -51,7 +51,7 @@ export const checkAuth = createAsyncThunk(
             }), {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access')}`,
 
                 },
 
@@ -59,14 +59,15 @@ export const checkAuth = createAsyncThunk(
                 console.log(e.message)
                 return thunkAPI.rejectWithValue(response.data);
             })
-            
-            if (response.status == 200){
-            const { dispatch } = thunkAPI;
-                
-            dispatch(getUser());
 
-            return response}
-            else{
+            if (response.status == 200) {
+                const { dispatch } = thunkAPI;
+
+                dispatch(getUser());
+
+                return response
+            }
+            else {
                 return thunkAPI.rejectWithValue(response.data);
             }
         }
@@ -77,7 +78,7 @@ export const checkAuth = createAsyncThunk(
 )
 export const logout = createAsyncThunk('user/logout', async (_, thunkAPI) => {
     try {
-        
+
         const res = await api.post("/logout", {
             'refresh_token': localStorage.getItem('refresh'),
             'access_token': localStorage.getItem('access'),
@@ -102,60 +103,62 @@ export const logout = createAsyncThunk('user/logout', async (_, thunkAPI) => {
     }
 
 })
-const userSlice= createSlice({
-    name:'user',
-    initialState:initialState,
-    reducers:{setAuthed:state=>{
-        state.isAuthenticated=true
-    }},
+const userSlice = createSlice({
+    name: 'user',
+    initialState: initialState,
+    reducers: {
+        setAuthed: state => {
+            state.isAuthenticated = true
+        }
+    },
     extraReducers:
         builder => {
             builder.addCase(checkAuth.fulfilled, state => {
                 state.loading = false;
                 const s1 = state.isAuthenticated
                 console.log();
-                
+
                 state.isAuthenticated = true;
-                console.log('changed =',s1 !== state.isAuthenticated)
+                console.log('changed =', s1 !== state.isAuthenticated)
                 console.log("checkAuth");
             }).addCase(checkAuth.pending, state => {
                 state.loading = true;
             })
-            .addCase(checkAuth.rejected, (state) => {
-                state.loading = false;
-                state.isAuthenticated = false;
-                state.user={}
-                console.log('checkauth rejected');
-                
-            }).addCase(getUser.pending, state => {
-                state.loading = true;
-            })
-            .addCase(getUser.fulfilled, (state, action) => {
-                state.loading = false;
-                
+                .addCase(checkAuth.rejected, (state) => {
+                    state.loading = false;
+                    state.isAuthenticated = false;
+                    state.user = {}
+                    console.log('checkauth rejected');
+
+                }).addCase(getUser.pending, state => {
+                    state.loading = true;
+                })
+                .addCase(getUser.fulfilled, (state, action) => {
+                    state.loading = false;
+
                     state.user = action.payload;
                     console.log(state.user)
-                
 
-            }).addCase(getUser.rejected, state => {
-                state.loading = false;
-                state.isAuthenticated = false;
-                state.user={}
 
-            }).addCase(logout.pending, state => {
-                state.loading = true;
-            })
-            .addCase(logout.fulfilled, state => {
-                state.loading = false;
-                state.isAuthenticated = false;
-                state.user = {};
-                localStorage.clear()
-            })
-            .addCase(logout.rejected, state => {
-                state.loading = false;
-            })
+                }).addCase(getUser.rejected, state => {
+                    state.loading = false;
+                    state.isAuthenticated = false;
+                    state.user = {}
+
+                }).addCase(logout.pending, state => {
+                    state.loading = true;
+                })
+                .addCase(logout.fulfilled, state => {
+                    state.loading = false;
+                    state.isAuthenticated = false;
+                    state.user = {};
+                    localStorage.clear()
+                })
+                .addCase(logout.rejected, state => {
+                    state.loading = false;
+                })
         }
-    
+
 })
-export const {setAuthed} = userSlice.actions
+export const { setAuthed } = userSlice.actions
 export default userSlice.reducer

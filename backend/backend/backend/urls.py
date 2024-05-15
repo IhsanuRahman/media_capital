@@ -21,5 +21,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('api.client.auth.urls'))
+    path('',include('api.client.auth.urls')),
+    path('messages/',include('api.client.messages.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
