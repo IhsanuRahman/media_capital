@@ -1,10 +1,12 @@
+import datetime
 from django.shortcuts import render
-from api.models import UserModel
+from api.models import Rooms, UserModel
 from channels.consumer import AsyncConsumer
 from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 class ChatConsumer(AsyncConsumer):
     async def websocket_connect(self,event):
         print('connected')
@@ -13,12 +15,40 @@ class ChatConsumer(AsyncConsumer):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_users(request):
-    users=UserModel.objects.exclude(id=request.user.id).values('id','username')
-    print(users,request.user)
-    data = []
-    for user in users:
-        data.append({
-            "username": user['username'],
-            "id": user['id']
-        })
+    data=[]
+    print(request.query_params)
+    if request.query_params['search']=='':
+        users=UserModel.objects.exclude(id=request.user.id).values('id','username')
+        print(users,request.user)
+        rooms=Rooms.objects.filter(users__id=request.user.id)
+        for user in users:
+            room=rooms.filter(users__id=user['id']).first()
+            if rooms.filter(users__id=user['id']).exists():
+                message=room.messages.all().order_by('sended_at').last()
+                if message:
+                    now=datetime.datetime.now()
+                    on=''
+                    if message.sended_at.date() == now.date():
+                        on = 'today'
+                    elif message.sended_at.date() == now.date()-datetime.timedelta(days=1):
+                        on = 'yesterday'
+                    else:
+                        on =message.sended_at.date().strftime("%d/%m/%Y")
+
+                    data.append({
+                        "username": user['username'],
+                        "id": user['id'],
+                        'lastMessage':message.message,
+                        'time':on,
+                    })
+    else:
+        search =request.query_params['search']
+        users=UserModel.objects.filter(Q(username__icontains=search)|Q(first_name__icontains=search)|Q(last_name__icontains=search))
+        for user in users:
+            data.append({
+                'username':user.username,
+                'id':user.id,
+                'message':'',
+                'time':''
+            })
     return JsonResponse({'users':data})

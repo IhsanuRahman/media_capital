@@ -7,9 +7,12 @@ import './App.css'
 import Login from './pages/client/auth/Login';
 import Home from './pages/client/home/Home';
 import AdminLogin from './pages/admin/auth/Login';
+import AdminHome from './pages/admin/dashboard/Home';
 import { useDispatch } from 'react-redux';
 import { checkAuth } from './features/user'
 import { useEffect } from 'react';
+import OTPPage from './pages/client/auth/otp';
+import ForgotPassword from './pages/client/auth/ForgotPassword';
 
 function App() {
   const dispatch = useDispatch();
@@ -21,9 +24,12 @@ function App() {
     <Router>
       <Routes>
         <Route path='/signup' element={<Signup />} />
+        <Route path='/verify-email' element={<OTPPage />} />
+        <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/admin/login' element={<AdminLogin />} />
+        <Route path='/admin' element={<AdminHome />} />
       </Routes>
     </Router>
   );

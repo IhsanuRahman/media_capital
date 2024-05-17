@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 function Signup() {
   const { isAuthenticated, user, loading } = useSelector(state => state.user)
+  const [sending, setSending] = useState(false)
   const navigator = useNavigate()
   useEffect(() => {
-      if (isAuthenticated && !loading) {
-        return navigator('/')
-      }
-    })
-  const PopupControler = useRef()
+    if (isAuthenticated && !loading) {
+      return navigator('/')
+    }
+  })
   const [userData, setData] = useState({
     username: '',
     first_name: '',
@@ -31,14 +31,16 @@ function Signup() {
     conform_password: ''
   })
   const submit = () => {
+    setSending(true)
     if (SignupValidator(errors, userData)) {
       api.post(
         '/signup',
         userData
       ).then(e => {
-          PopupControler.current.style.display = 'block'
-          PopupControler.current.style.fillOpacity = '0.5'
-          PopupControler.current.style.opacity = '1'
+        console.log(e);
+        localStorage.setItem('token', e.data.token)
+        navigator('/verify-email')
+        setSending(false)
 
       }).catch(e => {
         if (e.response.status == 403) {
@@ -49,41 +51,21 @@ function Signup() {
           })
 
           setErrors({ ...errors, ...serverErrors })
-        } 
+        }
+        setSending(false)
       })
-    } else
+    } else {
       setErrors({ ...errors })
-
-
+      setSending(false)
+    }
   }
   const handleinput = (e) => {
     setData({ ...userData, [e.target.name]: e.target.value })
   }
-  const Popup = (
-    <>
-      <div className={"modal fade show bg-white bg-opacity-25 p-5"} ref={PopupControler} tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="false" >
-        <div  style={{ top: '0', transition: 'top 2s ease 0s', }} className={`modal-dialog modal-sm   w-25  h-100 `}>
-          <div className="modal-content text-dark p-5">
-            <p>Login Success</p>
-            <button className="btn btn-success" onClick={_ => {
-              PopupControler.current.children[0].style.top = '0px'
-              PopupControler.current.style.display = 'none'
-              PopupControler.current.style.fillOpacity = '0'
-              PopupControler.current.style.opacity = '0'
-              navigator('/login')
-            }}>ok</button>
-          </div>
-        </div>
-
-      </div>
-     
-      </>
-  )
   return (
 
     <div className=" d-flex flex-column  align-items-center   m-0 h-100" >
-    
-      {Popup}
+
       <h1 className="mt-5 pt-5 mb-5 fw-bold  ">Welcome to Media Capital</h1>
       <div className=" flex-column d-flex  justify-content-between   mt-5  col-sm-8 col-md-6  col-10" style={{ height: '450px', }}>
         <input type="text" name="username" id="" className="form-control fw-bold " placeholder="Username" value={userData.username}
@@ -120,7 +102,10 @@ function Signup() {
         <p className="text-primary" style={{ cursor: 'pointer' }} onClick={_ => navigator('/login')}>already have account?</p>
         <button className="w-50  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '35px' }}
           onClick={submit}
-        >Sign up</button>
+        >{sending ?
+          <div className="spinner-border" role="status">
+          </div>
+          : 'Sign up'}</button>
       </div>
     </div>
   )

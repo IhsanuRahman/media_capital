@@ -23,7 +23,8 @@ export function Home() {
 
     var posts = ['post1', 'post1', 'post1', 'post1',];
     return (
-        <div className='pt-5 h-100 w-100'>
+
+        Object.keys(user).length > 0?<div className='pt-5 h-100 w-100'>
             <Header />
             <div className="row w-100 ">
                 <div style={{ maxHeight: (window.innerHeight - 150) + 'px', }} className='col-12 col-lg-9 pe-0'>
@@ -61,7 +62,7 @@ export function Home() {
                 </div>
                 <Messages />
             </div>
-        </div>
+        </div>:<div></div>
     );
 }
 

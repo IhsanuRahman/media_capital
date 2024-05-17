@@ -1,46 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import '../style.css'
 import { useSelector } from 'react-redux';
+import useWebSocket,{ReadyState} from 'react-use-websocket'
 function Messages({ username, userId, setMsgPg }) {
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [inputText, setInputText] = useState('')
     const [messages, setMessages] = useState([])
     const [buttonText, setButton] = useState('loading')
     const messageView = useRef()
-    const [connection, setConnection] = useState('connecting')
-    let chatSocket = new WebSocket(encodeURI(`ws://127.0.0.1:8000/${localStorage.getItem('access')}/${userId}`))
-    useEffect(() => {
-        chatSocket.onopen = function (e) {
-            console.log("The connection was setup successfully !", e);
+    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`ws://127.0.0.1:8000/${localStorage.getItem('access')}/${userId}`),{
+        onOpen: () =>{
+            console.log("The connection was setup successfully !",);
             setButton('send')
-        };
-        chatSocket.onclose = function (e) {
-            console.log("Something unexpected happened !");
-            setButton('loading')
-        };
+        },
+        onMessage:(e)=>{
 
-        console.log('rendering the messeages');
-
-        chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
 
             if (typeof data.text_data !== 'undefined') {
                 if (typeof data.text_data.messages !== 'undefined') {
-                    console.log(data.text_data.messages);
                     data.text_data.messages.map((msg) => {
-                        const newMessage = {
-                            type: msg.username === user.username ? 'send' : 'receive', message: msg.message + ':' + msg.username
-                        }
-
                         setMessages(prevMessages => [...prevMessages, {
-                            type: msg.username === user.username ? 'send' : 'receive', message: msg.message + ':' + msg.username
+                            type: msg.username === user.username ? 'send' : 'receive', message: msg.message 
                         }])
                     })
 
                 }
             } else if (data.username !== user.username) {
                 const newMessage = {
-                    type: data.username === user.username ? 'send' : 'receive', message: data.message + ':' + data.username
+                    type: data.username === user.username ? 'send' : 'receive', message: data.message 
                 }
 
                 setMessages(prevMessages => [...prevMessages, newMessage])
@@ -52,19 +40,19 @@ function Messages({ username, userId, setMsgPg }) {
                 });
             }
 
-        };
-    }, [])
-    useEffect(() => {
-        console.log('ready:', chatSocket.readyState);
-        if (chatSocket.readyState === 0) {
-            setConnection('connecting')
-        } else if (chatSocket.readyState === 1) {
-            setConnection('connected')
         }
-    }, [chatSocket])
-
+    });
+    console.log('lastmessage',lastMessage);
+    
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'connected',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+      }[readyState];
     return (
-        <div className='col-sm-12  col-3  d-flex  flex-column h-100 message-page ' style={{ maxHeight: (window.innerHeight - 80) + 'px', width: '25%' }}>
+        <div className='d-flex  flex-column h-100 message-page ' style={{ maxHeight: (window.innerHeight - 80) + 'px',width:'inherit' }}>
             <div className='w-100 mt-3  ps-1 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}>
                 <button type="button" className="bg-black border-0 me-2 mb-2" data-dismiss="modal" aria-label="Close" onClick={_ => setMsgPg(null)}>
                     <svg xmlns="http://www.w3.org/2000/svg" width='20' viewBox="0 0 320 512"><path fill='white' d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" /></svg>
@@ -72,7 +60,7 @@ function Messages({ username, userId, setMsgPg }) {
                 </div>
                 <div>
                     <h6 className='ms-3 mb-0 text-white '>{username}</h6>
-                    <p className='ms-4 mt-1  text-secondary' style={{ fontSize: '12px' }}> {connection}</p>
+                    <p className='ms-4 mt-1  text-secondary' style={{ fontSize: '12px' }}> {connectionStatus}</p>
                 </div>
 
             </div>
@@ -91,10 +79,9 @@ function Messages({ username, userId, setMsgPg }) {
                 />
                 <button className='w-25 bg-primary rounded border-0 '
                     onClick={_ => {
-                        if (chatSocket.readyState === 0) {
-                            setConnection('connecting')
+                        if (readyState === 0) {
                             alert('still connecting')
-                        } else {
+                        } else if (readyState===1) {
                             const message = {
                                 type: 'send',
                                 message: inputText,
@@ -102,7 +89,7 @@ function Messages({ username, userId, setMsgPg }) {
                             };
                             setMessages([...messages, message]);
 
-                            chatSocket.send(JSON.stringify({
+                            sendMessage(JSON.stringify({
                                 message: inputText, username: user.username
                             }))
                             if (messageView) {

@@ -55,12 +55,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         username = event["username"]
         user_id = self.scope['url_route']['kwargs']['receiver_id']
-        print(user_id,'fdsfsdfsdfsdfwerrrrrreee')
         receiver= await self.get_user_by_id(user_id)
         token=self.scope['url_route']['kwargs']['token']
-        print(token)
         user = await self.get_user_object(token)
-        print(user)
+        print(username,message)
         await self.create_message(sender=user,message=message,room_name=self.roomGroupName,receiver=receiver)
         await self.send(text_data=json.dumps({"message": message, "username":username,'to':'ihsan'}))
 
@@ -79,7 +77,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
        return User.objects.get(id=token.payload['user_id'])  
     @database_sync_to_async
     def create_message(self,sender,receiver,message,room_name):
-        messageObj=Message.objects.create(sender=sender,receiver=receiver,message=message)
+        messageObj=Message(sender=sender,receiver=receiver,message=message)
         room=Rooms.objects.get(groupName=room_name)
         messageObj.save()
         room.messages.add(messageObj)
@@ -105,10 +103,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_messages(self,room_name):
         messages=Rooms.objects.filter(groupName=room_name).first()
         datas=[]
+        print(messages.messages.all().order_by('sended_at').values())
         for msg in messages.messages.all().order_by('sended_at'):
             datas.append({"message": msg.message,'username':msg.sender.username})
         return datas
     
-# {'type': 'websocket', 'path': '/', 'raw_path': b'/', 'root_path': '',
-#   'headers': [(b'host', b'127.0.0.1:8000'), (b'connection', b'Upgrade'), (b'pragma', b'no-cache'), (b'cache-control', b'no-cache'), (b'user-agent', b'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'), (b'upgrade', b'websocket'), (b'origin', b'http://localhost:3000'), (b'sec-websocket-version', b'13'), (b'accept-encoding', b'gzip, deflate, br, zstd'), (b'accept-language', b'en-US,en;q=0.9,ml;q=0.8'), (b'sec-websocket-key', b'bOuSAcliEnPy6chdTPFb/Q=='), (b'sec-websocket-extensions', b'permessage-deflate; client_max_window_bits')],
-#     'query_string': b'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE2NDU0MjI0LCJpYXQiOjE3MTU1OTAyMjQsImp0aSI6IjlmZDZjNGExNTVkOTQ0ZjRhYjZmZmVhZDEzYTQyZDcyIiwidXNlcl9pZCI6MTR9.eKa7qLDg98QY6id7MsSLoTX5-zENtR8U_tYvIU0fI4w', 'client': ['127.0.0.1', 36570], 'server': ['127.0.0.1', 8000], 'subprotocols': [], 'asgi': {'version': '3.0'}, 'cookies': {}, 'session': < django.utils.functional.LazyObject object at 0x7e5010b61690 > , 'user': < channels.auth.UserLazyObject object at 0x7e5010b61ff0 > , 'path_remaining': '', 'url_route': {'args': (), 'kwargs': {}}}
+"""
+<QuerySet [
+    {'id': 13928, 'message': 'hai', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 47, 44, 962962, tzinfo=datetime.timezone.utc)},
+      {'id': 13929, 'message': 'hai', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 47, 44, 988077, tzinfo=datetime.timezone.utc)},
+        {'id': 13930, 'message': 'hai', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 47, 54, 567961, tzinfo=datetime.timezone.utc)},
+        {'id': 13931, 'message': 'hai', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 47, 54, 588604, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13932, 'message': 'hello', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 1, 249184, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13933, 'message': 'hello', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 1, 270038, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13934, 'message': 'message hai', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 21, 757812, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13935, 'message': 'message hai', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 21, 784961, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13936, 'message': 'hello', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 53, 762159, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13937, 'message': 'hello', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 53, 785553, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13938, 'message': 'hello', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 54, 801964, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13939, 'message': 'hello', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 54, 819858, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13940, 'message': 'hello', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 55, 454750, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13941, 'message': 'hello', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 3, 48, 55, 473977, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13942, 'message': 'fd', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 54, 636105, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13943, 'message': 'fd', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 54, 660898, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13944, 'message': 'fd', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 54, 877789, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13945, 'message': 'fd', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 54, 901255, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13946, 'message': 'fd', 'sender_id': 20, 'receiver_id': 14, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 55, 124949, tzinfo=datetime.timezone.utc)}, 
+        {'id': 13947, 'message': 'fd', 'sender_id': 14, 'receiver_id': 20, 'sended_at': datetime.datetime(2024, 5, 16, 4, 18, 55, 150936, tzinfo=datetime.timezone.utc)}]>
+"""
