@@ -13,9 +13,16 @@ import { checkAuth } from './features/user'
 import { useEffect } from 'react';
 import OTPPage from './pages/client/auth/otp';
 import ForgotPassword from './pages/client/auth/ForgotPassword';
-
+import ChangePassword from './pages/client/profile/ChangePassword';
+import ProtectedRoute from './PrivateRoute'
+import Profile from './pages/client/profile/Profile';
+import EditProfile from './pages/client/profile/EditProfile';
+import CreatePosts from './pages/client/posts/CreatePosts';
+import ViewPost from './pages/client/posts/ViewPost';
+import ViewUser from './pages/client/profile/ViewUser';
 function App() {
   const dispatch = useDispatch();
+
 
   useEffect(() => {
     console.log(dispatch(checkAuth()))
@@ -24,9 +31,50 @@ function App() {
     <Router>
       <Routes>
         <Route path='/signup' element={<Signup />} />
-        <Route path='/verify-email' element={<OTPPage />} />
+        <Route path='/verify-email' element={<OTPPage apiUrl={'/otp/send'} redirection={'/login'} keyName={'RToken'} resendUrl={'/otp/resend'} />} />
         <Route path='/forgotpassword' element={<ForgotPassword />} />
-        <Route path='/' element={<Home />} />
+        <Route path='/forgotpassword/verify-email' element={<OTPPage apiUrl={'forgot-password/verify'} redirection={'/forgotpassword/change-password'} resendUrl={'/forgot-password/verify-resend'} keyName={'FStoken'} success={
+          e => {
+            console.log('token', e.data.token)
+            localStorage.setItem('FStoken', e.data.token)
+          }
+        } />} />
+        <Route path='/forgotpassword/change-password' element={<ChangePassword />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/edit" element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/create-post" element={
+          <ProtectedRoute>
+            <CreatePosts />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/change-password" element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        } />
+        <Route path="/post/:id" element={
+          <ProtectedRoute>
+            <ViewPost />
+          </ProtectedRoute>
+        } />
+        <Route path="/user/:id" element={
+          <ProtectedRoute>
+            <ViewUser />
+          </ProtectedRoute>
+        } />
         <Route path='/login' element={<Login />} />
         <Route path='/admin/login' element={<AdminLogin />} />
         <Route path='/admin' element={<AdminHome />} />

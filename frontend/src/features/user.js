@@ -114,29 +114,28 @@ const userSlice = createSlice({
     extraReducers:
         builder => {
             builder.addCase(checkAuth.fulfilled, state => {
-                state.loading = false;
                 const s1 = state.isAuthenticated
                 console.log();
-
                 state.isAuthenticated = true;
+                state.loading = false;
                 console.log('changed =', s1 !== state.isAuthenticated)
                 console.log("checkAuth");
             }).addCase(checkAuth.pending, state => {
                 state.loading = true;
             })
                 .addCase(checkAuth.rejected, (state) => {
-                    state.loading = false;
                     state.isAuthenticated = false;
                     state.user = {}
+                    state.loading = false;
                     console.log('checkauth rejected');
 
                 }).addCase(getUser.pending, state => {
                     state.loading = true;
                 })
                 .addCase(getUser.fulfilled, (state, action) => {
-                    state.loading = false;
 
                     state.user = action.payload;
+                    state.loading = false;
                     console.log(state.user)
 
 
@@ -149,10 +148,10 @@ const userSlice = createSlice({
                     state.loading = true;
                 })
                 .addCase(logout.fulfilled, state => {
-                    state.loading = false;
                     state.isAuthenticated = false;
                     state.user = {};
                     localStorage.clear()
+                    state.loading = false;
                 })
                 .addCase(logout.rejected, state => {
                     state.loading = false;

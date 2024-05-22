@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import api from "../../../axios"
 import { useSelector } from 'react-redux'
 import { useTimer } from 'react-timer-hook';
-function OTPPage() {
-    const PopupController = useRef()
+function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
     const [alert, setAlert] = useState('')
     const [OTP, setOTP] = useState('')
     const [resendSpin, setResendSpin] = useState(false)
@@ -13,49 +12,35 @@ function OTPPage() {
     const navigator = useNavigate()
     const handleSubmit = () => {
         setSendSpin(true)
-        api.post('/otp/send', { 'otp': OTP, 'token': localStorage.getItem('token') },).then(e => {
+        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },).then(e => {
             console.log(e);
-            localStorage.removeItem('token')
-            navigator('/login')
+            localStorage.removeItem(keyName)
+            navigator(redirection)
+            success(e)
             setSendSpin(false)
         }).catch(e => {
-            setAlert(e.response.data.message)
+            try{
+            setAlert(e.response.data.message)}
+            catch{
+                setAlert(e.response)
+            }
             setSendSpin(false)
         })
     }
     const { isAuthenticated, user, loading } = useSelector(state => state.user)
     useEffect(() => {
-        if (localStorage.getItem('token') === null) {
+        if (localStorage.getItem(keyName) === null) {
             return navigator('/')
 
         }
         if (isAuthenticated && !loading) {
             return navigator('/')
         }
+        return()=>{
+            localStorage.removeItem(keyName)
+        }
     })
-    const Popup = (
-        <>
-            <div className={"modal fade show bg-white bg-opacity-25 p-5"} ref={PopupController} tabIndex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="false" >
-                <div style={{ top: '0', transition: 'top 2s ease 0s', }} className={`modal-dialog modal-sm   w-25  h-100 `}>
-                    <div className="modal-content text-dark p-5">
-                        <p>OTP verification Success</p>
-                        <button className="btn btn-success" onClick={_ => {
-
-                            PopupController.current.children[0].style.top = '0px'
-                            PopupController.current.style.display = 'none'
-                            PopupController.current.style.fillOpacity = '0'
-                            PopupController.current.style.opacity = '0'
-                            return navigator('/login')
-
-                        }}>ok</button>
-                    </div>
-                </div>
-
-            </div>
-
-        </>
-    )
-    console.log(Date.parse('0000-01-01 00:00:10',));
+    
     const now = new Date();
     const oneMinuteFromNow = new Date(now.getTime() + 60000);
     const [resendClr, setClr] = useState(' text-muted ');
@@ -79,7 +64,6 @@ function OTPPage() {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>}
-            {Popup}
             <h1 className="mt-5 pt-5 mb-5 fw-bold "> </h1>
             <div className='col-sm-8 col-md-7 col-10 flex-column d-flex pt-4 rounded-4 align-items-center' style={{ backgroundColor: '#494949', height: '400px' }}>
                 <div className='col-sm-8 col-md-8  col-10 flex-column d-flex   align-items-center'>
@@ -93,7 +77,7 @@ function OTPPage() {
                         onClick={e => {
                             if (resendClr.trim() !== 'text-muted') {
                             setResendSpin(true)
-                                api.post('/otp/resend', { 'otp': OTP, 'token': localStorage.getItem('token') },).then(e => {
+                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },).then(e => {
                                     const now = new Date();
                                     const oneMinuteFromNow = new Date(now.getTime() + 60000);
                                     restart(oneMinuteFromNow, true)
@@ -101,7 +85,8 @@ function OTPPage() {
                                     setResendSpin(false)
 
                                 }).catch(e => {
-                                    setAlert(e.response.data.message)
+                                    console.log(e);
+                                    setAlert(e.response.data)
                                     setResendSpin(false)
                                 })
                             }

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
@@ -6,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from api.client.auth.serilizers import UserRegisterSerilizer, UserSerializer
 from api.client.auth.utils import otp_generator, otp_resender
-from api.models import OTP, UserModel
+from api.models import OTP, ForgotPassword, Tags, TempUser, UserModel
 
 
 def login(request):
@@ -22,11 +23,14 @@ def signup(request):
     if user.is_valid():
         user = user.save()
         if user:
-            id = otp_generator(request, user)
-            
+            otpObj = otp_generator( user)
+            user.otp=otpObj
+            user.stored_time=datetime.datetime.now()
+            otpObj.save()
+            user.save()
             return JsonResponse({
                 'message': 'user is created',
-                'token': id
+                'token': otpObj.id
             }, status=200)
     else:
         return JsonResponse(user.errors, status=403)
@@ -37,7 +41,16 @@ def signup(request):
 def get_user(request):
     user = request.user
     user = UserSerializer(user)
+    
     data = user.data
+    intrsts=data['intresets']
+    intlist=[]
+    for i in intrsts:
+        intlist.append(Tags.objects.get(id=i).name)
+    data['intresets']=intlist
+    
+    # for i in range(len(data['intresets'])):
+    #     print(data['intresets'][i].name)
     # if UserImage.objects.filter(creator=request.user).exists():
     #     imageUrl=UserImage.objects.filter(creator=request.user).first().image.url
     #     data['image']='http://127.0.0.1:8000'+imageUrl
@@ -59,17 +72,17 @@ def logout(request):
 @api_view(['GET', 'POST'])
 def verify_otp(request):
     if request.data['otp'] and request.data['token']:
-        otpObj = OTP.objects.filter(
-            otp=request.data['otp'], id=request.data['token'])
-        if otpObj.exists():
-            otpObj = otpObj.first()
+        temp_user = TempUser.objects.filter(
+            otp__otp=request.data['otp'], otp__id=request.data['token'])
+        if temp_user.exists():
+            temp_user=temp_user.first()
+            otpObj = temp_user.otp
             print(datetime.datetime.now(), otpObj.otp_datetime)
             if datetime.datetime.now()-otpObj.otp_datetime.replace(tzinfo=None) > datetime.timedelta(minutes=3):
-                otpObj.temp_user.delete()
+                temp_user.delete()
                 otpObj.delete()
                 return JsonResponse({"message": "OTP verification time out"}, status=401)
             else:
-                    temp_user = otpObj.temp_user
                     user=UserModel(
                         username=temp_user.username,
                         first_name=temp_user.first_name,
@@ -79,7 +92,7 @@ def verify_otp(request):
                     )
                     user.set_password(temp_user.password)
                     user.save()
-                    otpObj.temp_user.delete()
+                    temp_user.delete()
                     otpObj.delete()
                     return JsonResponse({'message': 'OTP verification Success'}, status=200)
         else:
@@ -95,15 +108,17 @@ def resend_otp(request):
              id=request.data['token'])
         if otpObj.exists(): 
             otpObj = otpObj.first()
+            temp_user=TempUser.objects.filter(otp=otpObj).first()
             print(datetime.datetime.now(), otpObj.otp_datetime)
-            if datetime.datetime.now()-otpObj.otp_datetime.replace(tzinfo=None) > datetime.timedelta(minutes=3):
-                otpObj.temp_user.delete()
-                otpObj.delete()
-                return JsonResponse({"message": "OTP verification time out"}, status=401)
+            if datetime.datetime.now()-otpObj.otp_datetime.replace(tzinfo=None) >= datetime.timedelta(minutes=1):
+                otpObj=otp_resender(otpObj,TempUser.objects.filter(otp=otpObj).first().email)
+                otpObj.save()
+                return JsonResponse({'message': 'OTP resend Success'}, status=200)
+                
             else:
+                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=401)
                     
-                    otp_resender(otpObj)
-                    return JsonResponse({'message': 'OTP resend Success'}, status=200)
+                    
         else:
             return JsonResponse({'message': 'OTP not valid'}, status=401)
     else:
@@ -114,6 +129,75 @@ def resend_otp(request):
 def forgot_password(request):
     if request.data['email']:
         user=UserModel.objects.filter(email=request.data['email'])
-        
+        if ForgotPassword.objects.filter(user__email=request.data['email']).exists():
+            return  JsonResponse({'message':'another reques is in progress'},status=401) 
+        if user.exists():
+            user=user.first()
+            otpObj=otp_generator(user,user.email)
+            otpObj.save()
+            forgotObj=ForgotPassword(id=uuid.uuid4(),secondary_code=uuid.uuid4(),user=user,otp=otpObj,sended_at=datetime.datetime.now())
+            forgotObj.save()
+            return JsonResponse({'token':forgotObj.id})
+        else:
+           return JsonResponse({'message':'email not found'},status=401) 
 
     return JsonResponse({'message':''},status=200)
+
+@api_view(['POST'])
+def verify_with_email(request):
+    if request.data['otp'] and request.data['token']:
+        forgotObj=ForgotPassword.objects.filter(otp__otp=request.data['otp'],id=request.data['token'])
+        if forgotObj.exists():
+            forgotObj=forgotObj.first()
+            return JsonResponse({'token':forgotObj.secondary_code},status=200)
+        else:
+            return JsonResponse({'message':'otp is not corrent'},status=401)
+    elif not request.data['otp']:
+        return JsonResponse({'message':'otp is required'},status=401)
+    else:
+        return JsonResponse({'message':'credential missing'},status=401)
+
+@api_view(['POST'])
+def fp_change_password(request):
+    if request.data['token'] and request.data['password']:
+        forgotObj=ForgotPassword.objects.filter(secondary_code=request.data['token'])
+        if forgotObj.exists():
+            forgotObj=forgotObj.first()
+            if forgotObj.user.check_password(request.data['password']):
+                return JsonResponse({'details':'current and new password are same'})
+            else:
+                forgotObj.user.set_password(request.data['password'])
+                forgotObj.user.save()
+                forgotObj.otp.delete()
+                forgotObj.delete()
+                return JsonResponse({'message':'succes'},status=200)
+        else:
+            print('hai')
+            return JsonResponse({'details':'session error'},status=401)
+    return JsonResponse({'details':'no cred'},status=401)
+
+
+
+@api_view([ 'POST'])
+def fp_resend_otp(request):
+    if request.data['token']:
+        forgotObj = ForgotPassword.objects.filter(
+             id=request.data['token'])
+        if forgotObj.exists(): 
+            forgotObj = forgotObj.first()
+            print(datetime.datetime.now(), forgotObj.sended_at)
+            if datetime.datetime.now()-forgotObj.sended_at.replace(tzinfo=None) >= datetime.timedelta(minutes=1):
+                otpObj=otp_resender(forgotObj.otp,ForgotPassword.objects.filter(otp=forgotObj.otp).first().user.email)
+                forgotObj.sended_at=datetime.datetime.now()
+                otpObj.save()
+                forgotObj.save()
+                return JsonResponse({'message': 'OTP resend Success'}, status=200)
+                
+            else:
+                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=401)
+                    
+                    
+        else:
+            return JsonResponse({'message': 'OTP not valid'}, status=401)
+    else:
+        return JsonResponse({'message': 'OTP verification Failed'}, status=401)

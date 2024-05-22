@@ -6,15 +6,13 @@ from django.core.mail import send_mail
 from api.models import OTP, TempUser
 
 
-def otp_generator(request,user,email=None):
+def otp_generator(user,email=None):
     otp=random.randint(100000,999999)
-    user=TempUser.objects.get(id=user.id)
-    otpObj=OTP(otp=otp,otp_datetime=datetime.datetime.now(),temp_user=user,id=uuid.uuid4())
+#    user=TempUser.objects.get(id=user.id)
+    otpObj=OTP(otp=otp,otp_datetime=datetime.datetime.now(),id=uuid.uuid4())
     user.stored_time=datetime.datetime.now()
-    user.save()
-    if user:
-        if email is None:
-            email=user.email
+#    user.save()
+    if email:
         send_mail(
         "verify media capital account",
         f"your account is created and your verification code is {otp}.and note the link only valid until 3 minutes",
@@ -22,18 +20,14 @@ def otp_generator(request,user,email=None):
         [email]
         )
         print(email)
-    otpObj.save()
 
     print(otp)
-    return otpObj.id
+    return otpObj
 
-def otp_resender(otpObj,email=None):
+def otp_resender(otpObj,email):
     otp=random.randint(100000,999999)
     otpObj.otp=otp
-    user=otpObj.temp_user
-    if user:
-        if email is None:
-            email=user.email
+    if email :
         send_mail(
         "verify media capital account",
         f"your account is created and your verification code is {otp}.and note the link only valid until 3 minutes",
@@ -42,7 +36,7 @@ def otp_resender(otpObj,email=None):
         )
         print(email)
     otpObj.otp_datetime=datetime.datetime.now()
-    otpObj.save()
+    return otpObj
 
 def otp_verify(request,otp):
 

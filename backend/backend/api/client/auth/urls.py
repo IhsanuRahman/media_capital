@@ -8,6 +8,10 @@ urlpatterns =[
     path('signup',views.signup),
     path('user',views.get_user),
     path('logout',views.logout),
+    path('forgot-password',views.forgot_password),
+    path('forgot-password/verify',views.verify_with_email),
+    path('forgot-password/verify-resend',views.fp_resend_otp),
+    path('forgot-password/change',views.fp_change_password),
     path('otp/send',views.verify_otp),
     path('otp/resend',views.resend_otp),
 ]

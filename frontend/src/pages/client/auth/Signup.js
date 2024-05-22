@@ -38,7 +38,7 @@ function Signup() {
         userData
       ).then(e => {
         console.log(e);
-        localStorage.setItem('token', e.data.token)
+        localStorage.setItem('RToken', e.data.token)
         navigator('/verify-email')
         setSending(false)
 

@@ -18,7 +18,7 @@ def get_users(request):
     data=[]
     print(request.query_params)
     if request.query_params['search']=='':
-        users=UserModel.objects.exclude(id=request.user.id).values('id','username')
+        users=UserModel.objects.exclude(id=request.user.id).values('id','username','profile')
         print(users,request.user)
         rooms=Rooms.objects.filter(users__id=request.user.id)
         for user in users:
@@ -36,6 +36,7 @@ def get_users(request):
                         on =message.sended_at.date().strftime("%d/%m/%Y")
 
                     data.append({
+                        'profile':'/media/'+user['profile'],
                         "username": user['username'],
                         "id": user['id'],
                         'lastMessage':message.message,

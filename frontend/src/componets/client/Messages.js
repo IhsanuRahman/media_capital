@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import MessagesPage from '../../pages/client/home/MessagesPage'
 import api from './../../axios'
+import { baseUrl } from '../../constants'
 function Messages() {
     const [popup, setPopup] = useState(null)
     const [users, setUsers] = useState([])
@@ -35,10 +36,10 @@ function Messages() {
                 {users.map((user, idx) => {
                     return <div id={idx} className='   w-100 m-3  ps-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
                         onClick={e =>
-                            setPopup(<MessagesPage username={user.username} userId={user.id} setMsgPg={setPopup}></MessagesPage>)
+                            setPopup(<MessagesPage username={user.username} userId={user.id} profile={user.profile} setMsgPg={setPopup}></MessagesPage>)
 
                         }>
-                        <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ' }}>
+                        <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage:`url('${baseUrl+user.profile}')`}}>
                         </div>
                         <div>
                             <h6 className='ms-3 mb-0 text-white'>{user.username}</h6>

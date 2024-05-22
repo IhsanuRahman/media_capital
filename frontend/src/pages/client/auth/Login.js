@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import '../style.css'
 import { useNavigate } from 'react-router-dom'
 import api from "../../../axios"
-import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkAuth, setAuthed } from '../../../features/user'
 function Login() {
