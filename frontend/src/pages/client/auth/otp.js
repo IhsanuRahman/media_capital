@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import '../style.css'
 import { useNavigate } from 'react-router-dom'
 import api from "../../../axios"
 import { useSelector } from 'react-redux'
 import { useTimer } from 'react-timer-hook';
-function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
+function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
     const [alert, setAlert] = useState('')
     const [OTP, setOTP] = useState('')
     const [resendSpin, setResendSpin] = useState(false)
@@ -12,16 +12,17 @@ function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
     const navigator = useNavigate()
     const handleSubmit = () => {
         setSendSpin(true)
-        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },).then(e => {
+        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },{headers:{'Authorization':''}},).then(e => {
             console.log(e);
             localStorage.removeItem(keyName)
             navigator(redirection)
             success(e)
             setSendSpin(false)
         }).catch(e => {
-            try{
-            setAlert(e.response.data.message)}
-            catch{
+            try {
+                setAlert(e.response.data.message)
+            }
+            catch {
                 setAlert(e.response)
             }
             setSendSpin(false)
@@ -36,13 +37,12 @@ function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
         if (isAuthenticated && !loading) {
             return navigator('/')
         }
-        return()=>{
-            localStorage.removeItem(keyName)
-        }
+
     })
-    
+
     const now = new Date();
-    const oneMinuteFromNow = new Date(now.getTime() + 60000);
+    
+    const oneMinuteFromNow = useCallback(() =>  Date(now.getTime() + 60000, []))
     const [resendClr, setClr] = useState(' text-muted ');
 
     const {
@@ -75,9 +75,10 @@ function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
 
                     <p className={`d-inline  text-start align-items-start w-100 ${resendClr}`} style={{ cursor: 'pointer' }}
                         onClick={e => {
-                            if (resendClr.trim() !== 'text-muted') {
-                            setResendSpin(true)
-                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },).then(e => {
+                            if (true) {
+                                setResendSpin(true)
+                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName), },{headers:{'Authorization':''}}).then(e => {
+                                    
                                     const now = new Date();
                                     const oneMinuteFromNow = new Date(now.getTime() + 60000);
                                     restart(oneMinuteFromNow, true)
@@ -86,14 +87,18 @@ function OTPPage({apiUrl,redirection,keyName,success,resendUrl}) {
 
                                 }).catch(e => {
                                     console.log(e);
-                                    setAlert(e.response.data)
+                                    try {
+                                        setAlert(e.response.data.message)
+                                    }
+                                    catch {
+                                        setAlert(e.response.data.detail)
+                                    }
                                     setResendSpin(false)
                                 })
                             }
                         }}
                     >{resendSpin ? <>
                         <div class="spinner-border text-primary spinner-border-sm mt-2 " role="status">
-
                         </div> <span class="text-primary " role="status">resending...</span></> : 'resend in (' + minutes + ':' + seconds + ')'}  </p>
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}

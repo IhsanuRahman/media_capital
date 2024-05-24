@@ -34,7 +34,7 @@ function Login() {
         }
         setErrors({ ...errors })
         if (errors.username === '' && errors.password === '') {
-            api.post('/login', userData).then((e) => {
+            api.post('/login', userData,{headers:{'Authorization':''}}).then((e) => {
                 console.log(e);
                 localStorage.setItem('access', e.data.access)
                 localStorage.setItem('refresh', e.data.refresh)

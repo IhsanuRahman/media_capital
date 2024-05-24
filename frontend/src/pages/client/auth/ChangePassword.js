@@ -26,6 +26,7 @@ function ChangePassword() {
             api.post('/forgot-password/change', {
                 'token': localStorage.getItem('FStoken'),
                 'password': newPassword.trim(),
+                headers:{'Authorization':''}
             }).then((e) => {
                 console.log(e);
                 navigator('/')

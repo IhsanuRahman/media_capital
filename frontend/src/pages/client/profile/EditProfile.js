@@ -94,7 +94,7 @@ function EditProfile() {
                     <div className=' rounded-circle d-flex flex-column    bg-secondary  ' style={{ cursor: 'pointer', height: '150px', minWidth: '150px ', backgroundSize: 'cover', marginTop: '-50px', backgroundImage: `url(${typeof userData.profile === 'string' ? userData.profile : URL.createObjectURL(userData.profile)})` }}  >
                         <input type="file" accept=".jpg,.jpeg,.svg,.avif,.gif,.png" name="" id="" placeholder='' className='w-100 h-100 mt-auto m-0  rounded-circle  file-input ' style={{ cursor: 'pointer', color: 'transparent' }}
                             onChange={(e) => {
-                                setUserData({ ...userData, banner: e.target.files[0] })
+                                setUserData({ ...userData, profile: e.target.files[0] })
                             }}
                         />
 

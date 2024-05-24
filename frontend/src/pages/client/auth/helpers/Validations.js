@@ -20,7 +20,7 @@ function SignupValidator(errors, userData) {
         errors.first_name = 'first name is required'
         is_valid = false
     } else {
-        if (errors.first_name.length > 15) {
+        if (userData.first_name.length > 15) {
             errors.first_name = 'only maximum 15 chacters is allowed in first name'
         } else
             errors.first_name = ''
@@ -136,3 +136,43 @@ export function ProfileValidator(errors, userData) {
     return is_valid
 }
 export default SignupValidator 
+
+export class Validater{
+    constructor(fieldValue){
+        this.value=fieldValue
+        this.is_valid=true
+    }
+    required(message){
+        if (this.value==='' || this.value===null){
+            this.is_valid=false
+            return message
+        }
+        this.is_valid=true
+        return ''
+    }
+    maxLength(length,message){
+        if (this.value.length>length){
+            this.is_valid=false
+            return message
+        }
+        this.is_valid=true
+        return ''
+    }
+    minLength(length,message){
+        if (this.value.length<length){
+            this.is_valid=false
+            return message
+        }
+        this.is_valid=true
+        return ''
+    }
+    regexTest(regex,message){
+        if (regex.test(this.value)){
+            this.is_valid=false
+            return message
+        }
+        this.is_valid=true
+        return ''
+    }
+
+}

@@ -4,14 +4,12 @@ import Navbar from '../../../componets/client/Navbar';
 import Messages from '../../../componets/client/Messages';
 import '../style.css'
 import {  useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import api from '../../../axios';
 import Search from '../../../componets/client/Search';
 
 const Posts=React.lazy(() => import('../../../componets/client/Posts'))
 
 export function Home() {
-    const navigate = useNavigate()
     const [tab,setTab]=useState(0)
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [posts, setPosts] = useState([])

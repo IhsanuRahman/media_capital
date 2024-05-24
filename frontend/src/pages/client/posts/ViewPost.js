@@ -76,6 +76,8 @@ function ViewPost() {
                                 className="form-control w-50 ms-2 rounded-5 text-white whiteholder border-0" style={{ height: '25px', backgroundColor: '#494949' }} />
                             <button className='w-25 rounded-pill border-0 text-white fwbold' style={{ backgroundColor: '#233543' }}
                                 onClick={e => {
+                                    setComment('')
+                                    if (comment!==''){
                                     api.post('posts/comment/add', {
                                         post_id: post.id,
                                         comment: comment,
@@ -83,6 +85,7 @@ function ViewPost() {
 
                                         getPost()
                                     })
+                                }
                                 }}
                             >post</button>
                         </div>{post.comments.map((comment) =>

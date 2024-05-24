@@ -12,7 +12,7 @@ function ForgotPassword() {
     
     const handleSubmit = () => {
         setSpinner(true)
-            api.post('/forgot-password',{'email':email}).then((e) => {
+            api.post('/forgot-password',{'email':email},{headers:{'Authorization':''}}).then((e) => {
                 console.log(e.data.token);
                 localStorage.setItem('FStoken',e.data.token)
                 setSpinner(false)

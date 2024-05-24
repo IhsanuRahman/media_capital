@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { baseUrl } from '../../constants'
-import ratingSvg from '../../assets/Star.svg';
-import ratingHalfSvg from '../../assets/Half_filled_star.svg';
-import ratingFullSvg from '../../assets/Filled_star.svg';
-import option from '../../assets/options.svg';
 import Markdown from 'markdown-to-jsx';
 import api from '../../axios';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +32,8 @@ function Search() {
                     }}
                     className='w-75 greyholder text-white ms-auto me-auto rounded-3 ps-2 border-0' style={{ height: '30px', backgroundColor: '#494949' }} />
 
-            </div><div className='w-100 d-flex justify-content-center '>
+            </div>
+            <div className='w-100 d-flex justify-content-center '>
                 <button className={`btn text-white  ${tab == 0 ? 'active' : 'text-decoration-underline'}`}
                     onClick={e => {
                         if (tab !== 0) {
@@ -55,8 +52,8 @@ function Search() {
                     users
                 </button>
             </div>
-            <hr className='text-white bg-danger ' />
 
+            <hr  className='w-100'/>
             <div className='hidescroller  gap-1 overflow-y-scroll'>
 
                 {tab == 0 ? posts.map((post, idx) => {
