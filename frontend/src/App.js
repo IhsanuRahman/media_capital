@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import OTPPage from './pages/client/auth/otp';
 import ForgotPassword from './pages/client/auth/ForgotPassword';
 import ChangePassword from './pages/client/profile/ChangePassword';
+import ForgotChangePassword from './pages/client/auth/ChangePassword';
 import ProtectedRoute from './PrivateRoute'
 import Profile from './pages/client/profile/Profile';
 import EditProfile from './pages/client/profile/EditProfile';
@@ -39,7 +40,7 @@ function App() {
             localStorage.setItem('FStoken', e.data.token)
           }
         } />} />
-        <Route path='/forgotpassword/change-password' element={<ChangePassword />} />
+        <Route path='/forgotpassword/change-password' element={<ForgotChangePassword />} />
         <Route path="/" element={
           <ProtectedRoute>
             <Home />

@@ -11,14 +11,14 @@ function ChangePassword() {
     const [cnfrmPassword, setCnfrmPassword] = useState('')
     const handleSubmit = () => {
         setSpinner(true)
-        if (newPassword.trim().length===0 || cnfrmPassword.trim().length===0){
+        if (newPassword.trim().length === 0 || cnfrmPassword.trim().length === 0) {
             setAlert('all fields are required please specify it.')
             setSpinner(false)
-        }else if (newPassword.trim().length<6){
+        } else if (newPassword.trim().length < 6) {
             setAlert('password needs atleast 6 characters')
             setSpinner(false)
         }
-        if (newPassword.trim() !== cnfrmPassword.trim()){
+        if (newPassword.trim() !== cnfrmPassword.trim()) {
             setAlert('passwords are not match')
             setSpinner(false)
         }
@@ -26,9 +26,9 @@ function ChangePassword() {
             api.post('/forgot-password/change', {
                 'token': localStorage.getItem('FStoken'),
                 'password': newPassword.trim(),
-                headers:{'Authorization':''}
-            }).then((e) => {
+            }, { headers: { 'Authorization': '' } },).then((e) => {
                 console.log(e);
+                localStorage.removeItem('FStoken')
                 navigator('/')
                 setSpinner(false)
 
@@ -49,9 +49,7 @@ function ChangePassword() {
         if (isAuthenticated && !loading) {
             return navigator('/')
         }
-        return()=>{
-            localStorage.removeItem('FStoken')
-        }
+
     })
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >

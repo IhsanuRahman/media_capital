@@ -129,8 +129,12 @@ def resend_otp(request):
 def forgot_password(request):
     if request.data['email']:
         user=UserModel.objects.filter(email=request.data['email'])
-        if ForgotPassword.objects.filter(user__email=request.data['email']).exists():
-            return  JsonResponse({'message':'another reques is in progress'},status=401) 
+        FPObj=ForgotPassword.objects.filter(user__email=request.data['email'])
+        if FPObj.exists():
+            if datetime.datetime.now()-FPObj.first().sended_at.replace(tzinfo=None)> datetime.timedelta(minutes=3):
+                FPObj.delete()
+            else:
+                return  JsonResponse({'message':'another request is in progress'},status=401) 
         if user.exists():
             user=user.first()
             otpObj=otp_generator(user,user.email)

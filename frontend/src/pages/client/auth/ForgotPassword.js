@@ -15,6 +15,8 @@ function ForgotPassword() {
             api.post('/forgot-password',{'email':email},{headers:{'Authorization':''}}).then((e) => {
                 console.log(e.data.token);
                 localStorage.setItem('FStoken',e.data.token)
+                localStorage.removeItem('FStokenTime' )
+
                 setSpinner(false)
                 navigator('/forgotpassword/verify-email')
                 

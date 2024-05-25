@@ -40,6 +40,7 @@ function Signup() {
       ).then(e => {
         console.log(e);
         localStorage.setItem('RToken', e.data.token)
+        localStorage.removeItem('RTokenTime')
         navigator('/verify-email')
         setSending(false)
 
@@ -53,6 +54,7 @@ function Signup() {
         setSending(false)
       })
     } else {
+      setData({...userData,password:'',conform_password:''})
       setErrors({ ...errors })
       setSending(false)
     }
@@ -172,12 +174,11 @@ function Signup() {
             if (userData.conform_password.trim() === '') {
               errors.conform_password = 'conform password is required'
 
-            } else {
-              errors.conform_password = ''
-            }
-            if (userData.password !== userData.conform_password) {
+            } else if (userData.password !== userData.conform_password) {
               errors.conform_password = 'passwords are not match'
 
+            }else {
+              errors.conform_password = ''
             }
             setErrors({ ...errors })
           }} />

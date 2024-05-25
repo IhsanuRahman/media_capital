@@ -12,9 +12,10 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
     const navigator = useNavigate()
     const handleSubmit = () => {
         setSendSpin(true)
-        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) },{headers:{'Authorization':''}},).then(e => {
+        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) }, { headers: { 'Authorization': '' } },).then(e => {
             console.log(e);
             localStorage.removeItem(keyName)
+            localStorage.removeItem(keyName+'Time')
             navigator(redirection)
             success(e)
             setSendSpin(false)
@@ -41,8 +42,14 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
     })
 
     const now = new Date();
-    
-    const oneMinuteFromNow = useCallback(() =>  Date(now.getTime() + 60000, []))
+
+    if (localStorage.getItem(keyName + 'Time') === null) {
+        const time = new Date(now.getTime() + 60000)
+        localStorage.setItem(keyName + 'Time', time)
+
+    }
+    const oneMinuteFromNow = new Date(localStorage.getItem(keyName + 'Time')
+    )
     const [resendClr, setClr] = useState(' text-muted ');
 
     const {
@@ -77,10 +84,13 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
                         onClick={e => {
                             if (true) {
                                 setResendSpin(true)
-                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName), },{headers:{'Authorization':''}}).then(e => {
-                                    
+                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName), }, { headers: { 'Authorization': '' } }).then(e => {
+
                                     const now = new Date();
                                     const oneMinuteFromNow = new Date(now.getTime() + 60000);
+
+                                    
+                                    localStorage.setItem(keyName + 'Time', oneMinuteFromNow)
                                     restart(oneMinuteFromNow, true)
                                     setClr(' text-muted ')
                                     setResendSpin(false)
