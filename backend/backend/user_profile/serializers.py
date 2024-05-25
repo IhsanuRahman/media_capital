@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from api.models import TempUser, UserModel
+from client_auth.models import TempUser, UserModel
 
 class UserUpdateSerilizer(serializers.ModelSerializer):
   class Meta:

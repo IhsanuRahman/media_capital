@@ -3,10 +3,9 @@ from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-
-from api.client.auth.serilizers import UserRegisterSerilizer
-from api.models import Posts, Tags, UserModel
-from api.client.user_profile.serializers import UserUpdateSerilizer
+from client_auth.models import UserModel
+from posts.models import Tags, Posts
+from user_profile.serializers import UserUpdateSerilizer
 
 
 @api_view(['PUT'])

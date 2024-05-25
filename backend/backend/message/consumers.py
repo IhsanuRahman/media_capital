@@ -5,7 +5,8 @@ from channels.db import database_sync_to_async
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import  RefreshToken,AccessToken
 from asgiref.sync import async_to_sync
-from api.models import UserModel as User,Message,Rooms
+from client_auth.models import UserModel as User
+from .models import MessageModel,Rooms
 from django.db.models import Q
 import uuid
 
@@ -80,7 +81,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
        return User.objects.get(id=token.payload['user_id'])  
     @database_sync_to_async
     def create_message(self,sender,receiver,message,room_name):
-        messageObj=Message(sender=sender,receiver=receiver,message=message)
+        messageObj=MessageModel(sender=sender,receiver=receiver,message=message)
         room=Rooms.objects.get(groupName=room_name)
         messageObj.save()
         room.messages.add(messageObj)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import environ
 from datetime import timedelta
+
 from pathlib import Path
 env = environ.Env()
 environ.Env.read_env()
@@ -44,10 +45,13 @@ INSTALLED_APPS = [
     'daphne' , 
     'django.contrib.staticfiles',
     'rest_framework',
+    'user_profile',
+    'posts',
+    'client_auth',
+    'message',
     'corsheaders',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
-    'api',
     'channels',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -90,7 +94,7 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'backend.asgi.application'
-AUTH_USER_MODEL = 'api.UserModel'
+AUTH_USER_MODEL = 'client_auth.UserModel'
 MEDIA_ROOT = 'media/'
 
 # URL used to access the media

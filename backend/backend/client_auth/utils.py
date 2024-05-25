@@ -3,7 +3,7 @@ import random
 import uuid
 from django.core.mail import send_mail
 
-from api.models import OTP, TempUser
+from .models import OTP
 
 
 def otp_generator(user,email=None):

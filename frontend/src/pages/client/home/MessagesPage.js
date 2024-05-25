@@ -17,9 +17,9 @@ function Messages({ username, userId,profile, setMsgPg }) {
             setButton('send')
         },
         onMessage:(e)=>{
-
+            
             const data = JSON.parse(e.data);
-
+            
             if (typeof data.text_data !== 'undefined') {
                 if (typeof data.text_data.messages !== 'undefined') {
                     data.text_data.messages.map((msg) => {
@@ -45,7 +45,6 @@ function Messages({ username, userId,profile, setMsgPg }) {
 
         }
     });
-    console.log('lastmessage',lastMessage);
     
     const connectionStatus = {
         [ReadyState.CONNECTING]: 'Connecting',
@@ -79,8 +78,34 @@ function Messages({ username, userId,profile, setMsgPg }) {
                     onChange={e => {
                         setInputText(e.target.value)
                     }}
+                    onKeyDown={e => { 
+                        console.log(e.key);
+                        if (e.key === "Enter")
+                            if (readyState === 0) {
+                                alert('still connecting')
+                            } else if (readyState===1) {
+                                const message = {
+                                    type: 'send',
+                                    message: inputText,
+                                    username: user.username
+                                };
+                                setMessages([...messages, message]);
+                                setInputText('')
+    
+                                sendMessage(JSON.stringify({
+                                    message: inputText, username: user.username
+                                }))
+                                if (messageView) {
+                                    messageView.current.addEventListener('DOMNodeInserted', event => {
+                                        const { currentTarget: target } = event;
+                                        target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+                                    });
+                                }
+                            }
+                        }}
                 />
-                <button className='w-25 bg-primary rounded border-0 '
+                <button className='w-25 bg-primary rounded border-0 ' tabIndex="0"
+                    
                     onClick={_ => {
                         if (readyState === 0) {
                             alert('still connecting')
@@ -91,6 +116,7 @@ function Messages({ username, userId,profile, setMsgPg }) {
                                 username: user.username
                             };
                             setMessages([...messages, message]);
+                            setInputText('')
 
                             sendMessage(JSON.stringify({
                                 message: inputText, username: user.username

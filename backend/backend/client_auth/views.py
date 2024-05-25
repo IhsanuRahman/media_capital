@@ -1,13 +1,14 @@
 import datetime
 import uuid
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from api.client.auth.serilizers import UserRegisterSerilizer, UserSerializer
-from api.client.auth.utils import otp_generator, otp_resender
-from api.models import OTP, ForgotPassword, Tags, TempUser, UserModel
+from rest_framework_simplejwt.tokens import RefreshToken
+from .serilizers import UserRegisterSerilizer, UserSerializer
+from .utils import otp_generator, otp_resender
+from .models import OTP, ForgotPassword, TempUser, UserModel
+from posts.models import Tags
+
 
 
 def login(request):

@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from api.models import UserModel
+from client_auth.models import UserModel
 from rest_framework_simplejwt.tokens import  RefreshToken, AccessToken
 from rest_framework.exceptions import AuthenticationFailed
 

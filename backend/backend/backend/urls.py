@@ -18,13 +18,13 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
-from api.admin.admin_auth.urls import urlpatterns as admin_urls
-from api.client.user_profile.urls import urlpatterns as profile_urls
-from api.client.posts.urls import urlpatterns as posts_urls
-from api import views
+from admin.admin_auth.urls import urlpatterns as admin_urls
+from posts import views
 urlpatterns = [
     path('4dmin',admin.site.urls),
-    path('',include('api.client.auth.urls')),
-    path('messages/',include('api.client.messages.urls')),
+    path('',include('client_auth.urls')),
+    path('messages/',include('message.urls')),
+    path('',include('posts.urls')),
+    path('',include('user_profile.urls')),
     path('search',views.search)
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +admin_urls+profile_urls+posts_urls
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +admin_urls

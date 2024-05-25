@@ -1,15 +1,14 @@
 import datetime
 from django.shortcuts import render
-from api.models import Rooms, UserModel
+from .models import Rooms
+from client_auth.models import UserModel
 from channels.consumer import AsyncConsumer
 from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
-class ChatConsumer(AsyncConsumer):
-    async def websocket_connect(self,event):
-        print('connected')
+
     
 # Create your views here.
 @api_view(['GET'])
