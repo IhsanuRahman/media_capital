@@ -114,8 +114,8 @@ DATABASES = {
     
 }
 SIMPLE_JWT = {
-     'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-     'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
+     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=70),
+     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
 # Password validation
@@ -142,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 

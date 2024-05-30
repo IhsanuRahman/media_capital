@@ -11,8 +11,9 @@ function Profile() {
   const { isAuthenticated, user, loading } = useSelector(state => state.user);
   const navigator=useNavigate()
   const [posts, setPosts] = useState([])
+
   useEffect(() => {
-    api.get('/posts/own').then(e=>{
+    api.get('/posts/own',{headers:{'Authorization':`Bearer ${localStorage.getItem('access')}`}}).then(e=>{
      console.log(e.data.posts);
      setPosts(e.data.posts)
     })

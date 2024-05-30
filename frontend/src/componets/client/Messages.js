@@ -2,10 +2,56 @@ import React, { useEffect, useState } from 'react'
 import MessagesPage from '../../pages/client/home/MessagesPage'
 import api from './../../axios'
 import { baseUrl } from '../../constants'
+import useWebSocket,{ReadyState} from 'react-use-websocket'
+import { json } from 'react-router-dom'
 function Messages() {
     const [popup, setPopup] = useState(null)
     const [users, setUsers] = useState([])
     const [searchValue, setSearchValue] = useState('')
+    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`ws://127.0.0.1:8000/get-messages/${localStorage.getItem('access')}`),{
+        onOpen: () =>{
+            console.log("The connection was setup successfully !",);
+        },
+        onClose:(e)=>{
+            
+        },
+        onMessage:(e)=>{
+            console.log(e,'date ws')
+            const data = JSON.parse(e.data);
+            setUsers([data,...(users.filter(usr=>usr.id!==data.id))])
+
+            // if (typeof data.text_data !== 'undefined') {
+            //     if (typeof data.text_data.messages !== 'undefined' && messages.length===0) { 
+            //         data.text_data.messages.map((msg) => {
+            //             setMessages(prevMessages => [...prevMessages, {
+            //                 type: msg.username === user.username ? 'send' : 'receive', message: msg.message ,sended_at:new Date(msg.sended_at).toLocaleTimeString()
+            //             }])
+            //         })
+
+            //     }
+            // } else if (data.username !== user.username) {
+            //     const newMessage = {
+            //         type: data.username === user.username ? 'send' : 'receive', message: data.message 
+            //     }
+
+            //     setMessages(prevMessages => [...prevMessages, newMessage])
+            // }
+            // if (messageView) {
+            //     messageView.current.addEventListener('DOMNodeInserted', event => {
+            //         const { currentTarget: target } = event;
+            //         target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
+            //     });
+            // }
+
+        }   });
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'connected',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+      }[readyState];
+    
     useEffect(() => {
         if (localStorage.getItem('access')){
         api.get(`messages/users`, {
@@ -48,39 +94,6 @@ function Messages() {
                         <p className='ms-auto mb-auto  text-secondary' style={{ fontSize: '12px' }}>{user.time}</p>
                     </div>
                 })}
-                {/* <div className='w-100 m-3  ps-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
-
-                >
-                    <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ' }}>
-                    </div>
-                    <div>
-                        <h6 className='ms-3 mb-0 text-white'>user</h6>
-                        <p className='ms-4 mt-1  text-secondary' style={{ fontSize: '12px' }}>hello</p>
-                    </div>
-                    <p className='ms-auto mb-auto  text-secondary' style={{ fontSize: '12px' }}>today</p>
-                </div>
-                <div className='   w-100 m-3  ps-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
-                    onClick={e =>
-                        setPopup(<MessagesPage userId={1} setMsgPg={setPopup}></MessagesPage>)
-
-                    }>
-                    <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ' }}>
-                    </div>
-                    <div>
-                        <h6 className='ms-3 mb-0 text-white'>user</h6>
-                        <p className='ms-4 mt-1  text-secondary' style={{ fontSize: '12px' }}>hello</p>
-                    </div>
-                    <p className='ms-auto mb-auto  text-secondary' style={{ fontSize: '12px' }}>today</p>
-                </div>
-                <div className='   w-100 m-3  ps-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}>
-                    <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ' }}>
-                    </div>
-                    <div>
-                        <h6 className='ms-3 mb-0 text-white'>user</h6>
-                        <p className='ms-4 mt-1  text-secondary' style={{ fontSize: '12px' }}>hello</p>
-                    </div>
-                    <p className='ms-auto mb-auto  text-secondary' style={{ fontSize: '12px' }}>today</p>
-                </div> */}
 
             </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Header from '../../../componets/client/Header'
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import api from '../../../axios';
@@ -11,10 +11,20 @@ function CreatePosts() {
     const [tag, setTag] = useState('')
     const [image, setImage] = useState(null)
     const [description, setDescription] = useState('')
+    const [spinner, setSpinner] = useState(false)
+    const Image = useMemo(( )=> {
+        return <div className=' border rounded-3 align-content-center  ' style={{ height: '600px', width: '400px', backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundImage: `url(${image && URL.createObjectURL(image)})` }} >
+                    <input type="file" name="" id="d" placeholder='' className='h-100  file-input w-100 hover ' onChange={e => {
+                        setImage(e.target.files[0])
+                    }} style={image && { color: 'transparent' }} />
+                </div>
+      },[image]);
     const handleSubmit = () => {
+
         if (image===null){
             setAlert('image is required')
         }else if (alert === '') {
+            setSpinner(true)
             const formData = new FormData()
             formData.append('image', image)
             formData.append('tags', JSON.stringify(tags))
@@ -25,7 +35,11 @@ function CreatePosts() {
                     'Authorization': `Bearer ${localStorage.getItem('access')}`,
                 },
             }).then(e=>{
+                setSpinner(false)
                 navigator('/')
+            }).catch(e=>{
+                console.log(e)
+                setSpinner(false)
             })
         }
     }
@@ -33,7 +47,7 @@ function CreatePosts() {
         <div className='overflow-y-scroll h-100 pt-5 w-100'>
 
             <Header />
-            {alert && <div class="alert d-flex align-items-center justify-content-between m-2 alert-danger  alert-dismissible fade show pe-0" role="alert">
+            {alert && <div class="alert d-flex z-1 position-fixed w-75 align-items-center justify-content-between m-2 alert-danger  alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                     onClick={_ => setAlert('')}
@@ -41,12 +55,8 @@ function CreatePosts() {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>}
-            <div className="d-flex mt-2 w-100 align-items-center flex-md-row flex-colume   justify-content-around  ">
-                <div className=' border rounded-3 align-content-center  ' style={{ height: '600px', width: '400px', backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundImage: `url(${image && URL.createObjectURL(image)})` }} >
-                    <input type="file" name="" id="d" placeholder='' className='h-100  file-input w-100 hover ' onChange={e => {
-                        setImage(e.target.files[0])
-                    }} style={image && { color: 'transparent' }} />
-                </div>
+            <div className="d-flex mt-2 w-100 align-items-center flex-md-row flex-md-row flex-column   justify-content-around  ">
+               {Image} 
                 <div className='col-8'>
                     <div className='border border-white rounded h-75 p-4'>
                         <h4 className='mb-3'>Tags</h4>
@@ -55,6 +65,7 @@ function CreatePosts() {
                             {tags.map((tagObj, i) => <div className='rounded-5 col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                                 {tagObj} <b className='btn ms-auto mb-1   ms-2 text-white ' onClick={
                                     e => {
+                                        tags.splice(i,1)
                                         setTags([...tags])
                                     }
                                 }>x</b>
@@ -93,7 +104,7 @@ function CreatePosts() {
             </div>
             <div className='w-100 ps-auto mt-5 ms-auto pe-3 d-flex'
                 onClick={handleSubmit}
-            ><button className='btn btn-success ms-auto  '>create</button></div>
+            ><button className='btn btn-success ms-auto p-1 ' style={{width:'80px',height:'40px'}}>{spinner?<span class=" spinner-border" aria-hidden="true"></span> :'create'}</button></div>
 
         </div>
     )

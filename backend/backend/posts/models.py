@@ -19,6 +19,7 @@ class Posts(models.Model):
     tags=models.ManyToManyField(Tags,related_name='posts')
     user=models.ForeignKey(UserModel,related_name='posts',on_delete=models.CASCADE)
     rating=models.FloatField(default=0.0)
+    posted_at=models.DateTimeField(auto_now_add=True)
     
 class Ratings(models.Model):
     user=models.ForeignKey(UserModel,on_delete=models.CASCADE)
@@ -29,3 +30,11 @@ class Comments(models.Model):
     comment=models.TextField()
     user=models.ForeignKey(UserModel,related_name='Comments',on_delete=models.CASCADE)
     post=models.ForeignKey(Posts,related_name='comments',on_delete=models.CASCADE)
+    posted_at=models.DateTimeField(auto_now_add=True)
+
+
+class CommentsReply(models.Model):
+    reply=models.TextField()
+    user=models.ForeignKey(UserModel,related_name='replys',on_delete=models.CASCADE)
+    comment=models.ForeignKey(Comments,related_name='replys',on_delete=models.CASCADE)
+    posted_at=models.DateTimeField(auto_now_add=True)

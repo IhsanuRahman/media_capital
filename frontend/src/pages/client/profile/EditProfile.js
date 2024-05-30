@@ -50,7 +50,11 @@ function EditProfile() {
             form_data.append("first_name", userData.first_name);
             form_data.append("last_name", userData.last_name);
             form_data.append('email', userData.email)
-            form_data.append('banner', userData.banner)
+            console.log(typeof userData.banner);
+            if (typeof userData.banner!=='string' && userData.banner!==null)
+                form_data.append('banner', userData.banner)
+            if (typeof userData.profile!=='string' && userData.profile!==null)
+                form_data.append('profile', userData.profile)
             form_data.append('intresets', JSON.stringify(userData.interests))
             form_data.append('dob', userData.dob)
             form_data.append('description', userData.description)

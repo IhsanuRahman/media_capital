@@ -103,7 +103,7 @@ function ChangePassword() {
                    <button className="w-75 mt-5 me-auto ms-auto mb-5 rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >
-                      {spinner? <span class="spinner-border" aria-hidden="true"></span>:'login'}
+                      {spinner? <span class="spinner-border" aria-hidden="true"></span>:'submit'}
                     </button>
                 </div>
             </div>

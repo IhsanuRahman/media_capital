@@ -1,7 +1,10 @@
+import datetime
 import uuid
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import pre_init
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -11,7 +14,7 @@ class UserModel(AbstractUser):
     banner=models.ImageField(null=True,upload_to='banners')
     is_banned=models.BooleanField(default=False)
     description=models.TextField()
-    dob=models.DateField()
+    dob=models.DateField(null=False)
     supportings=models.ManyToManyField('UserModel',related_name='supporters')
 
  
@@ -40,3 +43,13 @@ class TempUser(models.Model):
     stored_time=models.DateTimeField(auto_now=True)
     dob=models.DateField()
     otp=models.ForeignKey(OTP,on_delete=models.CASCADE)    
+
+
+@receiver(pre_init,sender=TempUser)
+def user_preinit(sender,**kwargs):
+    
+    print('started accessing TempUser')
+
+@receiver(pre_init,sender=OTP)
+def user_preinit(sender,**kwargs):
+    print('started accessing OTP')

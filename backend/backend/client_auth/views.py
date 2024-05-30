@@ -8,8 +8,9 @@ from .serilizers import UserRegisterSerilizer, UserSerializer
 from .utils import otp_generator, otp_resender
 from .models import OTP, ForgotPassword, TempUser, UserModel
 from posts.models import Tags
+import pytz
 
-
+utc=pytz.UTC
 
 def login(request):
     return JsonResponse({
@@ -78,8 +79,8 @@ def verify_otp(request):
         if temp_user.exists():
             temp_user=temp_user.first()
             otpObj = temp_user.otp
-            print(datetime.datetime.now(), otpObj.otp_datetime)
-            if datetime.datetime.now()-otpObj.otp_datetime.replace(tzinfo=None) > datetime.timedelta(minutes=3):
+            print(datetime.datetime.now(pytz.timezone('Asia/Kolkata')), otpObj.otp_datetime)
+            if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-otpObj.otp_datetime > datetime.timedelta(minutes=3):
                 temp_user.delete()
                 otpObj.delete()
                 return JsonResponse({"message": "OTP verification time out"}, status=401)
@@ -111,7 +112,7 @@ def resend_otp(request):
             otpObj = otpObj.first()
             temp_user=TempUser.objects.filter(otp=otpObj).first()
             print(datetime.datetime.now(), otpObj.otp_datetime)
-            if datetime.datetime.now()-otpObj.otp_datetime.replace(tzinfo=None) >= datetime.timedelta(minutes=1):
+            if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-otpObj.otp_datetime >= datetime.timedelta(minutes=1):
                 otpObj=otp_resender(otpObj,TempUser.objects.filter(otp=otpObj).first().email)
                 otpObj.save()
                 return JsonResponse({'message': 'OTP resend Success'}, status=200)
@@ -121,7 +122,7 @@ def resend_otp(request):
                     
                     
         else:
-            return JsonResponse({'message': 'OTP not valid'}, status=401)
+            return JsonResponse({'message': 'credentials are not valid'}, status=401)
     else:
         return JsonResponse({'message': 'OTP verification Failed'}, status=401)
 

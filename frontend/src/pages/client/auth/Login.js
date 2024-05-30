@@ -47,7 +47,8 @@ function Login() {
              setSpinner(false)
              console.log(e.response.data.detail);
              
-            })
+            })}else{
+            setSpinner(false)
         }
     }
     const { isAuthenticated, user, loading } = useSelector(state => state.user)

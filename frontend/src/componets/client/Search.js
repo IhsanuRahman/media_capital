@@ -19,8 +19,15 @@ function Search() {
                 <input type="search" placeholder='search' value={searchValue}
                     onChange={e => {
                         setSearchValue(e.target.value)
-                        if (e.target.value !== '') {
                             api.get('/search', {
+                                
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${localStorage.getItem('access')}`,
+                    
+                                    },
+                    
+                                
                                 params: {
                                     search: e.target.value
                                 }
@@ -28,7 +35,7 @@ function Search() {
                                 setPosts(resp.data.posts)
                                 setUsers(resp.data.users)
                             })
-                        }
+                        
                     }}
                     className='w-75 greyholder text-white ms-auto me-auto rounded-3 ps-2 border-0' style={{ height: '30px', backgroundColor: '#494949' }} />
 

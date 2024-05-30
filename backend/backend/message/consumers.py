@@ -1,34 +1,58 @@
+import datetime
 import json
+from channels.layers import get_channel_layer
 from channels.consumer import AsyncConsumer
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from rest_framework.authtoken.models import Token
-from rest_framework_simplejwt.tokens import  RefreshToken,AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from asgiref.sync import async_to_sync
 from client_auth.models import UserModel as User
-from .models import MessageModel,Rooms
+from .models import MessageModel, Rooms
 from django.db.models import Q
 import uuid
 
-class ChatConsumer(AsyncWebsocketConsumer):
+
+class ChatNotifier(AsyncWebsocketConsumer):
     async def connect(self):
-        
-        token=(self.scope['url_route']['kwargs']['token'])
-        receiver_id=self.scope['url_route']['kwargs']['receiver_id']
-        receiver= await self.get_user_by_id(receiver_id)
-        sender=await self.get_user_object(token=token)
-        gname=await self.get_room(sender,receiver)
-        self.roomGroupName = gname
-        
+        token = (self.scope['url_route']['kwargs']['token'])
+        user = await self.get_user_object(token)
+        self.roomGroupName = 'user_id'+str(user.id)
+        print('id:', 'user_id'+str(user.id))
         await self.channel_layer.group_add(
             self.roomGroupName,
             self.channel_name
         )
-       
+        await self.accept()
+
+    async def sendMessage(self, event):
+        await self.send(text_data=json.dumps(event))
+
+    @database_sync_to_async
+    def get_user_object(self, token):
+        print(token)
+        token = AccessToken(token=token)
+        print(token)
+        return User.objects.get(id=token.payload['user_id'])
+
+
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        token = (self.scope['url_route']['kwargs']['token'])
+        receiver_id = self.scope['url_route']['kwargs']['receiver_id']
+        receiver = await self.get_user_by_id(receiver_id)
+        sender = await self.get_user_object(token=token)
+        gname = await self.get_room(sender, receiver)
+        self.roomGroupName = gname
+
+        await self.channel_layer.group_add(
+            self.roomGroupName,
+            self.channel_name
+        )
+
         messages = await self.get_messages(gname)
         await self.accept()
-        await self.send(json.dumps({'text_data':{'messages':messages}}))
-
+        await self.send(json.dumps({'text_data': {'messages': messages}}))
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -41,74 +65,96 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         username = text_data_json["username"]
         print(self.roomGroupName,
-            self.channel_name)
-        user= await self.get_user_object(token=(self.scope['url_route']['kwargs']['token']))
+              self.channel_name)
+        user = await self.get_user_object(token=(self.scope['url_route']['kwargs']['token']))
         await self.channel_layer.group_send(
-                self.roomGroupName, {
-                    "type": "sendMessage",
-                    "message": message,
-                    "username": username,
-                })
-        
-        
+            self.roomGroupName, {
+                "type": "sendMessage",
+                "message": message,
+                "username": username,
+            })
 
     async def sendMessage(self, event):
         message = event["message"]
         username = event["username"]
         user_id = self.scope['url_route']['kwargs']['receiver_id']
-        receiver= await self.get_user_by_id(user_id)
-        token=self.scope['url_route']['kwargs']['token']
+        receiver = await self.get_user_by_id(user_id)
+        token = self.scope['url_route']['kwargs']['token']
         user = await self.get_user_object(token)
-        print(username,message)
-        await self.create_message(sender=user,message=message,room_name=self.roomGroupName,receiver=receiver)
-        await self.send(text_data=json.dumps({"message": message, "username":username,'to':'ihsan'}))
+        print(username, receiver.id)
+        channel_layer = get_channel_layer()
+        msgObj = await self.create_message(sender=user, message=message, room_name=self.roomGroupName, receiver=receiver)
+        on=''
+        now=datetime.datetime.now()
+        if msgObj.sended_at.date() == now.date():
+            on = 'today'
+        elif message.sended_at.date() == now.date()-datetime.timedelta(days=1):
+            on = 'yesterday'
+        else:
+            on = message.sended_at.date().strftime("%d/%m/%Y")
+        await channel_layer.group_send(
+            'user_id'+str(receiver.id),
+            {
+                "type": "sendMessage",
+                        'profile': user.profile.url,
+                        "username": user.username,
+                        "id": user.id,
+                        'lastMessage': message,
+                        'time': on,
+                 },
+        )
+        print('id:', 'user_id'+str(receiver.id))
+        await self.send(text_data=json.dumps({"message": message, "username": username, 'to': 'ihsan'}))
 
-    async def send_old_messages(self,messages):
+    async def send_old_messages(self, messages):
         for message in messages:
-            print(message.message,message.sender.username)
-            await self.send(text_data=json.dumps({"message": message.message,'username':message.sender.username}))
-        
+            print(message.message, message.sender.username)
+            await self.send(text_data=json.dumps({"message": message.message, 'username': message.sender.username}))
 
     @database_sync_to_async
-    def get_user_by_id(self,id):
-        user=User.objects.filter(id=id).first()
+    def get_user_by_id(self, id):
+        user = User.objects.filter(id=id).first()
         if user is None:
-            raise KeyError()  
-        return  user
+            raise KeyError()
+        return user
+
     @database_sync_to_async
-    def get_user_object(self, token): 
-       token=AccessToken(token=token)
-       return User.objects.get(id=token.payload['user_id'])  
+    def get_user_object(self, token):
+        token = AccessToken(token=token)
+        return User.objects.get(id=token.payload['user_id'])
+
     @database_sync_to_async
-    def create_message(self,sender,receiver,message,room_name):
-        messageObj=MessageModel(sender=sender,receiver=receiver,message=message)
-        room=Rooms.objects.get(groupName=room_name)
+    def create_message(self, sender, receiver, message, room_name):
+        messageObj = MessageModel(
+            sender=sender, receiver=receiver, message=message)
+        room = Rooms.objects.get(groupName=room_name)
         messageObj.save()
         room.messages.add(messageObj)
         room.save()
         return messageObj
+
     @database_sync_to_async
-    def get_room(sdataself,user1,user2):
-        print(user1.id,user2.id)
-        room=Rooms.objects.filter(Q(users__id=user1.id))
-        room=room.filter(Q(users__id=user2.id)).first()
+    def get_room(sdataself, user1, user2):
+        print(user1.id, user2.id)
+        room = Rooms.objects.filter(Q(users__id=user1.id))
+        room = room.filter(Q(users__id=user2.id)).first()
         if room:
             return room.groupName
         else:
             print('creating new')
-            room=Rooms(groupName=str(uuid.uuid1()))
+            room = Rooms(groupName=str(uuid.uuid1()))
             room.save()
             room.users.add(user1)
             room.users.add(user2)
             room.save()
             return room.groupName
-    
+
     @database_sync_to_async
-    def get_messages(self,room_name):
-        messages=Rooms.objects.filter(groupName=room_name).first()
-        datas=[]
+    def get_messages(self, room_name):
+        messages = Rooms.objects.filter(groupName=room_name).first()
+        datas = []
         print(messages.messages.all().order_by('sended_at').values())
         for msg in messages.messages.all().order_by('sended_at'):
-            datas.append({"message": msg.message,'username':msg.sender.username})
+            datas.append({"message": msg.message, 'username': msg.sender.username,
+                         'sended_at': msg.sended_at.strftime('%Y-%m-%d %H:%M:%z')})
         return datas
-    

@@ -17,6 +17,7 @@ class UserRegisterSerilizer(serializers.Serializer):
         error={}
         if data['username']:
             if UserModel.objects.filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
+                
                 error['username']='Username is already exists'
                 # raise serializers.ValidationError({"username":""})
         if data['email']:

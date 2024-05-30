@@ -9,6 +9,23 @@ const initialState = {
 // export const setAuthed =state=>{
 //     state.isAuthenticated=true
 // }
+
+// export const refresh=createAsyncThunk('user/refresh',async (_,thunkAPI)=>{
+
+//     api.post('token/refresh',{
+//         'refresh':localStorage.getItem('refresh'),
+//     }).then(e=>{
+//         console.log('REFRESH',e.data.access)
+//         const { dispatch } = thunkAPI;
+//         localStorage.setItem('access',e.data.access)
+//         localStorage.removeItem('access')
+//         localStorage.removeItem('refresh')
+//         dispatch(checkAuth());
+//     }).catch(e=>{
+//         console.log('REFRESH',e)
+
+//     })
+// })
 export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
     if (!(localStorage.getItem('refresh') && localStorage.getItem('access'))) {
         return thunkAPI.rejectWithValue('no token');
@@ -30,10 +47,37 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
         if (res.status === 200) {
             return data;
         } else {
+            api.post('token/refresh',{
+                'refresh':localStorage.getItem('refresh'),
+            }).then(e=>{
+                console.log('REFRESH',e.data.access)
+                const { dispatch } = thunkAPI;
+                localStorage.setItem('access',e.data.access)
+                localStorage.removeItem('access')
+                localStorage.removeItem('refresh')
+                dispatch(checkAuth());
+            }).catch(e=>{
+                console.log('REFRESH',e)
+
+            })
             console.log(data)
             return thunkAPI.rejectWithValue(data);
         }
     } catch (err) {
+        api.post('token/refresh',{
+            'refresh':localStorage.getItem('refresh'),
+            'access_token':localStorage.getItem('access'),
+        }).then(e=>{
+            console.log('REFRESH',e)
+            const { dispatch } = thunkAPI;
+            localStorage.setItem('access',e.data.access)
+            dispatch(checkAuth());
+        }).catch(e=>{
+            localStorage.removeItem('access')
+            localStorage.removeItem('refresh')
+            console.log('REFRESH',e)
+
+        })
         return thunkAPI.rejectWithValue(err.response.data);
     }
 });
@@ -55,23 +99,37 @@ export const checkAuth = createAsyncThunk(
 
                 },
 
-            }).catch(e => {
-                console.log(e.message)
-                return thunkAPI.rejectWithValue(response.data);
             })
 
             if (response.status == 200) {
                 const { dispatch } = thunkAPI;
-
                 dispatch(getUser());
 
                 return response
             }
             else {
+                api.post('token/refresh',{
+                    'refresh_token':localStorage.getItem('refresh'),
+                    'access_token':localStorage.getItem('access'),
+                }).then(e=>{
+                    console.log('REFRESH',e)
+                }).catch(e=>{
+                    console.log('REFRESH',e)
+    
+                })
                 return thunkAPI.rejectWithValue(response.data);
             }
         }
         catch (e) {
+            api.post('token/refresh',{
+                'refresh_token':localStorage.getItem('refresh'),
+                'access_token':localStorage.getItem('access'),
+            }).then(e=>{
+                console.log('REFRESH',e)
+            }).catch(e=>{
+                console.log('REFRESH',e)
+
+            })
             return thunkAPI.rejectWithValue(e.response.data);
         }
     },
