@@ -6,11 +6,13 @@ import Markdown from 'markdown-to-jsx'
 import { useNavigate } from 'react-router-dom';
 import api from '../../axios';
 import { Rating, Stack } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 function PostItem({ post }) {
+    const {user} = useSelector(state=>state.user)
     const navigator = useNavigate()
     const [commentInput, setCommentInput] = useState('')
-    const [comments,setComments]=useState(post.comments?post.comments:[])
+    const [comments, setComments] = useState(post.comments ? post.comments : [])
     const [overAllRate, setAllRate] = useState(post.rating)
     console.log(post, 'post');
     return (
@@ -18,7 +20,7 @@ function PostItem({ post }) {
             <div className='d-flex align-items-center ps-2   w-100 ' style={{ minHeight: "45px", maxHeight: "45px", borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
                 <div className='bg-light rounded-5' onClick={e => navigator('/user/' + post.user.id)} loading="lazy" style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + post.user.profile})` }}>
                 </div>
-                <h6 className='ms-3' onClick={e => navigator('/user/' + post.user.id)}>{post.user.username}</h6>
+                <h6 className='ms-3' onClick={e => user.id===post.user.id?navigator('/profile'):navigator('/user/' + post.user.id)}>{post.user.username}</h6>
             </div>
             <div className='w-100' style={{ borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}
                 onClick={e => {
@@ -45,13 +47,13 @@ function PostItem({ post }) {
                                     api.put('/posts/rate/add', {
                                         id: post.id,
                                         rate: newValue === null ? 0 : newValue
-                                    },{
+                                    }, {
                                         headers: {
                                             'Content-Type': 'application/json',
                                             'Authorization': `Bearer ${localStorage.getItem('access')}`,
-                        
+
                                         },
-                        
+
                                     }).then(e => {
                                         setAllRate(e.data.rate)
                                     })
@@ -60,7 +62,17 @@ function PostItem({ post }) {
                                 emptyIcon={
                                     <img src={ratingSvg} alt="" srcset="" />} /></div>
                     </Stack>
-                    <img src={option} alt="" srcset="" className='ms-auto me-1' style={{ cursor: 'pointer' }} />
+                    <div className='dropdown ms-auto me-1 '  data-bs-theme="dark" >
+                        <img src={option} alt=""  srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
+                        <ul className="dropdown-menu dropdown-center alert"  aria-labelledby="dropdownMenuButtonDark">
+                            {post.user.id===user.id?
+                            <li className="dropdown-item" >delete post</li>
+                            :
+                            <>
+                            <li className="dropdown-item" >save post</li>
+                            <li className="dropdown-item">report</li></>}
+                        </ul>
+                    </div>
                 </div>
                 {<Markdown className={`ms-3 text-break `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.description}</Markdown>}
                 <div className="w-100 ps-3 row mb-2 gap-2 clearfix mt-2">
@@ -68,7 +80,7 @@ function PostItem({ post }) {
                         {'#' + tag}
                     </div>)}
                 </div>
-               
+
                 <div className='d-flex gap-2 align-self-end mt-2  mb-2 justify-content-start w-100'>
                     <input type="text" name="" value={commentInput} placeholder="comment" className="form-control w-50 ms-2 rounded-5 text-white whiteholder border-0" style={{ height: '25px', backgroundColor: '#494949' }}
                         onChange={e => {
@@ -80,13 +92,13 @@ function PostItem({ post }) {
                             api.post('posts/comment/add', {
                                 post_id: post.id,
                                 comment: commentInput,
-                            },{
+                            }, {
                                 headers: {
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${localStorage.getItem('access')}`,
-                
+
                                 },
-                
+
                             })
                             setCommentInput('')
                         }}

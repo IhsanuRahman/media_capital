@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../../../componets/client/Header'
+import GridPosts from '../../../componets/client/GridPosts'
 import three_dots from '../../../assets/three_dots.svg'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ function Profile() {
   const { isAuthenticated, user, loading } = useSelector(state => state.user);
   const navigator=useNavigate()
   const [posts, setPosts] = useState([])
+  const [tab, setTab] = useState(0)
 
   useEffect(() => {
     api.get('/posts/own',{headers:{'Authorization':`Bearer ${localStorage.getItem('access')}`}}).then(e=>{
@@ -51,6 +53,25 @@ function Profile() {
           <p className=' text-custom-grey'>{user.description}</p>
         </div>
       </div>
+      <div className='w-100 d-flex justify-content-center '>
+                <button className={`btn text-white  ${tab == 0 ? 'active' : 'text-decoration-underline'}`}
+                    onClick={e => {
+                        if (tab !== 0) {
+                            setTab(0)
+                        }
+                    }}>
+                    my posts
+                </button>
+                <button className={`btn text-white   ${tab == 1 ? 'active' : 'text-decoration-underline'}`}
+                    onClick={e => {
+                        if (tab !== 1) {
+                            setTab(1)
+                        }
+                    }}
+                >
+                    saved
+                </button>
+            </div>
       <Posts posts={posts}/>
     </div>
   )

@@ -13,7 +13,7 @@ function Header({ leading }) {
     const [popup, setPopup] = useState(null)
 
     const popupComponent = (
-        <div class="bg-black border gap-4 pt-5 mb-5  d-flex flex-column align-items-center " onMouseLeave={_ => setPopup(null)} style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px', height: '300px', width: '400px', }}>
+        <div  className="bg-gradient bg-dark rounded border gap-4 pt-5 mb-5  d-flex flex-column align-items-center " onMouseLeave={_ => setPopup(null)} style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px', height: '300px', width: '400px', }}>
             <div className='bg-light  btn' style={{ height: '80px', width: '80px ', borderRadius: '100%', backgroundSize: 'cover', backgroundImage: `url(${baseUrl+user.profile})` }}>
 
             </div>

@@ -104,7 +104,7 @@ function EditProfile() {
 
                     </div>
                 </div>
-                <div className=' w-max d-flex'  >
+                <div className=' w-max d-flex'>
                     <div className='d-flex gap-3  flex-column w-75 p-5'>
                         <input type="text" value={userData.username} className='form-control bg-black text-white whiteholder' placeholder='username' style={{ height: '35px', Top: '45px' }}
                             onChange={(e) => {

@@ -27,7 +27,7 @@ function App() {
 
   useEffect(() => {
     console.log(dispatch(checkAuth()))
-  }, []);
+  },[]);
   return (
     <Router>
       <Routes>

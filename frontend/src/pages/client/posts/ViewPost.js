@@ -11,7 +11,9 @@ import Header from '../../../componets/client/Header';
 import { Stack, Rating } from '@mui/material';
 import CommentReply from '../../../componets/client/CommentReply';
 import moment from 'moment'
+import { useSelector } from 'react-redux';
 function ViewPost() {
+    const {user}=useSelector(state=>state.user)
     const { id } = useParams()
     const [comment, setComment] = useState('')
     const [post, setPost] = useState()
@@ -74,6 +76,18 @@ function ViewPost() {
                                 emptyIcon={
                                     <img src={ratingSvg} alt="" srcset="" />} />
                         </Stack>
+                        {/* <div className='dropdown ms-auto me-1'  data-bs-theme="dark">
+                        <img src={option} alt=""  srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" />
+                        <ul className="dropdown-menu dropdown-center"  aria-labelledby="dropdownMenuButtonDark">
+                            {post.user.id===user.id?
+                            <li className="dropdown-item" >delete post</li>
+                            
+                            :
+                            <>
+                            <li className="dropdown-item" >save post</li>
+                            <li className="dropdown-item">report</li></>}
+                        </ul>
+                    </div> */}
                         <p className='text-secondary'>{posted_at}</p>
 
                         <Markdown className={`ms-3 text-break `}  >{post.description}</Markdown>

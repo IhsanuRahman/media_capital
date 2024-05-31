@@ -6,13 +6,14 @@ import '../style.css'
 import { useSelector } from 'react-redux';
 import api from '../../../axios';
 import Search from '../../../componets/client/Search';
-
+import { Toast } from 'bootstrap';
 const Posts = React.lazy(() => import('../../../componets/client/Posts'))
 
 export function Home() {
     const [tab, setTab] = useState(0)
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [posts, setPosts] = useState([])
+    
     useEffect(() => {
         api.get('/posts', {
             headers: {
@@ -25,11 +26,9 @@ export function Home() {
             console.log(e.data.posts);
             setPosts(e.data.posts)
         }).catch(e => {
-            if (e.status===401){
-                navigator('/login')
-            }
             console.log(e);
         })
+        
     }, [])
     const tabs = [
         <Posts posts={posts} />,

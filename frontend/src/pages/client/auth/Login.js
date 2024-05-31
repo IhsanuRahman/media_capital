@@ -45,7 +45,6 @@ function Login() {
             }).catch(e => {
              setAlert(e.response.data.detail)
              setSpinner(false)
-             console.log(e.response.data.detail);
              
             })}else{
             setSpinner(false)
@@ -53,10 +52,10 @@ function Login() {
     }
     const { isAuthenticated, user, loading } = useSelector(state => state.user)
     useEffect(() => {
-        if (isAuthenticated && !loading ) {
+        if (isAuthenticated && !loading ) { 
           return navigator('/')
         }
-      })
+    })
     
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
