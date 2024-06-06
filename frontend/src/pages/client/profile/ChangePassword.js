@@ -13,12 +13,12 @@ function ChangePassword() {
     const [errors, setErrors] = useState({
         old_password: '',
         new_password: '',
-        conform_password: '',
+        confirm_password: '',
     })
     const [userData, setUserData] = useState({
         old_password: '',
         new_password: '',
-        conform_password: '',
+        confirm_password: '',
     })
     const handleinput = (e) => {
         setUserData({ ...userData, [e.target.name]: e.target.value })
@@ -38,21 +38,21 @@ function ChangePassword() {
         } else {
             errors.new_password = ''
         }
-        if (userData.conform_password === '' || userData.conform_password === null) {
-            errors.conform_password = 'password is required'
+        if (userData.confirm_password === '' || userData.confirm_password === null) {
+            errors.confirm_password = 'password is required'
             is_valid=false
         } else {
-            errors.conform_password = ''
+            errors.confirm_password = ''
         }
-        if (userData.conform_password.trim() === '') {
-            errors.conform_password = 'conform password is required'
+        if (userData.confirm_password.trim() === '') {
+            errors.confirm_password = 'confirm password is required'
             is_valid=false
             
         } else {
-            errors.conform_password = ''
+            errors.confirm_password = ''
         }
-        if (userData.new_password!==userData.conform_password){
-            errors.conform_password ='passwords are not match'
+        if (userData.new_password!==userData.confirm_password){
+            errors.confirm_password ='passwords are not match'
             is_valid=false
         }
         setErrors({ ...errors })
@@ -101,8 +101,8 @@ function ChangePassword() {
                     {errors.old_password !== '' && <li className="text-danger ms-2">{errors.old_password}</li>}
                     <input type="password" onChange={handleinput} name="new_password" id="" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='new password' style={{ color: '#fff', height: '40px' }} />
                     {errors.new_password !== '' && <li className="text-danger ms-2">{errors.new_password}</li>}
-                    <input type="password" onChange={handleinput} name="conform_password" id="" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='conform password' style={{ color: '#fff', height: '40px' }} />
-                    {errors.conform_password !== '' && <li className="text-danger ms-2">{errors.conform_password}</li>}
+                    <input type="password" onChange={handleinput} name="confirm_password" id="" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='confirm password' style={{ color: '#fff', height: '40px' }} />
+                    {errors.confirm_password !== '' && <li className="text-danger ms-2">{errors.confirm_password}</li>}
                    <button className="w-75 mt-5 me-auto ms-auto mb-5 rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >

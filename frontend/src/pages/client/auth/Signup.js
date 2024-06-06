@@ -19,7 +19,7 @@ function Signup() {
     email: '',
     dob: '',
     password: '',
-    conform_password: ''
+    confirm_password: ''
   })
   const [errors, setErrors] = useState({
     username: '',
@@ -28,7 +28,7 @@ function Signup() {
     email: '',
     dob: '',
     password: '',
-    conform_password: ''
+    confirm_password: ''
   })
   const today = new Date()
   const submit = () => {
@@ -54,7 +54,7 @@ function Signup() {
         setSending(false)
       })
     } else {
-      setData({...userData,password:'',conform_password:''})
+      setData({...userData,password:'',confirm_password:''})
       setErrors({ ...errors })
       setSending(false)
     }
@@ -168,22 +168,22 @@ function Signup() {
             setErrors({ ...errors })
           }} />
         {errors.password !== '' && <li className="text-danger ms-2">{errors.password}</li>}
-        <input type="password" name="conform_password" className="form-control fw-bold" placeholder="Conform Password" value={userData.conform_password}
+        <input type="password" name="confirm_password" className="form-control fw-bold" placeholder="Confirm Password" value={userData.confirm_password}
           onChange={handleinput}
           onBlur={_ => {
-            if (userData.conform_password.trim() === '') {
-              errors.conform_password = 'conform password is required'
+            if (userData.confirm_password.trim() === '') {
+              errors.confirm_password = 'confirm password is required'
 
-            } else if (userData.password !== userData.conform_password) {
-              errors.conform_password = 'passwords are not match'
+            } else if (userData.password !== userData.confirm_password) {
+              errors.confirm_password = 'passwords are not match'
 
             }else {
-              errors.conform_password = ''
+              errors.confirm_password = ''
             }
             setErrors({ ...errors })
           }} />
 
-        {errors.conform_password !== '' && <li className="text-danger ms-2">{errors.conform_password}</li>}
+        {errors.confirm_password !== '' && <li className="text-danger ms-2">{errors.confirm_password}</li>}
         <p className="text-primary" style={{ cursor: 'pointer' }} onClick={_ => navigator('/login')}>already have account?</p>
         <button className="w-50  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '35px' }}
           onClick={submit}

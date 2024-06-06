@@ -43,9 +43,9 @@ def edit_profile(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def change_password(request):
-    if request.user.id and 'old_password' in request.data and 'new_password' in request.data and 'conform_password' in request.data:
+    if request.user.id and 'old_password' in request.data and 'new_password' in request.data and 'confirm_password' in request.data:
         user = UserModel.objects.get(id=request.user.id)
-        if request.data['new_password'] == request.data['conform_password']:
+        if request.data['new_password'] == request.data['confirm_password']:
             new_password = request.data['new_password']
             old_password = request.data['old_password']
             if user.check_password(old_password):

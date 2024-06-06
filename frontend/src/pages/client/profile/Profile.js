@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import Header from '../../../componets/client/Header'
-import GridPosts from '../../../componets/client/GridPosts'
 import three_dots from '../../../assets/three_dots.svg'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +14,9 @@ function Profile() {
   const [tab, setTab] = useState(0)
   const [saved_posts, setSaved] = useState([])
   const [own_posts, setOwn] = useState([])
+  const [supporters,setSupporters]=useState(user.supporters?[...user.supporters]:[])
+  const [supportings,setSupportings]=useState(user.supportings?[...user.supportings]:[])
+  
   useEffect(() => {
     api.get('/posts/saved', { headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` } }).then(e => {
       console.log(e.data.posts);
@@ -52,10 +54,9 @@ function Profile() {
             <p className='ms-4  text-custom-grey '>{user.first_name} {user.last_name}</p>
             <div className='ms-sm-4 gap-2 w-50 d-flex'>
               <div className="col d-sm-flex fw-light "> <p className='me-1 fw-normal text-center   mb-0'>{own_posts.length}</p> posts</div>
-              <div className="col d-sm-flex fw-light cursor-pointer" data-bs-toggle="modal" data-bs-target={`#SupportingsBackdrop`}><p className='me-1 fw-normal text-center mb-0 '>{user.supportings&&user.supportings.length}</p>supportings</div>
-              <div className="col  d-sm-flex fw-light cursor-pointer " data-bs-toggle="modal" data-bs-target={`#SupportersBackdrop`}><p className='me-1 fw-normal  text-center mb-0'>{user.supportings&&user.supporters.length}</p>supporters</div>
-              <SupportersList list={user.supporters} type='Supporters' />
-              <SupportersList list={user.supportings} type='Supportings' />
+              <div className="col d-sm-flex fw-light cursor-pointer"  data-bs-toggle="modal" data-bs-target={`#SupportingsBackdrop`}><p className='me-1 fw-normal text-center mb-0 '>{supportings?.length}</p>supportings</div>
+              <div className="col  d-sm-flex fw-light cursor-pointer " data-bs-toggle="modal" data-bs-target={`#SupportersBackdrop`}><p className='me-1 fw-normal  text-center mb-0'>{supporters?.length}</p>supporters</div>
+             
             </div>
           </div>
         </div>
@@ -85,7 +86,8 @@ function Profile() {
       {tab === 0 ?
         <Posts posts={own_posts} clearHeight={400}/> :
         <Posts posts={saved_posts}  clearHeight={400}/>
-      }
+      } <SupportersList list={supporters} setList={setSupporters} type='Supporters' />
+              <SupportersList list={supportings} setList={setSupportings} type='Supportings' />
     </div>:null
   )
 }

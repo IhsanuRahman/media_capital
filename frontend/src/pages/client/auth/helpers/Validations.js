@@ -61,14 +61,14 @@ function SignupValidator(errors, userData) {
     } else {
         errors.password = ''
     }
-    if (userData.conform_password.trim() === '') {
-        errors.conform_password = 'conform password is required'
+    if (userData.confirm_password.trim() === '') {
+        errors.confirm_password = 'confirm password is required'
         is_valid = false
     } else {
-        errors.conform_password = ''
+        errors.confirm_password = ''
     }
-    if (userData.password!==userData.conform_password){
-        errors.conform_password ='passwords are not match'
+    if (userData.password!==userData.confirm_password){
+        errors.confirm_password ='passwords are not match'
         is_valid=false
     }
     return is_valid

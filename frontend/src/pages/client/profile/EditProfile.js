@@ -32,7 +32,7 @@ function EditProfile() {
         last_name: '',
         dob: '',
         password: '',
-        conform_password: ''
+        confirm_password: ''
     })
     console.log(typeof userData.profile);
     const submitHandler = () => {

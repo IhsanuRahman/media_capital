@@ -67,7 +67,7 @@ function ChangePassword() {
                     <h3 className='pb-5 fw-bold'>enter new password</h3>
 
                     <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} name="password" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='new password' style={{ color: '#fff', height: '40px' }} />
-                    <input type="password" value={cnfrmPassword} onChange={e => setCnfrmPassword(e.target.value)} name="password" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='conform password' style={{ color: '#fff', height: '40px' }} />
+                    <input type="password" value={cnfrmPassword} onChange={e => setCnfrmPassword(e.target.value)} name="password" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='confirm password' style={{ color: '#fff', height: '40px' }} />
 
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 mt-3" style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
