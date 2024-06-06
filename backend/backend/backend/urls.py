@@ -26,5 +26,6 @@ urlpatterns = [
     path('messages/',include('message.urls')),
     path('',include('posts.urls')),
     path('',include('user_profile.urls')),
-    path('search',views.search)
+    path('search',views.search),
+    path('search-suggestion',views.search_suggestions)
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +admin_urls

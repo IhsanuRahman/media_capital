@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../axios';
+import { useDispatch } from 'react-redux';
 
 const initialState = {
     user: {},
@@ -32,7 +33,7 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
     }
     try {
         console.log();
-        const res = await api.post('/user', {
+        const res = await api.post('user', {
             'token': localStorage.getItem('refresh')
         }, {
             headers: {
@@ -43,7 +44,6 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
 
         })
         const data = await res.data
-
         if (res.status === 200) {
             return data;
         } else {
@@ -61,23 +61,24 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
 
             // })
             console.log(data)
-            return thunkAPI.rejectWithValue(data);
+            return thunkAPI.fulfillWithValue(data);
         }
     } catch (err) {
         // api.post('token/refresh',{
         //     'refresh':localStorage.getItem('refresh'),
-        //     'access_token':localStorage.getItem('access'),
+        //     'access':localStorage.getItem('access'),
         // }).then(e=>{
         //     console.log('REFRESH',e)
         //     const { dispatch } = thunkAPI;
         //     localStorage.setItem('access',e.data.access)
-        //     dispatch(checkAuth());
+        //     return thunkAPI.fulfillWithValue(dispatch(checkAuth()));
         // }).catch(e=>{
         //     localStorage.removeItem('access')
         //     localStorage.removeItem('refresh')
         //     console.log('REFRESH',e)
 
         // })
+        console.log('from   j',err)
         return thunkAPI.rejectWithValue(err.response.data);
     }
 });
@@ -87,26 +88,27 @@ export const checkAuth = createAsyncThunk(
 
         try {
             if (localStorage.getItem('access') == null || localStorage.getItem('refresh') == null) {
-                return thunkAPI.rejectWithValue(response.data);
+                console.log('token is null')
+                return thunkAPI.rejectWithValue('token is null');
 
             }
-            const response = await api.post('token/verify', JSON.stringify({
-                'token': localStorage.getItem('access')
-            }), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access')}`,
+            // const response = await api.post('token/verify', JSON.stringify({
+            //     'token': localStorage.getItem('access')
+            // }), {
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${localStorage.getItem('access')}`,
 
-                },
+            //     },
 
-            })
+            // })
 
-            if (response.status == 200) {
+            // if (response.status == 200) {
+
+            //     return response
+            // }
                 const { dispatch } = thunkAPI;
                 dispatch(getUser());
-
-                return response
-            }
             
         }
         catch (e) {
@@ -183,13 +185,14 @@ const userSlice = createSlice({
 
                     state.user = action.payload;
                     state.loading = false;
-                    console.log(state.user)
+                    console.log('from silice',state.user)
 
 
                 }).addCase(getUser.rejected, state => {
                     state.loading = false;
                     state.isAuthenticated = false;
                     state.user = {}
+                    
 
                 }).addCase(logout.pending, state => {
                     state.loading = true;
@@ -199,6 +202,7 @@ const userSlice = createSlice({
                     state.user = {};
                     localStorage.clear()
                     state.loading = false;
+
                 })
                 .addCase(logout.rejected, state => {
                     state.loading = false;

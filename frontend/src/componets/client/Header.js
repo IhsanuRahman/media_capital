@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import logoutIcon from '../../assets/Sign_Out.svg'
 import ProfileIcon from '../../assets/User.svg'
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser, logout } from '../../features/user';
+import { checkAuth, getUser, logout } from '../../features/user';
 import { useNavigate } from 'react-router-dom';
 import { baseUrl } from '../../constants';
 function Header({ leading }) {
@@ -22,6 +22,7 @@ function Header({ leading }) {
                 <button className='btn btn-outline-light w-25'
                     onClick={_ => {
                         dispatch(logout())
+                        dispatch(checkAuth())
                         navigate('/login')
                     }}
                 >

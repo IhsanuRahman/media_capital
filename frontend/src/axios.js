@@ -1,39 +1,41 @@
-import axios from "axios";
-import { useDispatch } from "react-redux";
+import axios, { Axios } from "axios";
+import { baseUrl } from "./constants";
 
 
 const api = axios.create({
     baseURL: 'http://127.0.0.1:8000/',
 })
 
-let refresh = false;
 
-api.interceptors.response.use(resp => resp, async error => {
-    if (error.response.status === 401 && !refresh) {
-        refresh = true;
-        console.log(localStorage.getItem('refresh'))
-        const response = await
-            api.post('token/refresh', {
+api.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        const refreshToken = localStorage.getItem('refresh');
+        if (refreshToken) {
+          try {
+            const response = await axios.post(`${baseUrl}/token/refresh`, {
                 refresh: localStorage.getItem('refresh')
-            },
-                {
-                    headers:
-                        { 'Content-Type': 'application/json' }
-                }
-                , { withCredentials: true });
-            console.log('refresh',response);
-        if (response.status === 200) {
-            api.defaults.headers.common['Authorization'] = `Bearer 
-            ${response.data['access']}`;
-            localStorage.setItem('access', response.data.access);
-            localStorage.setItem('refresh', response.data.refresh);
-            window.location.href='/'
-            return api(error.config);
+            });
+            const newAccessToken = response.data.access;
+            const newRefreshToken = response.data.refresh;
+            console.log('tok',newAccessToken)
+            localStorage.setItem('access', newAccessToken);  
+            localStorage.setItem('refresh', newRefreshToken);  
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+            return axios(originalRequest);
+          } catch (error) {
+            console.log('eerr',error)
+        
+          }
         }
+      }
+      return Promise.reject(error);
     }
-    refresh = false;
-    return error;
-});
-
+  );
 
 export default api

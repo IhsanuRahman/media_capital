@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import api from "../../../axios"
 import { useSelector } from 'react-redux'
 import { useTimer } from 'react-timer-hook';
-function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
+function OTPPage({ apiUrl, redirection, keyName, success, resendUrl ,isAuth}) {
     const [alert, setAlert] = useState('')
     const [OTP, setOTP] = useState('')
     const [resendSpin, setResendSpin] = useState(false)
@@ -12,14 +12,15 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
     const navigator = useNavigate()
     const handleSubmit = () => {
         setSendSpin(true)
-        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) }, { headers: { 'Authorization': '' } },).then(e => {
+        api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) }, { headers: !isAuth?{ 'Authorization': '' } :{'Authorization': `Bearer ${localStorage.getItem('access')}`} },).then(e => {
             console.log(e);
             localStorage.removeItem(keyName)
             localStorage.removeItem(keyName+'Time')
-            navigator(redirection)
             success(e)
+            navigator(redirection)
             setSendSpin(false)
         }).catch(e => {
+            console.log('from otp',e)
             try {
                 setAlert(e.response.data.message)
             }
@@ -35,7 +36,7 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
             return navigator('/')
 
         }
-        if (isAuthenticated && !loading) {
+        if (isAuthenticated && !loading && !isAuth) {
             return navigator('/')
         }
 
@@ -84,7 +85,7 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl }) {
                         onClick={e => {
                             if (true) {
                                 setResendSpin(true)
-                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName), }, { headers: { 'Authorization': '' } }).then(e => {
+                                api.post(resendUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName), }, { headers: !isAuth?{ 'Authorization': '' } :{'Authorization': `Bearer ${localStorage.getItem('access')}`}}).then(e => {
 
                                     const now = new Date();
                                     const oneMinuteFromNow = new Date(now.getTime() + 60000);

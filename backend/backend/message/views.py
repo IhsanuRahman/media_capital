@@ -45,7 +45,7 @@ def get_users(request):
     else:
         search = request.query_params['search']
         users = UserModel.objects.filter(Q(username__icontains=search) | Q(
-            first_name__icontains=search) | Q(last_name__icontains=search))
+            first_name__icontains=search) | Q(last_name__icontains=search)).exclude(id=request.user.id)
         for user in users:
             data.append({
                         'profile': user.profile.url,

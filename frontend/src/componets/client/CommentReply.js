@@ -6,7 +6,7 @@ function CommentReply({comment}) {
     const [reply, setReply] = useState('')
     const [replys, setReplys] = useState(comment.replys)
     return (
-        <div class="modal fade" id={`staticBackdrop${comment.id}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id={`staticBackdrop${comment.id}`} data-bs-backdrop="static"  data-bs-theme="dark" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " >
                 <div class="modal-content bg-black ">
                     <div class="modal-header">

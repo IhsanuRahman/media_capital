@@ -1,9 +1,6 @@
 import uuid
 from django.db import models
 from client_auth.models import UserModel
-
-
-
 # Create your models here.
 
 class Tags(models.Model):
@@ -20,6 +17,9 @@ class Posts(models.Model):
     user=models.ForeignKey(UserModel,related_name='posts',on_delete=models.CASCADE)
     rating=models.FloatField(default=0.0)
     posted_at=models.DateTimeField(auto_now_add=True)
+    saved_users=models.ManyToManyField(UserModel,related_name='saved_posts')
+    class Meta:
+        ordering = ['-posted_at']
     
 class Ratings(models.Model):
     user=models.ForeignKey(UserModel,on_delete=models.CASCADE)
@@ -31,7 +31,8 @@ class Comments(models.Model):
     user=models.ForeignKey(UserModel,related_name='Comments',on_delete=models.CASCADE)
     post=models.ForeignKey(Posts,related_name='comments',on_delete=models.CASCADE)
     posted_at=models.DateTimeField(auto_now_add=True)
-
+    class Meta:
+        ordering = ['-posted_at']
 
 class CommentsReply(models.Model):
     reply=models.TextField()

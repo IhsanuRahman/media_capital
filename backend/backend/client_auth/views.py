@@ -43,10 +43,24 @@ def signup(request):
 def get_user(request):
     user = request.user
     user = UserSerializer(user)
-    
     data = user.data
     intrsts=data['intresets']
     intlist=[]
+    supporters=[]
+    userSup=UserModel.objects.get(id=request.user.id).supportings.all()
+    for supporter in data['supporters']:
+        userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+        if userSup.filter(id=supporter).exists() :
+             userData['is_supporting'] = True
+        else:userData['is_supporting']=False
+        supporters.append(userData)
+    data['supporters']=supporters
+    supportings=[]
+    for supporter in data['supportings']:
+        userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+        userData['is_supporting']=  True
+        supportings.append(userData)
+    data['supportings']=supportings
     for i in intrsts:
         intlist.append(Tags.objects.get(id=i).name)
     data['intresets']=intlist
@@ -83,7 +97,7 @@ def verify_otp(request):
             if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-otpObj.otp_datetime > datetime.timedelta(minutes=3):
                 temp_user.delete()
                 otpObj.delete()
-                return JsonResponse({"message": "OTP verification time out"}, status=401)
+                return JsonResponse({"message": "OTP verification time out"}, status=400)
             else:
                     user=UserModel(
                         username=temp_user.username,
@@ -98,9 +112,9 @@ def verify_otp(request):
                     otpObj.delete()
                     return JsonResponse({'message': 'OTP verification Success'}, status=200)
         else:
-            return JsonResponse({'message': 'OTP not valid'}, status=401)
+            return JsonResponse({'message': 'OTP not valid'}, status=400)
     else:
-        return JsonResponse({'message': 'OTP verification Failed'}, status=401)
+        return JsonResponse({'message': 'OTP verification Failed'}, status=400)
 
 
 @api_view(['GET', 'POST'])
@@ -118,13 +132,13 @@ def resend_otp(request):
                 return JsonResponse({'message': 'OTP resend Success'}, status=200)
                 
             else:
-                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=401)
+                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=400)
                     
                     
         else:
-            return JsonResponse({'message': 'credentials are not valid'}, status=401)
+            return JsonResponse({'message': 'credentials are not valid'}, status=400)
     else:
-        return JsonResponse({'message': 'OTP verification Failed'}, status=401)
+        return JsonResponse({'message': 'OTP verification Failed'}, status=400)
 
 
 @api_view(['POST'])
@@ -136,7 +150,7 @@ def forgot_password(request):
             if datetime.datetime.now()-FPObj.first().sended_at.replace(tzinfo=None)> datetime.timedelta(minutes=3):
                 FPObj.delete()
             else:
-                return  JsonResponse({'message':'another request is in progress'},status=401) 
+                return  JsonResponse({'message':'another request is in progress'},status=400) 
         if user.exists():
             user=user.first()
             otpObj=otp_generator(user,user.email)
@@ -145,7 +159,7 @@ def forgot_password(request):
             forgotObj.save()
             return JsonResponse({'token':forgotObj.id})
         else:
-           return JsonResponse({'message':'email not found'},status=401) 
+           return JsonResponse({'message':'email not found'},status=400) 
 
     return JsonResponse({'message':''},status=200)
 
@@ -157,11 +171,11 @@ def verify_with_email(request):
             forgotObj=forgotObj.first()
             return JsonResponse({'token':forgotObj.secondary_code},status=200)
         else:
-            return JsonResponse({'message':'otp is not corrent'},status=401)
+            return JsonResponse({'message':'otp is not corrent'},status=400)
     elif not request.data['otp']:
-        return JsonResponse({'message':'otp is required'},status=401)
+        return JsonResponse({'message':'otp is required'},status=400)
     else:
-        return JsonResponse({'message':'credential missing'},status=401)
+        return JsonResponse({'message':'credential missing'},status=400)
 
 @api_view(['POST'])
 def fp_change_password(request):
@@ -179,8 +193,8 @@ def fp_change_password(request):
                 return JsonResponse({'message':'succes'},status=200)
         else:
             print('hai')
-            return JsonResponse({'details':'session error'},status=401)
-    return JsonResponse({'details':'no cred'},status=401)
+            return JsonResponse({'details':'session error'},status=400)
+    return JsonResponse({'details':'no cred'},status=400)
 
 
 
@@ -200,10 +214,10 @@ def fp_resend_otp(request):
                 return JsonResponse({'message': 'OTP resend Success'}, status=200)
                 
             else:
-                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=401)
+                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=400)
                     
                     
         else:
-            return JsonResponse({'message': 'OTP not valid'}, status=401)
+            return JsonResponse({'message': 'OTP not valid'}, status=400)
     else:
-        return JsonResponse({'message': 'OTP verification Failed'}, status=401)
+        return JsonResponse({'message': 'OTP verification Failed'}, status=400)

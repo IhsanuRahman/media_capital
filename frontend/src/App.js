@@ -1,15 +1,18 @@
 
 import Signup from './pages/client/auth/Signup';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.js';
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import './App.css'
 import Login from './pages/client/auth/Login';
 import Home from './pages/client/home/Home';
 import AdminLogin from './pages/admin/auth/Login';
 import AdminHome from './pages/admin/dashboard/Home';
 import { useDispatch } from 'react-redux';
-import { checkAuth } from './features/user'
+import { checkAuth, getUser } from './features/user'
 import { useEffect } from 'react';
 import OTPPage from './pages/client/auth/otp';
 import ForgotPassword from './pages/client/auth/ForgotPassword';
@@ -21,20 +24,21 @@ import EditProfile from './pages/client/profile/EditProfile';
 import CreatePosts from './pages/client/posts/CreatePosts';
 import ViewPost from './pages/client/posts/ViewPost';
 import ViewUser from './pages/client/profile/ViewUser';
+import EditEmail from './pages/client/profile/EditEmail';
 function App() {
   const dispatch = useDispatch();
 
 
   useEffect(() => {
-    console.log(dispatch(checkAuth()))
+    dispatch(checkAuth())
   },[]);
   return (
     <Router>
       <Routes>
         <Route path='/signup' element={<Signup />} />
-        <Route path='/verify-email' element={<OTPPage apiUrl={'/otp/send'} redirection={'/login'} keyName={'RToken'} resendUrl={'/otp/resend'} />} />
+        <Route path='/verify-email' element={<OTPPage  isAuth={false} apiUrl={'/otp/send'} redirection={'/login'} keyName={'RToken'} resendUrl={'/otp/resend'} />} />
         <Route path='/forgotpassword' element={<ForgotPassword />} />
-        <Route path='/forgotpassword/verify-email' element={<OTPPage apiUrl={'forgot-password/verify'} redirection={'/forgotpassword/change-password'} resendUrl={'/forgot-password/verify-resend'} keyName={'FStoken'} success={
+        <Route path='/forgotpassword/verify-email' element={<OTPPage isAuth={false} apiUrl={'forgot-password/verify'} redirection={'/forgotpassword/change-password'} resendUrl={'/forgot-password/verify-resend'} keyName={'FStoken'} success={
           e => {
             console.log('token', e.data.token)
             localStorage.setItem('FStoken', e.data.token)
@@ -64,6 +68,20 @@ function App() {
         <Route path="/profile/change-password" element={
           <ProtectedRoute>
             <ChangePassword />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/change-email" element={
+          <ProtectedRoute>
+            <EditEmail />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile/change-email/verify" element={
+          <ProtectedRoute>
+            <OTPPage apiUrl={'profile/edit-email/verify'} redirection={'/profile'} keyName={'EEToken'} 
+            success={_=>{
+              dispatch(getUser())
+            }}
+            isAuth={true}  resendUrl={'/profile/edit-email/resend'}/>
           </ProtectedRoute>
         } />
         <Route path="/post/:id" element={

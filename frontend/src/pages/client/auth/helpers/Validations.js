@@ -111,21 +111,21 @@ export function ProfileValidator(errors, userData) {
         } else
             errors.last_name = ''
     }
-    if (userData.email.trim() === '') {
-        errors.email = 'email is required'
-        is_valid = false
-    } else {
-        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-        if (!regex.test(userData.email.trim())) {
-            errors.email = 'enter a valid email'
-            is_valid = false
-        }else if (userData.email.length < 5) {
-            errors.email = 'minimum 5 chacters need in email'
-            is_valid=false
-        } else {
-            errors.email = ''
-        }
-    }
+    // if (userData.email.trim() === '') {
+    //     errors.email = 'email is required'
+    //     is_valid = false
+    // } else {
+    //     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    //     if (!regex.test(userData.email.trim())) {
+    //         errors.email = 'enter a valid email'
+    //         is_valid = false
+    //     }else if (userData.email.length < 5) {
+    //         errors.email = 'minimum 5 chacters need in email'
+    //         is_valid=false
+    //     } else {
+    //         errors.email = ''
+    //     }
+    // }
     if (userData.dob === '' || userData.dob === null) {
         errors.dob = 'date of birth is required'
         is_valid = false

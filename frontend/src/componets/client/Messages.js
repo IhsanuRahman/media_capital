@@ -79,6 +79,7 @@ function Messages() {
             className='w-75 greyholder text-white ms-auto me-auto rounded-3 ps-2 border-0' style={{ height: '30px', backgroundColor: '#494949' }} />
             <hr className=' ms-auto me-auto ' style={{ width: '85%' }} />
             <div className='w-auto ps-2 pe-5'>
+                
                 {users.map((user, idx) => {
                     return <div id={idx} className='   w-100 m-3  ps-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
                         onClick={e =>

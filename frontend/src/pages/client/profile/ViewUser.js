@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../../../componets/client/Header'
 import three_dots from '../../../assets/three_dots.svg'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { baseUrl } from '../../../constants';
 import Posts from '../../../componets/client/Posts';
 import api from '../../../axios';
 import GridPosts from '../../../componets/client/GridPosts';
 import {Toast} from 'bootstrap'
+import { getUser } from '../../../features/user';
 function ViewUser() {
   const { id } = useParams()
+  const dispatch =useDispatch()
   const { isAuthenticated, user, loading } = useSelector(state => state.user);
   const [userData, setUserData] = useState({
 
@@ -58,6 +60,7 @@ function ViewUser() {
 
                     },
                   }).then(e => {
+                    dispatch(getUser())
                     setData()
                     const toastLiveExample = tostRef.current
 
@@ -81,7 +84,7 @@ function ViewUser() {
           <p className=' text-custom-grey'>{userData.description}</p>
         </div>
       </div>
-      <Posts posts={posts} />
+      <Posts posts={posts} clearHeight={400}/>
       <div className="toast-container position-fixed bottom-0 end-0 p-3 "  data-bs-theme="dark">
         <div ref={tostRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">
          

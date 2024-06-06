@@ -6,11 +6,12 @@ from django.core.mail import send_mail
 from .models import OTP
 
 
-def otp_generator(user,email=None):
+def otp_generator(user=None,email=None):
     otp=random.randint(100000,999999)
 #    user=TempUser.objects.get(id=user.id)
     otpObj=OTP(otp=otp,otp_datetime=datetime.datetime.now(),id=uuid.uuid4())
-    user.stored_time=datetime.datetime.now()
+    if user:
+        user.stored_time=datetime.datetime.now()
 #    user.save()
     if email:
         send_mail(

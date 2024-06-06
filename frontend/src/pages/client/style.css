@@ -2,6 +2,9 @@ body{
     background-color: black;
     color: white;
 }
+.cursor-pointer{
+    cursor: pointer;
+}
 .greayholder::placeholder {
     color: #898686;
     font-weight: bold;
@@ -75,4 +78,8 @@ input[type=number]::-webkit-outer-spin-button {
    
     background-color: rgba(0, 0, 0, 0.615);
 
+}
+.tab-btn-secondary:hover{
+    --bs-bg-opacity: 0.5;
+    background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
 }

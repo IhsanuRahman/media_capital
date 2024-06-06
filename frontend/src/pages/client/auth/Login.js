@@ -7,7 +7,7 @@ import { checkAuth, setAuthed } from '../../../features/user'
 function Login() {
     const [alert, setAlert] = useState('')
     const [spinner, setSpinner] = useState(false)
-    const dispatch =useDispatch()
+    const dispatch = useDispatch()
     const navigator = useNavigate()
     const [errors, setErrors] = useState({
         username: '',
@@ -34,35 +34,40 @@ function Login() {
         }
         setErrors({ ...errors })
         if (errors.username === '' && errors.password === '') {
-            api.post('/login', userData,{headers:{'Authorization':''}}).then((e) => {
-                console.log(e);
+            api.post('/login', userData, { headers: { 'Authorization': '' } }).then((e) => {
+                console.log('logsuces',e);
                 localStorage.setItem('access', e.data.access)
                 localStorage.setItem('refresh', e.data.refresh)
                 dispatch(setAuthed())
                 dispatch(checkAuth())
                 setSpinner(false)
-                
+
             }).catch(e => {
-             setAlert(e.response.data.detail)
-             setSpinner(false)
-             
-            })}else{
+                console.log('err',e)
+                if (e.response?.data && e.response.data?.detail) {
+                    setAlert(e.response?.data?.detail)
+                }
+
+                setSpinner(false)
+
+            })
+        } else {
             setSpinner(false)
         }
     }
     const { isAuthenticated, user, loading } = useSelector(state => state.user)
     useEffect(() => {
-        if (isAuthenticated && !loading ) { 
-          return navigator('/')
+        if (isAuthenticated && !loading) {
+            return navigator('/')
         }
     })
-    
+
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert &&<div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert && <div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
-                 onClick={_=>setAlert('')}
+                    onClick={_ => setAlert('')}
                 >
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -80,7 +85,7 @@ function Login() {
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >
-                      {spinner? <span class="spinner-border" aria-hidden="true"></span>:'login'}
+                        {spinner ? <span class="spinner-border" aria-hidden="true"></span> : 'login'}
                     </button>
                 </div>
             </div>

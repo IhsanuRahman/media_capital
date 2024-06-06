@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { baseUrl } from '../../../constants'
 import ratingSvg from '../../../assets/Star.svg';
 import ratingHalfSvg from '../../../assets/Half_filled_star.svg';
-import ratingFullSvg from '../../../assets/Filled_star.svg';
+import deleteIcon from '../../../assets/delete.svg';
 import option from '../../../assets/options.svg';
 import Markdown from 'markdown-to-jsx'
 import api from '../../../axios';
@@ -12,13 +12,17 @@ import { Stack, Rating } from '@mui/material';
 import CommentReply from '../../../componets/client/CommentReply';
 import moment from 'moment'
 import { useSelector } from 'react-redux';
+import { Toast } from 'bootstrap';
+import EditComment from '../../../componets/client/EditComment';
 function ViewPost() {
-    const {user}=useSelector(state=>state.user)
+    const { user } = useSelector(state => state.user)
     const { id } = useParams()
     const [comment, setComment] = useState('')
     const [post, setPost] = useState()
-    const listRef = useRef()
-    const [posted_at,setPostedAt]=useState()
+    const toastRef = useRef()
+    const [toastMsg, setToastMsg] = useState('')
+    const [posted_at, setPostedAt] = useState()
+    const [comments, setComments] = useState([])
     console.log(id);
     const navigator = useNavigate()
     const getPost = () => {
@@ -31,9 +35,10 @@ function ViewPost() {
         }).then(e => {
             console.log('resp', e.data.post);
             setPost(e.data.post)
-            const dateTime=moment.utc(e.data.post.posted_at.replace('+','00+')).local().startOf('seconds').fromNow()
+            const dateTime = moment.utc(e.data.post.posted_at.replace('+', '00+')).local().startOf('seconds').fromNow()
             setPostedAt(dateTime)
             setAllRate(parseFloat(e.data.post.rating))
+            setComments(e.data.post.comments)
         })
 
     }
@@ -67,6 +72,13 @@ function ViewPost() {
                                     api.put('/posts/rate/add', {
                                         id: post.id,
                                         rate: newValue
+                                    }, {
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+                                        },
+
                                     }).then(e => {
 
                                         getPost()
@@ -99,23 +111,68 @@ function ViewPost() {
                         <hr />
                         <h5 className='ps-2'>Comments</h5>
                         <div className='d-flex flex-column'>
-                            {post.comments.map((comment, idx) =>{
-                                const DateTime=moment.utc(comment.posted_at).local().startOf('seconds').fromNow()
-                                
-                               return <div id={idx} className="d-flex border  rounded ms-2 mb-1 me-2 p-1 align-items-center ps-2">
+                            {comments.map((comment, idx) => {
+                                const DateTime = moment.utc(comment.posted_at).local().startOf('seconds').fromNow()
+
+                                return <div id={idx} className="d-flex border  rounded ms-2 mb-1 me-2 p-1 align-items-center ps-2">
                                     <div className='d-flex w-100 ps-1 pt-1'>
                                         <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + comment.profile})` }}>
                                         </div>
                                         <div>
                                             <p className='ms-3 mb-0  text-secondary' style={{ fontSize: '12px' }}> {comment.user}</p>
                                             <p className='mt-1 ms-4 mb-1 text-white text-break  '>{comment.comment}</p>
-                                            <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`}>replys</p>
-                                            <CommentReply comment={comment}  />
+                                            <div className="d-flex gap-2 ">
+                                                <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`}>replys</p>
+                                                
+                                            {comment.user_id === user.id &&<p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#editBackdrop${comment.id}`}>edit</p>
+                                            }</div>
+                                            
+                                            <CommentReply comment={comment} />
+                                            <EditComment comment={comment} onSuccess={comment=>{
+                                                
+                                                setToastMsg('comment has been edited')
+
+                                                const toastLiveExample = toastRef.current
+                                                const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                comments[idx].comment=comment
+                                                setComments([...comments])
+                                                toastBootstrap.show()
+                                                
+                                                }}/>
                                         </div>
-                                        <p className='ms-auto text-secondary'>{DateTime}</p>
+                                        <div className='ms-auto d-flex flex-column '>
+                                            <p className=' text-secondary mb-0'>{DateTime}</p>
+                                            {comment.user_id === user.id && <button className='btn  ms-auto mt-0'
+                                                onClick={_ => {
+                                                    api.delete('posts/comment/delete', {
+                                                        data: {
+                                                            comment_id: comment.id
+                                                        },
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+                                                        },
+
+                                                    }).then(e => {
+                                                        comments.splice(idx, 1)
+                                                        setToastMsg('comment has been deleted')
+
+                                                        const toastLiveExample = toastRef.current
+                                                        const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                        setComments([...comments])
+                                                        toastBootstrap.show()
+                                                    })
+
+                                                }}
+                                            >
+                                                <img src={deleteIcon} width={'20px'} height={'20px'} />
+                                            </button>}
+                                        </div>
                                     </div>
 
-                                </div>})}
+                                </div>
+                            })}
                         </div>
                         <div className='d-flex gap-2 align-self-end mt-3  mb-2 justify-content-start w-100'>
                             <input type="text" name="" placeholder="comment" value={comment}
@@ -140,7 +197,17 @@ function ViewPost() {
                         </div>
                     </div>
                 </div>
-            </div>}</div>
+            </div>}
+            <div className="toast-container position-fixed bottom-0 end-0 p-3 " data-bs-theme="dark">
+                <div ref={toastRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">
+
+                    <div className="toast-body d-flex">
+                        {toastMsg}
+                        <button type="button" className="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
 

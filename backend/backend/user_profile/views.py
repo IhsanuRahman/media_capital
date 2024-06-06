@@ -1,13 +1,18 @@
+import datetime
+import uuid
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
+import pytz
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from client_auth.models import UserModel
+from client_auth.models import OTP, UserModel
 from posts.models import Tags, Posts
 from user_profile.serializers import UserUpdateSerilizer
-
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from .models import EditEmail
+from client_auth.utils import otp_generator, otp_resender
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def edit_profile(request):
@@ -32,7 +37,7 @@ def edit_profile(request):
         else:
             return JsonResponse({'message': user.errors}, status=400)
     else:
-        return JsonResponse({'message': 'user not found'}, status=401)
+        return JsonResponse({'message': 'user not found'}, status=400)
 
 
 @api_view(['PUT'])
@@ -49,9 +54,10 @@ def change_password(request):
                 user.set_password(new_password)
                 user.save()
                 return JsonResponse({'message': 'change password success'}, status=200)
-
-        return JsonResponse({'message': 'passwords are not match'}, status=401)
-    return JsonResponse({'message': 'not found'}, status=401)
+            else:
+                return JsonResponse({'message': 'old password are not match'}, status=404)
+        return JsonResponse({'message': 'passwords are not match'}, status=404)
+    return JsonResponse({'message': 'not found'}, status=404)
 
 
 @api_view(['GET'])
@@ -73,7 +79,7 @@ def get_userdata(request):
                     'is_supporting':UserModel.objects.get(id=request.user.id) in user.supporters.all()
                     }
       return JsonResponse({'userData':userData,'posts':postData})
-    return JsonResponse({'message':'not found'},status=401)
+    return JsonResponse({'message':'not found'},status=400)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -83,7 +89,7 @@ def support(request):
         user=UserModel.objects.get(id=id)
         supporter=UserModel.objects.get(id=request.user.id)
         if user==supporter:
-            return JsonResponse({'message':'self support not allowed'},status=401)
+            return JsonResponse({'message':'self support not allowed'},status=400)
         if user in supporter.supportings.all():
             supporter.supportings.remove(user)
             print('unsuport',user,supporter)
@@ -91,4 +97,82 @@ def support(request):
         print('suport',user,supporter.supportings.all())
         supporter.supportings.add(user)
         return JsonResponse({'message':'supported'},status=201)
-    return JsonResponse({'message':'not found'},status=401)
+    return JsonResponse({'message':'not found'},status=400)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def edit_email(request):
+    email=request.data.get('email',None)
+    if not email:
+        return JsonResponse({'message':'email is required'},status=400)
+    try:
+        validate_email(email)
+    except ValidationError as err:
+        return JsonResponse({'message':err.message},status=400)
+    if EditEmail.objects.filter(new_email=email).exists():
+        obj=EditEmail.objects.filter(new_email=email).first()
+        if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-obj.otp.otp_datetime > datetime.timedelta(minutes=3):
+            obj.otp.delete()
+            obj.delete()
+        else:
+            return JsonResponse({'message':'email already used'},status=400)
+
+    if UserModel.objects.filter(email=email).exists():
+        if UserModel.objects.filter(id=request.user.id,email=email):
+            return JsonResponse({'message':'new email is same as old email'},status=400)
+        return JsonResponse({'message':'email already used'},status=400)
+    
+    editObj=EditEmail(id=uuid.uuid4(),new_email=email,user=UserModel.objects.get(id=request.user.id))
+    otpObj=otp_generator(email=email)
+    otpObj.save()
+    editObj.otp=otpObj
+    editObj.save()
+    return JsonResponse({'token':editObj.id})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def email_verify(request):
+    user=UserModel.objects.get(id=request.user.id)
+    objId=request.data.get('token',None)
+    otp=request.data.get('otp')
+    if objId:
+        editObj=EditEmail.objects.filter(id=objId,user=user)
+        if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-editObj.first().otp.otp_datetime > datetime.timedelta(minutes=3):
+            editObj.first().otp.delete()
+            editObj.first().delete()
+            return JsonResponse({'message':'otp is time out'},status=400)
+        if editObj.exists():
+            if editObj.filter(otp__otp=otp):
+                editObj=editObj.first()
+                user.email=editObj.new_email
+                user.save()
+                editObj.otp.delete()
+                editObj.delete()
+                return JsonResponse({'message':'edit email success'})
+            else:
+                return JsonResponse({'message':'invalid otp'},status=400)  
+    return JsonResponse({'message':'credential not valid'},status=400)          
+    
+    
+@api_view(['GET', 'POST'])
+def resend_otp(request):
+    if request.data['token']:
+        user=UserModel.objects.get(id=request.user.id)
+        otpObj = EditEmail.objects.filter(
+             id=request.data['token'],user=user).first().otp
+        if otpObj:
+            print(datetime.datetime.now(), otpObj.otp_datetime)
+            if datetime.datetime.now(pytz.timezone('Asia/Kolkata'))-otpObj.otp_datetime >= datetime.timedelta(minutes=1):
+                otpObj=otp_resender(otpObj,user.email)
+                otpObj.save()
+                return JsonResponse({'message': 'OTP resend Success'}, status=200)
+                
+            else:
+                return JsonResponse({"message": "OTP resend only after 1 minute"}, status=400)
+                    
+                    
+        else:
+            return JsonResponse({'message': 'credentials are not valid'}, status=400)
+    else:
+        return JsonResponse({'message': 'OTP verification Failed'}, status=400)

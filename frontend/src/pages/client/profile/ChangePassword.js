@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import api from '../../../axios'
+import { checkAuth, logout } from '../../../features/user'
 
 function ChangePassword() {
   
@@ -66,7 +67,9 @@ function ChangePassword() {
             }).then((e) => {
                 console.log(e);
                 setSpinner(false)
-                navigator('/profile')
+                dispatch(logout())
+                dispatch(checkAuth())
+                navigator('/login')
                 
             }).catch(e => {
              setAlert(e.response.data.message)

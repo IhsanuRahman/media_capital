@@ -6,6 +6,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import pre_init
 from django.dispatch import receiver
 
+from posts import models as postModels
+
+
+
+
 
 # Create your models here.
 class UserModel(AbstractUser):
@@ -23,7 +28,6 @@ class OTP(models.Model):
     id=models.CharField(default=uuid.uuid4(), editable=False, unique=True,max_length=120,primary_key=True)
     otp=models.BigIntegerField()
     otp_datetime=models.DateTimeField()
-
 
 
 class ForgotPassword(models.Model):
