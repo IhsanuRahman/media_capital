@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from client_auth.models import UserModel
 from rest_framework_simplejwt.tokens import  RefreshToken, AccessToken
@@ -25,3 +24,4 @@ def admin_login_view( request):
         "access": access_token,
         "refresh": refresh_token
     })
+

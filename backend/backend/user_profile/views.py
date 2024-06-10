@@ -6,9 +6,12 @@ import json
 import pytz
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from admin.admin_auth.utils import admin_only
 from client_auth.models import OTP, UserModel
 from posts.models import Tags, Posts
 from user_profile.serializers import UserUpdateSerilizer
+from .serializers import  UserSerializer
+from .serializers import CreateUserSerializer
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from .models import EditEmail
@@ -24,13 +27,13 @@ def edit_profile(request):
             user.save()
             user = UserModel.objects.get(id=request.user.id)
             print(user)
-            interests = json.loads(request.data.get('intresets', ''))
-            user.intresets.all().delete()
+            interests = json.loads(request.data.get('interests', ''))
+            user.interests.all().delete()
             for intrst in interests:
                 tag, created = Tags.objects.get_or_create(name=intrst)
                 print(tag)
                 tag.save()
-                user.intresets.add(tag)
+                user.interests.add(tag)
 
             user.save()
             return JsonResponse({'message': 'user update success'}, status=200)
@@ -176,3 +179,106 @@ def resend_otp(request):
             return JsonResponse({'message': 'credentials are not valid'}, status=400)
     else:
         return JsonResponse({'message': 'OTP verification Failed'}, status=400)
+    
+#  -- admin -- 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def get_users(request):
+    data=UserSerializer(UserModel.objects.all(),many=True).data
+    print(data)
+    return JsonResponse({'users':data})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def create_user(request):
+    print(request.data)
+    user = CreateUserSerializer(data=request.data)
+    if user.is_valid():
+        user = user.save()
+        if user:
+            return JsonResponse({
+                'message': 'user is created',
+            }, status=200)
+    else:
+        return JsonResponse(user.errors, status=403)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@admin_only    
+def ban_user(request):
+    user_id=request.data.get('user_id',None)
+    if user_id:
+        user=UserModel.objects.filter(id=user_id).first()
+        if user:
+            user.is_banned=True
+            user.save()
+            return JsonResponse({'message':'user banned success'})
+    return JsonResponse({'message':'user banned failed'})
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@admin_only    
+def unban_user(request):
+    user_id=request.data.get('user_id',None)
+    if user_id:
+        user=UserModel.objects.filter(id=user_id).first()
+        if user:
+            user.is_banned=False
+            user.save()
+            return JsonResponse({'message':'user banned success'})
+    return JsonResponse({'message':'user banned failed'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@admin_only   
+def users_ops(request):
+    op=request.data.get('users_op',None)
+    ids=request.data.get('users')
+    users=UserModel.objects.filter(id__in=ids)
+    if op=='del':
+        users.delete()
+        return JsonResponse({"message":'success'})
+    elif op=='ban':
+        users.update(is_banned=True)
+        print(ids)
+        return JsonResponse({"message":'success'})
+    elif op=='unban':
+        users.update(is_banned=False)
+        print(ids)
+        return JsonResponse({"message":'success'})
+    return JsonResponse({'message':'not found '},status=404) 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def get_user(request):
+    id=request.query_params['id']
+    if id :
+        user=UserModel.objects.get(id=id)
+        user = UserSerializer(user)
+        data = user.data
+        intrsts=data['interests']
+        intlist=[]
+        supporters=[]
+        userSup=UserModel.objects.get(id=request.user.id).supportings.all()
+        for supporter in data['supporters']:
+            userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+            if userSup.filter(id=supporter).exists() :
+                userData['is_supporting'] = True
+            else:userData['is_supporting']=False
+            supporters.append(userData)
+        data['supporters']=supporters
+        supportings=[]
+        for supporter in data['supportings']:
+            userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+            userData['is_supporting']=  True
+            supportings.append(userData)
+        data['supportings']=supportings
+        for i in intrsts:
+            intlist.append(Tags.objects.get(id=i).name)
+        data['interests']=intlist
+        return JsonResponse({'userData':data}) 

@@ -44,7 +44,7 @@ def get_user(request):
     user = request.user
     user = UserSerializer(user)
     data = user.data
-    intrsts=data['intresets']
+    intrsts=data['interests']
     intlist=[]
     supporters=[]
     userSup=UserModel.objects.get(id=request.user.id).supportings.all()
@@ -63,10 +63,10 @@ def get_user(request):
     data['supportings']=supportings
     for i in intrsts:
         intlist.append(Tags.objects.get(id=i).name)
-    data['intresets']=intlist
+    data['interests']=intlist
     
-    # for i in range(len(data['intresets'])):
-    #     print(data['intresets'][i].name)
+    # for i in range(len(data['interests'])):
+    #     print(data['interests'][i].name)
     # if UserImage.objects.filter(creator=request.user).exists():
     #     imageUrl=UserImage.objects.filter(creator=request.user).first().image.url
     #     data['image']='http://127.0.0.1:8000'+imageUrl

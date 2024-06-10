@@ -25,6 +25,9 @@ import CreatePosts from './pages/client/posts/CreatePosts';
 import ViewPost from './pages/client/posts/ViewPost';
 import ViewUser from './pages/client/profile/ViewUser';
 import EditEmail from './pages/client/profile/EditEmail';
+import CreateUser from './pages/admin/user/CreateUser';
+import EditUser from './pages/admin/user/EditUser';
+import AdminProtectedRoute from './AdminProtectedRoute';
 function App() {
   const dispatch = useDispatch();
 
@@ -96,7 +99,16 @@ function App() {
         } />
         <Route path='/login' element={<Login />} />
         <Route path='/admin/login' element={<AdminLogin />} />
-        <Route path='/admin' element={<AdminHome />} />
+        <Route path='/admin' element={
+          <AdminProtectedRoute>
+          <AdminHome />
+          </AdminProtectedRoute>} />
+        <Route path='/admin/user/create' element={
+          <AdminProtectedRoute>
+          <CreateUser /></AdminProtectedRoute>} />
+        <Route path='/admin/user/:id' element={
+           <AdminProtectedRoute>
+          <EditUser /></AdminProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -19,7 +19,7 @@ function EditProfile() {
         last_name: user.last_name,
         dob: user.dob,
         banner:`${baseUrl+user.banner}`,
-        interests:user.intresets,
+        interests:user.interests,
         description: user.description,
         profile: `${baseUrl+user.profile}`
     }
@@ -54,7 +54,7 @@ function EditProfile() {
                 form_data.append('banner', userData.banner)
             if (typeof userData.profile!=='string' && userData.profile!==null)
                 form_data.append('profile', userData.profile)
-            form_data.append('intresets', JSON.stringify(userData.interests))
+            form_data.append('interests', JSON.stringify(userData.interests))
             form_data.append('dob', userData.dob)
             form_data.append('description', userData.description)
             api.put('/profile/edit', form_data, {
@@ -167,7 +167,7 @@ function EditProfile() {
                                 onChange={e=>{
                                     setInterest(e.target.value)
                                 }}
-                                placeholder="add intresets" id="" className='w-75 bg-black text-white border-0' />
+                                placeholder="add interests" id="" className='w-75 bg-black text-white border-0' />
                             <div className=" ms-2 text-white " style={{cursor:'pointer'}}
                             onClick={e=>{
                                 if (!userData.interests.includes(interest) && interest!==''){

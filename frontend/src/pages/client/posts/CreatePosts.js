@@ -77,7 +77,7 @@ function CreatePosts() {
                                 onChange={e => {
                                     setTag(e.target.value)
                                 }}
-                                placeholder="add intresets" id="" className='w-100 bg-black text-white border-0' />
+                                placeholder="add interests" id="" className='w-100 bg-black text-white border-0' />
                             <div className=" ms-2 text-white " style={{ cursor: 'pointer' }}
                                 onClick={e => {
                                     if (!tags.includes(tag) && tag !== '') {

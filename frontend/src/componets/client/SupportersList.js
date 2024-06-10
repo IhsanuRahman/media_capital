@@ -14,9 +14,9 @@ function SupportersList({ list, setList, type }) {
         <div  className="modal fade" id={`${type}Backdrop`} data-bs-backdrop="true" data-bs-keyboard="true" data-bs-focus='true' tabIndex="-1" data-bs-theme="dark" aria-labelledby={`${type}BackdropLabel`} aria-hidden="false">
             <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable "  >
                 <div className="modal-content bg-black ">
-                    <div class="modal-header">
+                    <div className="modal-header">
 
-                        <h5 class="modal-title">{type}</h5>
+                        <h5 className="modal-title">{type}</h5>
                         <button type="button" className="btn-close " data-bs-dismiss="modal" aria-label="Close" onClick={_=>dispatch(getUser())}></button>
                     </div>
                     <div class="modal-body">
