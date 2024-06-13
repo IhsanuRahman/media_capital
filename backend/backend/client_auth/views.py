@@ -1,6 +1,8 @@
 import datetime
 import uuid
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,14 +11,29 @@ from .utils import otp_generator, otp_resender
 from .models import OTP, ForgotPassword, TempUser, UserModel
 from posts.models import Tags
 import pytz
-
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 utc=pytz.UTC
 
+@api_view(['POST'])
 def login(request):
-    return JsonResponse({
-        'data': 'hai'
-    })
-
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = UserModel.all.all().filter(username=username).first() 
+        if user is not None and user.check_password(password):
+            if user.is_banned:
+                return JsonResponse({
+                    'detail': 'The user account is blocked'
+                }, status=400)
+            refresh = RefreshToken.for_user(user)
+            return JsonResponse({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        else:
+            return JsonResponse({
+                'detail': 'Invalid credentials'
+            }, status=400)
 
 @api_view(['POST'])
 def signup(request):

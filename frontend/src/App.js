@@ -23,11 +23,13 @@ import Profile from './pages/client/profile/Profile';
 import EditProfile from './pages/client/profile/EditProfile';
 import CreatePosts from './pages/client/posts/CreatePosts';
 import ViewPost from './pages/client/posts/ViewPost';
+import AdminViewPost from './pages/admin/posts/ViewPost';
 import ViewUser from './pages/client/profile/ViewUser';
 import EditEmail from './pages/client/profile/EditEmail';
 import CreateUser from './pages/admin/user/CreateUser';
 import EditUser from './pages/admin/user/EditUser';
 import AdminProtectedRoute from './AdminProtectedRoute';
+import CreateNotification from './pages/admin/notifications/CreateNotifications';
 function App() {
   const dispatch = useDispatch();
 
@@ -109,6 +111,12 @@ function App() {
         <Route path='/admin/user/:id' element={
            <AdminProtectedRoute>
           <EditUser /></AdminProtectedRoute>} />
+          <Route path='/admin/post/:id' element={
+           <AdminProtectedRoute>
+          <AdminViewPost /></AdminProtectedRoute>} />
+        <Route path='/admin/notification/create' element={
+          <AdminProtectedRoute>
+          <CreateNotification /></AdminProtectedRoute>} />
       </Routes>
     </Router>
   );

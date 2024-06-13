@@ -11,8 +11,10 @@ urlpatterns =[
     # admin
     path('admin/users',views.get_users),
     path('admin/user',views.get_user),
+    path('admin/user/edit',views.edit_user),
     path('admin/users/ops',views.users_ops),
     path('admin/user/create',views.create_user),
     path('admin/user/ban',views.ban_user),
     path('admin/user/unban',views.unban_user),
+    
 ]

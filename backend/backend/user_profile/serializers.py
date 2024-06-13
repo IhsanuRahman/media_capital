@@ -16,11 +16,11 @@ class UserUpdateSerilizer(serializers.ModelSerializer):
         print('validate')
         error={}
         if data['username']:
-            if UserModel.objects.exclude(id=self.instance.id).filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
+            if UserModel.all.exclude(id=self.instance.id).filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
                 error['username']='Username is already exists'
                 # raise serializers.ValidationError({"username":""})
         if data['email']:
-            if UserModel.objects.exclude(id=self.instance.id).filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
+            if UserModel.all.exclude(id=self.instance.id).filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
                 error['email']='Email is already exists'
                 # raise serializers.ValidationError({"email":'Email is already exists'})
         if error:
@@ -38,11 +38,11 @@ class UserUpdateSerilizerT(serializers.Serializer):
     def validate(self, data):
         error={}
         if data['username']:
-            if UserModel.objects.exclude(id=self.instance.id).filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
+            if UserModel.all.exclude(id=self.instance.id).filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
                 error['username']='Username is already exists'
                 # raise serializers.ValidationError({"username":""})
         if data['email']:
-            if UserModel.objects.exclude(id=self.instance.id).filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
+            if UserModel.all.exclude(id=self.instance.id).filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
                 error['email']='Email is already exists'
                 # raise serializers.ValidationError({"email":'Email is already exists'})
         if error:
@@ -71,12 +71,12 @@ class CreateUserSerializer(serializers.Serializer):
     def validate(self, data):
         error={}
         if data['username']:
-            if UserModel.objects.filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
+            if UserModel.all.filter(username=data['username']).exists() or TempUser.objects.filter(username=data['username']).exists():
                 
                 error['username']='Username is already exists'
                 # raise serializers.ValidationError({"username":""})
         if data['email']:
-            if UserModel.objects.filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
+            if UserModel.all.filter(email=data['email']).exists() or TempUser.objects.filter(email=data['email']).exists():
                 error['email']='Email is already exists'
                 # raise serializers.ValidationError({"email":'Email is already exists'})
         if error:
@@ -94,3 +94,4 @@ class CreateUserSerializer(serializers.Serializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+    

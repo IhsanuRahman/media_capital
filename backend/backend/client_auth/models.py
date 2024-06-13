@@ -10,7 +10,11 @@ from posts import models as postModels
 
 
 
-
+class BanManager(models.Manager):
+    def get_queryset(self) :
+        return super().get_queryset().filter(is_banned=False)
+    def get_by_natural_key(self, username):
+        return self.get(username=username)
 
 # Create your models here.
 class UserModel(AbstractUser):
@@ -21,7 +25,8 @@ class UserModel(AbstractUser):
     description=models.TextField()
     dob=models.DateField(null=False)
     supportings=models.ManyToManyField('UserModel',related_name='supporters')
-
+    objects=BanManager()
+    all=models.Manager()
  
 
 class OTP(models.Model):

@@ -7,7 +7,10 @@ import uuid
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from .models import Tags
+
+from admin_auth.utils import admin_only
+from .serializers import ReportSerilizer
+from .models import Reports, Tags
 from client_auth.models import UserModel
 from .models import Posts, Comments, Ratings, CommentsReply
 from PIL import Image
@@ -46,9 +49,13 @@ def create_post(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_posts(request):
-    objects = Posts.objects.all()
+    objects=None
+    if request.user.is_superuser:
+        objects = Posts.all.all()
+    else:
+        objects = Posts.objects.all()
     print('posts')
-    page = Paginator(objects, 2)
+    page = Paginator(objects, 10)
     n = request.query_params.get('page', 1)
     if int(page.num_pages) < int(n):
         return JsonResponse({'posts': []})
@@ -72,7 +79,7 @@ def get_posts(request):
             saved = True
         data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
                     'description': post.description,
-                     'is_saved': saved,
+                     'is_saved': saved,'is_hidded':post.is_hidded,
                      'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
 
     return JsonResponse({'posts': data})
@@ -102,10 +109,14 @@ def get_own_posts(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_post(request):
+    post=None
     try:
-        post = Posts.objects.get(id=request.query_params['id'])
+        if request.user.is_superuser:
+            post =Posts.all.get(id=request.query_params['id'])
+        else:
+            post = Posts.objects.get(id=request.query_params['id'])
     except:
-        return JsonResponse({'message': 'not found'})
+        return JsonResponse({'message': 'not found'},status=404)
     comments = Comments.objects.filter(post__id=post.id)
     commentsFormated = []
     for comment in comments:
@@ -285,8 +296,15 @@ def save_post(request):
 @permission_classes([IsAuthenticated])
 def delete_post(request):
     post_id = request.data['post_id']
-    postObj = Posts.objects.get(id=post_id, user__id=request.user.id)
-    postObj.delete()
+    postObj=None
+    if request.user.is_superuser:
+        postObj = Posts.all.get(id=post_id)
+    else:
+        postObj = Posts.objects.get(id=post_id, user__id=request.user.id)
+    if postObj:
+        postObj.delete()
+    else:
+        return JsonResponse({'message':'post not found'},status=404)
     return JsonResponse({'message': 'post is delete'})
 
 
@@ -324,7 +342,11 @@ def get_saved_post(request):
 @permission_classes([IsAuthenticated])
 def delete_comment(request):
     comment_id = request.data.get('comment_id', None)
-    comment = Comments.objects.get(user__id=request.user.id, id=comment_id)
+    comment=None
+    if request.user.is_superuser:
+        comment = Comments.objects.get( id=comment_id)
+    else:
+        comment = Comments.objects.get(user__id=request.user.id, id=comment_id)
     comment.delete()
     return JsonResponse({'message': 'comment deletion success'})
 
@@ -340,3 +362,72 @@ def edit_comment(request):
         commentObj.save()
         return JsonResponse({'message': 'edit comment is success'})
     return JsonResponse({'message': 'edit comment is fail'}, status=404)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def report_post(request):
+    post_id=request.data.get('post_id',None)
+    reson=request.data.get('reson',None)
+    detail=request.data.get('detail',None)
+    user=UserModel.objects.get(id=request.user.id)
+    if post_id and reson and detail :
+        post=Posts.objects.get(id=post_id)
+        report=Reports(user=user,detail=detail,reson=reson,post=post)
+        report.save()
+        return JsonResponse({'message':'report is submited'})
+    return JsonResponse({'message':'missing data'},status=401)
+
+
+## admin
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def hide_post(request):
+    post_id = request.data['post_id']
+    postObj = Posts.all.get(id=post_id)
+    if postObj:
+        postObj.is_hidded= not postObj.is_hidded
+        postObj.save()
+
+    else:
+        return JsonResponse({'message':'post not found'},status=404)
+    return JsonResponse({'message': 'post is hide success'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def get_reports(request):
+    reports=Reports.objects.all()
+    return JsonResponse({'reports':ReportSerilizer(reports,many=True).data})
+
+@api_view(['put'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def take_action(request):
+    report_id=request.data.get('report_id',None)
+    action=request.data.get('action',None)
+    report=Reports.objects.get(id=report_id)
+    if report_id and action:
+        if action =='avoid':
+            report.is_action_taked=True
+            report.action_type=action
+            report.save()
+        elif action =='ban':
+            user=report.post.user
+            user.is_banned=True
+            report.is_action_taked=True
+            report.save()
+            user.save()
+        elif action == 'hide':
+            post=report.post
+            post.is_hidded=True
+            report.is_action_taked=True
+            post.save()
+            report.save()
+        else:
+            return JsonResponse({'message':'give proper action name'},status=400)
+        return JsonResponse({'message':'action success'})
+    return JsonResponse({'message':'args are missing'},status=400)
+

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { baseUrl } from '../../constants'
 import ratingSvg from '../../assets/Star.svg';
 import option from '../../assets/options.svg';
@@ -8,6 +8,7 @@ import api from '../../axios';
 import { Rating, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
+import Report from './Report'
 
 function PostItem({ post }) {
     const { user } = useSelector(state => state.user)
@@ -18,6 +19,7 @@ function PostItem({ post }) {
     const toastRef = useRef()
     const [toastMsg, setToastMsg] = useState('')
     const [visible, setVisible] = useState(true)
+    const [report, setReport] = useState(false)
     console.log(post, 'post');
     return (
         <>
@@ -71,6 +73,7 @@ function PostItem({ post }) {
                         <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
                             <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
                             <ul className="dropdown-menu dropdown-center " >
+
                                 {post.user.id === user.id ?
                                     <li className="dropdown-item cursor-pointer"
                                         onClick={_ => {
@@ -118,9 +121,16 @@ function PostItem({ post }) {
                                                 })
                                             }}
                                         >{is_saved === true && 'un'}save post</li>
-                                        <li className="dropdown-item cursor-pointer">report</li></>}
+                                        <li className="dropdown-item cursor-pointer" style={{ cursor: 'pointer' }} onClick={_ => setReport(true)}>report</li></>}
                             </ul>
                         </div>
+                        {report && <Report post={post} close={_ => setReport(false)} onSuccess={_ => {
+                            setToastMsg('report is submited')
+                            const toastLiveExample = toastRef.current
+                            const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                            toastBootstrap.show()
+                            setReport(false)
+                        }} />}
 
                     </div>
                     {<Markdown className={`ms-3 text-break `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.description}</Markdown>}
@@ -154,7 +164,7 @@ function PostItem({ post }) {
                         >post</button>
                     </div>
                 </div>
-                
+
             </div> : null}
             <div className="toast-container position-fixed bottom-0 end-0 p-3 " data-bs-theme="dark">
                 <div ref={toastRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">

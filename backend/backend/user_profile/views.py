@@ -6,7 +6,7 @@ import json
 import pytz
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from admin.admin_auth.utils import admin_only
+from admin_auth.utils import admin_only
 from client_auth.models import OTP, UserModel
 from posts.models import Tags, Posts
 from user_profile.serializers import UserUpdateSerilizer
@@ -186,7 +186,7 @@ def resend_otp(request):
 @permission_classes([IsAuthenticated])
 @admin_only
 def get_users(request):
-    data=UserSerializer(UserModel.objects.all(),many=True).data
+    data=UserSerializer(UserModel.all.all(),many=True).data
     print(data)
     return JsonResponse({'users':data})
 
@@ -211,7 +211,7 @@ def create_user(request):
 def ban_user(request):
     user_id=request.data.get('user_id',None)
     if user_id:
-        user=UserModel.objects.filter(id=user_id).first()
+        user=UserModel.all.filter(id=user_id).first()
         if user:
             user.is_banned=True
             user.save()
@@ -224,7 +224,7 @@ def ban_user(request):
 def unban_user(request):
     user_id=request.data.get('user_id',None)
     if user_id:
-        user=UserModel.objects.filter(id=user_id).first()
+        user=UserModel.all.filter(id=user_id).first()
         if user:
             user.is_banned=False
             user.save()
@@ -238,7 +238,7 @@ def unban_user(request):
 def users_ops(request):
     op=request.data.get('users_op',None)
     ids=request.data.get('users')
-    users=UserModel.objects.filter(id__in=ids)
+    users=UserModel.all.filter(id__in=ids)
     if op=='del':
         users.delete()
         return JsonResponse({"message":'success'})
@@ -258,15 +258,15 @@ def users_ops(request):
 def get_user(request):
     id=request.query_params['id']
     if id :
-        user=UserModel.objects.get(id=id)
+        user=UserModel.all.get(id=id)
         user = UserSerializer(user)
         data = user.data
         intrsts=data['interests']
         intlist=[]
         supporters=[]
-        userSup=UserModel.objects.get(id=request.user.id).supportings.all()
+        userSup=UserModel.all.get(id=request.user.id).supportings.all()
         for supporter in data['supporters']:
-            userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+            userData=UserSerializer(UserModel.all.get(id=supporter)).data
             if userSup.filter(id=supporter).exists() :
                 userData['is_supporting'] = True
             else:userData['is_supporting']=False
@@ -274,7 +274,7 @@ def get_user(request):
         data['supporters']=supporters
         supportings=[]
         for supporter in data['supportings']:
-            userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+            userData=UserSerializer(UserModel.all.get(id=supporter)).data
             userData['is_supporting']=  True
             supportings.append(userData)
         data['supportings']=supportings
@@ -282,3 +282,28 @@ def get_user(request):
             intlist.append(Tags.objects.get(id=i).name)
         data['interests']=intlist
         return JsonResponse({'userData':data}) 
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def edit_user(request):
+    id=request.data['id']
+    userObj=UserModel.all.get(id=id)
+    user = UserUpdateSerilizer(instance=userObj, data=request.data)
+    if user.is_valid():
+            user.save()
+            print(user)
+            interests = json.loads(request.data.get('interests', ''))
+            userObj.interests.all().delete()
+            for intrst in interests:
+                tag, created = Tags.objects.get_or_create(name=intrst)
+                print(tag)
+                tag.save()
+                userObj.interests.add(tag)
+
+            userObj.save()
+            return JsonResponse({'message': 'user update success'}, status=200)
+    else:
+            return JsonResponse({'message': user.errors}, status=400)
+    
+

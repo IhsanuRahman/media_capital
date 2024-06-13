@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
-from admin.admin_auth.urls import urlpatterns as admin_urls
+from admin_auth.urls import urlpatterns as admin_urls
 from posts import views
 urlpatterns = [
     path('4dmin',admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     path('messages/',include('message.urls')),
     path('',include('posts.urls')),
     path('',include('user_profile.urls')),
+    path('',include('notifications.urls')),
     path('search',views.search),
     path('search-suggestion',views.search_suggestions)
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +admin_urls

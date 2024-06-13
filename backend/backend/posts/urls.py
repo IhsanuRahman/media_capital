@@ -13,4 +13,9 @@ urlpatterns =[
     path('posts/comment/edit',views.edit_comment),
     path('posts/comment-reply/add',views.comment_reply),
     path('posts/rate/add',views.add_rate),
+    path('post/report/add',views.report_post),
+    # admin
+    path('admin/post/hide',views.hide_post),
+    path('admin/reports',views.get_reports),
+    path('admin/report/action',views.take_action),
 ]

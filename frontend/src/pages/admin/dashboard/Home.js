@@ -5,6 +5,9 @@ import { json, useNavigate } from 'react-router-dom';
 import { logout } from '../../../features/user';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Users from '../../../componets/admin/Users';
+import Posts from '../../../componets/admin/Posts';
+import Reports from '../../../componets/admin/Reports';
+import Notifications from '../../../componets/admin/Notifications';
 function AdminHome() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -24,7 +27,7 @@ function AdminHome() {
       tab!==idx&&setTab(idx)
     }}
   >{name}</td></tr>)}
-  const Tabs=[<Users/>,null,null,null,null]
+  const Tabs=[<Users/>,<Posts/>,null,<Reports/>,<Notifications/>]
   return (
 
     user.is_staff === true ? <div className='bg-main text-dark d-flex justify-content-center align-items-center' style={{ height: '100%', weight: '100%' }}>
@@ -51,7 +54,7 @@ function AdminHome() {
 
 
         </div>
-        <div className="col pe-0">
+        <div className="col pe-0 overflow-hidden h-100">
             {Tabs[tab]}
         </div>
       </div>

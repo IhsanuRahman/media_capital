@@ -1,7 +1,16 @@
 import uuid
 from django.db import models
 from client_auth.models import UserModel
+from django.db.models import Q
 # Create your models here.
+
+class BanManger(models.Manager):
+    def get_queryset(self) :
+        return super().get_queryset().filter(user__is_banned=False)
+
+class PostBanManger(models.Manager):
+    def get_queryset(self) :
+        return super().get_queryset().filter(user__is_banned=False,is_hidded=False)    
 
 class Tags(models.Model):
     name=models.CharField( max_length=50,unique=True)
@@ -18,8 +27,11 @@ class Posts(models.Model):
     rating=models.FloatField(default=0.0)
     posted_at=models.DateTimeField(auto_now_add=True)
     saved_users=models.ManyToManyField(UserModel,related_name='saved_posts')
+    is_hidded=models.BooleanField(default=False)
     class Meta:
         ordering = ['-posted_at']
+    objects=PostBanManger()
+    all=models.Manager()
     
 class Ratings(models.Model):
     user=models.ForeignKey(UserModel,on_delete=models.CASCADE)
@@ -33,9 +45,24 @@ class Comments(models.Model):
     posted_at=models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering = ['-posted_at']
+    objects=BanManger()
+    all=models.Manager()
 
 class CommentsReply(models.Model):
     reply=models.TextField()
     user=models.ForeignKey(UserModel,related_name='replys',on_delete=models.CASCADE)
     comment=models.ForeignKey(Comments,related_name='replys',on_delete=models.CASCADE)
     posted_at=models.DateTimeField(auto_now_add=True)
+    objects=BanManger()
+    all=models.Manager()
+
+class Reports(models.Model):
+    reson=models.CharField(max_length=50)
+    detail=models.TextField()
+    user=models.ForeignKey(UserModel,related_name='submited_reports',on_delete=models.CASCADE)
+    post=models.ForeignKey(Posts,related_name='reports',on_delete=models.CASCADE)
+    reported_at=models.DateTimeField(auto_now_add=True)
+    is_action_taked=models.BooleanField(default=False)
+    action_type=models.CharField(default='no_action',max_length=50)
+    class Meta:
+        ordering = ['-reported_at']

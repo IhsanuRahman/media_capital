@@ -88,7 +88,7 @@ function Users() {
                         <tr className=''>
                             <th className='col-1 bg-transparent text-dark'>
                                 <input type="checkbox" name="" id="" className=''
-
+                                            
                                     onChange={
                                         e => {
                                             if (e.target.checked) {
@@ -107,9 +107,10 @@ function Users() {
 
                     <tbody className='w-100 h-100'>
                         {users?.map((user, idx) =>
-                            <tr id={idx} className='fixed' onClick={_=>navigate('/admin/user/'+user.id)}>
+                            <tr id={idx} >
                                 <th className='  text-dark bg-transparent' ><input type="checkbox" name="" id="" className='c-12'
                                     checked={selectedList.includes(user.id)}
+                                    
                                     onChange={e => {
                                         const ind = selectedList.indexOf(user.id)
                                         if (ind !== -1) {
@@ -124,8 +125,8 @@ function Users() {
                                     }
                                     }
                                 /></th>
-                                <td className=' bg-transparent text-dark'><img src={baseUrl + user.profile} height={'50'} alt="" className=' rounded-circle' /></td>
-                                <td className='text-dark bg-transparent'>
+                                <td className=' bg-transparent text-dark' onClick={_=>navigate('/admin/user/'+user.id)}><img src={baseUrl + user.profile} height={'50'} alt="" className=' rounded-circle' /></td>
+                                <td className='text-dark bg-transparent'  onClick={_=>navigate('/admin/user/'+user.id)}>
                                     <div className='d-flex flex-column mb-0 ' style={{ height: '70px' }}>
                                         <p className='fw-medium mb-0 fs-5 '>{user.username}</p>
                                         <p className='ms-2 mb-0 small '>{user.first_name} {user.last_name}</p>
@@ -133,6 +134,7 @@ function Users() {
                                 </td>
                                 <td className='text-dark bg-transparent'><button className='btn btn-danger'
                                     onClick={e => {
+                                        
                                         if (user.is_banned) {
                                             api.put('admin/user/unban', { user_id: user.id }, {
                                                 headers: {
