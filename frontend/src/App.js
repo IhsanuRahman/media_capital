@@ -116,7 +116,8 @@ function App() {
           <AdminViewPost /></AdminProtectedRoute>} />
         <Route path='/admin/notification/create' element={
           <AdminProtectedRoute>
-          <CreateNotification /></AdminProtectedRoute>} />
+          <CreateNotification />
+          </AdminProtectedRoute>} />
       </Routes>
     </Router>
   );

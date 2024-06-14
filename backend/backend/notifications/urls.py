@@ -5,4 +5,5 @@ urlpatterns =[
     path('notifications',views.get_notifications),
     path('admin/notifications',views.get_all_notifications),
     path('admin/notification/activate',views.activate_notifications),
+    path('admin/notification/edit',views.edit_notifications),
 ]

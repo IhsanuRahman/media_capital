@@ -347,6 +347,7 @@ def delete_comment(request):
         comment = Comments.objects.get( id=comment_id)
     else:
         comment = Comments.objects.get(user__id=request.user.id, id=comment_id)
+        
     comment.delete()
     return JsonResponse({'message': 'comment deletion success'})
 

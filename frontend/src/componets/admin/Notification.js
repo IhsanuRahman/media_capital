@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { baseUrl } from '../../constants'
 import api from '../../axios'
-import {Modal} from 'bootstrap'
+import { Modal } from 'bootstrap'
 import { useNavigate } from 'react-router-dom'
-function Notification({ notification,setMsg}) {
+function Notification({ notification, setMsg ,update}) {
     const [title, setTitle] = useState(notification.title)
     const [description, setDescription] = useState(notification.description)
-    const [error, setError] = useState('')
-    const navigator =useNavigate()
-    
+    const [active, setActive] = useState(notification.is_active)
+    const navigator = useNavigate()
+
     return (
-        <div  className="modal  fade bg-transparent" id={`notificationBackdrop${notification.id}`} data-bs-backdrop="static"  data-bs-keyboard="false" tabIndex="-1" aria-labelledby="notificationBackdropLabel" aria-hidden="false">
+        <div className="modal  fade bg-transparent" id={`notificationBackdrop${notification.id}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="notificationBackdropLabel" aria-hidden="false">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " >
                 <div class="modal-content  text-dark">
                     <div class="modal-header">
@@ -22,46 +22,82 @@ function Notification({ notification,setMsg}) {
 
                         <div className="mb-3">
                             <label for="recipient-name" class="col-form-label">title:</label>
-                            <input type="text" readOnly className="form-control" id="reson" value={notifyState.title}
-                                
+                            <input type="text"  className="form-control" id="reson" value={title}
+                                onChange={e=>{
+                                    setTitle(e.target.value)
+                                }}
                             />
                         </div>
-                        
+
                         <div className="mb-3">
                             <label for="recipient-name" class="col-form-label">description:</label>
-                            <textarea type="text" readOnly className="form-control" id="detail" value={notifyState.description}
+                            <textarea type="text"  className="form-control" id="detail" value={description}
+                                onChange={e=>{
+                                    setDescription(e.target.value)
+                                }}
 
-                                
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" class="col-form-label"><b>on</b>: { notifyState.sended_at}</label>
+                            <label for="recipient-name" class="col-form-label"><b>on</b>: {notification.sended_at}</label>
                         </div>
                         <div className="mb-3 d-flex align-items-center justify-content-between">
-                            
-                            
+
+
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                    <button className='btn btn-danger me-auto'
-                                    onClick={e => {
-                                          api.put('admin/notification/activate', { id: notification.id }, {
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'Authorization': `Bearer ${localStorage.getItem('access')}`,
+                        <button className='btn btn-danger me-auto'
+                            onClick={e => {
+                                api.put('admin/notification/activate', { id: notification.id }, {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${localStorage.getItem('access')}`,
 
-                                                },
-                                            }).then(e => {
-                                                notification.is_active = !notification.is_active 
-                                                setNotify({...notification})
-                                                setMsg(`notification is ${notification.is_active?'activation success':'deactivation success'}`)
-                                            })
-                                        
-                                    }}
-                                >{notification.is_active?'deactivate':'activate'}</button>
+                                    },
+                                }).then(e => {
+                                    setActive(!active)
+                                    notification.is_active=!notification.is_active
+                                    update(notification)
+                                    setMsg(`notification is ${!active ? 'activation success' : 'deactivation success'}`)
+                                })
+
+                            }}
+                        >{active ? 'deactivate' : 'activate'}</button>
                         <button type="button" className="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                        
+                        <button type="button" className="btn btn-success"
+                            onClick={
+                                _ => {
+
+                                    if (title === '' || description === '') {
+                                        setMsg(<p className=' text-danger'>requierd</p>)
+                                    }
+                                    else {
+                                        api.patch('admin/notification/edit',{
+                                            id:notification.id,
+                                            title,
+                                            description
+                                        },{
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': `Bearer ${localStorage.getItem('access')}`,
+        
+                                            },
+                                        }).then(e => {
+                                            notification.title=title
+                                            notification.description=description
+                                            update(notification)
+                                            setMsg('notification is saved')
+                                            
+                                        })
+                                    }
+                                }
+
+                            }
+
+                        >Save</button>
+
                     </div>
                 </div>
             </div>

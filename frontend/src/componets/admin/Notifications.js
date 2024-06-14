@@ -72,7 +72,11 @@ function Notifications() {
                                         
                                     }}
                                 >{notification.is_active?'deactivate':'activate'}</button></td>
-                                <Notification notification={notification} setMsg={setMsg}/>
+                                <Notification notification={notification} setMsg={setMsg} update={(notification)=>{
+                                    let tlist = [...notifications]
+                                    tlist[idx] = notification
+                                    setNotifications(tlist)
+                                }}/>
                             </tr>)}
                         {/* <tr>
                         <th className='col-1'><input type="checkbox" name="" id="" className='c-12' /></th>

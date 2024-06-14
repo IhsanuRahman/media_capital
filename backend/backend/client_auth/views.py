@@ -75,6 +75,7 @@ def get_user(request):
     supportings=[]
     for supporter in data['supportings']:
         userData=UserSerializer(UserModel.objects.get(id=supporter)).data
+        
         userData['is_supporting']=  True
         supportings.append(userData)
     data['supportings']=supportings

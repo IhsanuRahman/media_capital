@@ -186,7 +186,7 @@ def resend_otp(request):
 @permission_classes([IsAuthenticated])
 @admin_only
 def get_users(request):
-    data=UserSerializer(UserModel.all.all(),many=True).data
+    data=UserSerializer(UserModel.all.filter(is_superuser=False),many=True).data
     print(data)
     return JsonResponse({'users':data})
 

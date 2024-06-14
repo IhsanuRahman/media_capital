@@ -9,7 +9,7 @@ import api from '../../../axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../../../componets/admin/Header';
 import { Stack, Rating } from '@mui/material';
-import CommentReply from '../../../componets/client/CommentReply';
+import CommentReply from '../../../componets/admin/CommentReply';
 import moment from 'moment'
 import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
