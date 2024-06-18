@@ -22,7 +22,7 @@ class UserModel(AbstractUser):
     profile=models.ImageField(default='/user_profiles/profile.png',upload_to='user_profiles')
     banner=models.ImageField(null=True,upload_to='banners')
     is_banned=models.BooleanField(default=False)
-    description=models.TextField()
+    description=models.TextField(null=True)
     dob=models.DateField(null=False)
     supportings=models.ManyToManyField('UserModel',related_name='supporters')
     objects=BanManager()

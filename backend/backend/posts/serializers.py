@@ -1,13 +1,18 @@
 
 from rest_framework import serializers
+from client_auth.serilizers import UserSerializer
+from .models import Posts, Reports, Tags
 
-from .models import Posts, Reports
-
-class PostsSerilizer(serializers.Serializer):
+class PostsSerilizer(serializers.ModelSerializer):
     class Meta:
         model=Posts
         fields = "__all__"
 
+class TagsSerilizer(serializers.ModelSerializer):
+    users=UserSerializer(read_only=True, many=True)
+    class Meta:
+        model=Tags
+        fields = "__all__"
 class ReportSerilizer(serializers.ModelSerializer):
     reported_username=serializers.CharField(source='user.username')
     suspect_username=serializers.CharField(source='post.user.username')

@@ -3,48 +3,103 @@ import logoutIcon from '../../assets/Sign_Out.svg'
 import ProfileIcon from '../../assets/User.svg'
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAuth, getUser, logout } from '../../features/user';
-import { useNavigate } from 'react-router-dom';
-import { baseUrl } from '../../constants';
+import { useNavigate , json } from 'react-router-dom';
+import { baseUrl,WSBaseUrl } from '../../constants';
 import { Toast } from 'bootstrap';
+import AddIcon from '@mui/icons-material/Add';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import api from '../../axios';
+import useWebSocket,{ReadyState} from 'react-use-websocket'
+import './popup.css'
+
+
+
 function Header({ leading }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     console.log(user);
     const [popup, setPopup] = useState(null)
+    const [spinner, setSpinner] = useState(true)
     const notificationRef = useRef()
     const [notifications, setNotifications] = useState([])
-    useEffect(()=>{
-        api.get('notifications', {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access')}`,
 
-            },
-        }).then(e => {
-            setNotifications(e.data.notifications)
-        })
-    },[])
+    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/get-notifications/${localStorage.getItem('access')}`),{
+        onOpen: () =>{
+            console.log("The connection was setup successfully !",);
+            setSpinner(false)
+        },
+        onClose:(e)=>{
+            
+        },
+        onMessage:(e)=>{
+            console.log(e.data,'notify ws')
+            const data = JSON.parse(e.data);
+            if(data.text_data!==undefined)
+                setNotifications([...data.text_data])
+            else
+                setNotifications([data,...notifications])
+            
+
+            console.log('notify',data)
+
+        }   });
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'connected',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+      }[readyState];
+
+
+    // useEffect(() => {
+    //     api.get('notifications', {
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+    //         },
+    //     }).then(e => {
+    //         setNotifications(e.data.notifications)
+    //     })
+    // }, [])
     const MyModal = Toast.getOrCreateInstance(notificationRef.current)
     const popupComponent = (
-        <div className="bg-gradient bg-dark rounded border gap-4 pt-5 mb-5  d-flex flex-column align-items-center " onMouseLeave={_ => setPopup(null)} style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px', height: '300px', width: '400px', }}>
-            <div className='bg-light  btn' style={{ height: '80px', width: '80px ', borderRadius: '100%', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + user.profile})` }}>
-
-            </div>
-            <h6>{user.username}</h6>
-            <div className="d-flex w-100 justify-content-center gap-3 ">
-                <button className='btn btn-outline-light w-25'
+        <div class="popup text-white bg-gradient bg-dark gap-1" onMouseLeave={_ => setPopup(null)}  style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px' }}>
+                <img src={`${baseUrl + user.profile}`} alt="Profile Picture"  class="profile-pic" />
+                <div class="profile-name">{user.username}</div>
+                <button class="btn btn-outline-primary" onClick={_ => navigate('/profile')}><AccountCircleOutlinedIcon/> Profile</button>
+                <button class=" btn btn-outline-danger" 
                     onClick={_ => {
                         dispatch(logout())
                         dispatch(checkAuth())
                         navigate('/login')
-                    }}
-                >
-                    <img src={logoutIcon} alt="" srcset="" />
-                    logout</button><button className='btn btn-outline-light w-25 gap-2' onClick={_ => navigate('/profile')}> <img src={ProfileIcon} alt="" />profile</button>
+                    }}><LogoutIcon/> Logout</button>
+                <button class="btn btn-outline-success"  onClick={_ => navigate('/create-post')}> <AddIcon /> Create Post</button>
             </div>
-        </div>
+        // <div className="bg-gradient bg-dark rounded  gap-4 px-2 pt-5 mb-5  d-flex flex-column align-items-center " onMouseLeave={_ => setPopup(null)} style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px', height: '300px', width: '400px', }}>
+        //     <div className='bg-light  btn' style={{ height: '80px', width: '80px ', borderRadius: '100%', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + user.profile})` }}>
+
+        //     </div>
+        //     <h6>{user.username}</h6>
+        //     <div className="d-flex w-100 justify-content-center gap-3 ">
+        //         <button className='btn btn-outline-light col'
+        //             onClick={_ => {
+        //                 dispatch(logout())
+        //                 dispatch(checkAuth())
+        //                 navigate('/login')
+        //             }}
+        //         >
+        //             <img src={logoutIcon} alt="" srcset="" />
+        //             logout</button>
+        //             <button className='btn btn-outline-light w-25 col' onClick={_ => navigate('/profile')}> <img src={ProfileIcon} alt="" />profile</button>
+        //             <button className='btn btn-outline-light w-25 col' onClick={_ => navigate('/profile')}> <AddIcon />create post</button>
+        //     </div>
+            
+
+        // </div>
     )
 
     return (
@@ -72,26 +127,29 @@ function Header({ leading }) {
 
                     </div>
                 </div>
-                <div className="toast-container position-fixed p-3 overflow-hidden  " data-bs-theme="dark" style={{top:'50px',right:'100px',height:'calc(100% - 60px)'}}>
-                    <div ref={notificationRef} id="liveToast" className="toast   " role="alert" aria-live="assertive" aria-atomic="true">
-                        <div className="toast-header " style={{backgroundColor:'rgb(33 37 41)'}}>
-                                <strong className="me-auto">Notification</strong>
-                                
-                                <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                <div className="toast-container position-fixed p-3   " data-bs-autohide="false" data-bs-theme="dark" style={{ top: '50px', right: '100px',}}>
+                    <div ref={notificationRef} id="liveToast" className="h-100 toast  " role="alert" aria-live="assertive" aria-atomic="true">
+                        <div className="toast-header " style={{ backgroundColor: 'rgb(33 37 41)' ,height:'30px'}}>
+                            <strong className="me-auto">Notification</strong>
+
+                            <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                        <div className="toast-body d-flex flex-column text-dark overflow-y-scroll h-100" style={{backgroundColor:'rgb(33 37 41)'}}>
-                            {notifications.length>0?<ul type='none' className='list-group'>
-                                {notifications.map(notification=>{
-                                   return <li className='text-white list-group-item'>
-                                    <div className='d-flex flex-column mb-0 '>
-                                        <p className='fw-medium mb-0 fs-5 '>{notification.title}</p>
-                                        <p className='ms-2 mb-0 small '>{notification.description}</p>
-                                    </div>
+                        <div className="toast-body d-flex flex-column text-dark overflow-y-scroll  " style={{ backgroundColor: 'rgb(33 37 41)',maxHeight:'calc(100vh - 100px)' }}>
+                            {spinner?<span class="spinner-border" aria-hidden="true"></span>:notifications.length > 0 ? <ul type='none' className='list-group'>
+                                {notifications.map(notification => {
+                                    return <li className='text-white list-group-item'>
+                                        <div className='d-flex flex-column mb-0 '>
+                                            <p className='fw-medium mb-0 fs-5 '>{notification.title}</p>
+                                            <p className='ms-2 mb-0 small '>{notification.description}</p>
+                                        </div>
                                     </li>
                                 })}
-                                
-                                
-                            </ul>:<p className='text-secondary'>no any notifications</p>}
+
+
+                            </ul> : <p className='text-secondary'>no any notifications</p>}
+                            
+                            
+                        
                         </div>
                     </div>
                 </div>

@@ -83,3 +83,11 @@ input[type=number]::-webkit-outer-spin-button {
     --bs-bg-opacity: 0.5;
     background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
 }
+.post-item{
+    width: 400px;
+}
+@media screen and (max-width: 400px){
+    .post-item{
+        width: 100%;
+}
+}

@@ -8,6 +8,7 @@ import Users from '../../../componets/admin/Users';
 import Posts from '../../../componets/admin/Posts';
 import Reports from '../../../componets/admin/Reports';
 import Notifications from '../../../componets/admin/Notifications';
+import Tags from '../../../componets/admin/Tags';
 function AdminHome() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -27,7 +28,7 @@ function AdminHome() {
       tab!==idx&&setTab(idx)
     }}
   >{name}</td></tr>)}
-  const Tabs=[<Users/>,<Posts/>,null,<Reports/>,<Notifications/>]
+  const Tabs=[<Users/>,<Posts/>,<Tags/>,<Reports/>,<Notifications/>]
   return (
 
     user.is_staff === true ? <div className='bg-main text-dark d-flex justify-content-center align-items-center' style={{ height: '100%', weight: '100%' }}>

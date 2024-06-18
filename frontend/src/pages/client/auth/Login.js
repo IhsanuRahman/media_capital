@@ -43,7 +43,7 @@ function Login() {
                 setSpinner(false)
 
             }).catch(e => {
-                console.log('err',e)
+                setAlert('err',JSON.stringify(e))
                 if (e.response?.data && e.response.data?.detail) {
                     setAlert(e.response?.data?.detail)
                 }

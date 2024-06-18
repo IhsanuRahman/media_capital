@@ -23,7 +23,7 @@ function PostItem({ post }) {
     console.log(post, 'post');
     return (
         <>
-            {visible ? <div className='  rounded-1 ' style={{ width: '400px', borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
+            {visible ? <div className='  rounded-1 post-item' style={{ borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
                 <div className='d-flex align-items-center ps-2   w-100 ' style={{ minHeight: "45px", maxHeight: "45px", borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
                     <div className='bg-light rounded-5' onClick={e => navigator('/user/' + post.user.id)} loading="lazy" style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + post.user.profile})` }}>
                     </div>

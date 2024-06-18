@@ -3,7 +3,7 @@ import '../style.css'
 import { useSelector } from 'react-redux';
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { useNavigate } from 'react-router-dom';
-import { baseUrl } from '../../../constants';
+import { baseUrl,WSBaseUrl } from '../../../constants';
 function Messages({ username, userId, profile, setMsgPg }) {
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [inputText, setInputText] = useState('')
@@ -11,7 +11,7 @@ function Messages({ username, userId, profile, setMsgPg }) {
     const [buttonText, setButton] = useState('loading')
     const messageView = useRef()
     const navigator = useNavigate()
-    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`ws://127.0.0.1:8000/chat/${localStorage.getItem('access')}/${userId}`), {
+    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/chat/${localStorage.getItem('access')}/${userId}`), {
         onOpen: () => {
             console.log("The connection was setup successfully !",);
             setButton('send')

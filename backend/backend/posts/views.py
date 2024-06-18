@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from admin_auth.utils import admin_only
-from .serializers import ReportSerilizer
+from .serializers import ReportSerilizer, TagsSerilizer
 from .models import Reports, Tags
 from client_auth.models import UserModel
 from .models import Posts, Comments, Ratings, CommentsReply
@@ -19,7 +19,7 @@ from django.core.files.base import ContentFile
 from django.db.models import Avg
 from django.core.paginator import Paginator
 import time
-
+from notifications.models import Notifications
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -378,6 +378,43 @@ def report_post(request):
         return JsonResponse({'message':'report is submited'})
     return JsonResponse({'message':'missing data'},status=401)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_recommended(request):
+    user=UserModel.objects.get(id=request.user.id)
+    objects = Posts.objects.filter(tags__users=user).exclude(user=user)
+    print('posts')
+    page = Paginator(objects, 10)
+    n = request.query_params.get('page', 1)
+    if int(page.num_pages) < int(n):
+        return JsonResponse({'posts': []})
+    posts = page.page(n).object_list
+    data = []
+    for post in list(posts):
+        print()
+        myRate = post.ratings.filter(user__id=request.user.id).first()
+        if myRate:
+            myRate = myRate.rate
+        else:
+            myRate = 0
+        comments = Comments.objects.filter(post__id=post.id)
+        commentsFormated = []
+        for comment in comments:
+            commentsFormated.append(
+                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+            print(comment.comment)
+        saved = False
+        if post.saved_users.filter(id=request.user.id).exists():
+            saved = True
+        data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
+                    'description': post.description,
+                     'is_saved': saved,'is_hidded':post.is_hidded,
+                     'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+
+    return JsonResponse({'posts': data})
+
+
+
 
 ## admin
 
@@ -389,6 +426,10 @@ def hide_post(request):
     postObj = Posts.all.get(id=post_id)
     if postObj:
         postObj.is_hidded= not postObj.is_hidded
+        if postObj.is_hidded:
+            Notifications.objects.create(title='your post is hidded',description='verify it is no violent content',user=postObj.user)
+        else:
+            Notifications.objects.create(title='your post is now view to all',description=' ',user=postObj.user)
         postObj.save()
 
     else:
@@ -402,6 +443,7 @@ def hide_post(request):
 def get_reports(request):
     reports=Reports.objects.all()
     return JsonResponse({'reports':ReportSerilizer(reports,many=True).data})
+
 
 @api_view(['put'])
 @permission_classes([IsAuthenticated])
@@ -432,3 +474,10 @@ def take_action(request):
         return JsonResponse({'message':'action success'})
     return JsonResponse({'message':'args are missing'},status=400)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def get_tags(request):
+    tags=TagsSerilizer(Tags.objects.all(),many=True).data
+    return JsonResponse({'tags':tags})

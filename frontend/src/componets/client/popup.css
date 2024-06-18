@@ -1,0 +1,66 @@
+/* General styling for the pop-up */
+.popup {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+    padding: 20px;
+    margin: 10px;
+    font-family: 'Arial', sans-serif;
+    color: #f1f1f1;
+    width: 400px; /* Adjust width as needed */
+}
+
+/* Styling for the buttons */
+.popup button {
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 5px 0;
+    cursor: pointer;
+    width: 100%; /* Full width buttons */
+}
+
+
+
+/* Profile picture styling */
+.popup .profile-pic {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Profile text */
+.popup .profile-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Specific styling for each button */
+.popup .logout-btn {
+    background-color: #dc3545;
+}
+
+.popup .logout-btn:hover {
+    background-color: #c82333;
+}
+
+.popup .create-post-btn {
+    background-color: #28a745;
+}
+
+.popup .create-post-btn:hover {
+    background-color: #218838;
+}
+
+.popup .profile-btn {
+    background-color: #007bff;
+}
+
+.popup .profile-btn:hover {
+    background-color: #0056b3;
+}

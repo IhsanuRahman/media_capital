@@ -28,12 +28,12 @@ def edit_profile(request):
             user = UserModel.objects.get(id=request.user.id)
             print(user)
             interests = json.loads(request.data.get('interests', ''))
-            user.interests.all().delete()
+            user.interests.remove()
             for intrst in interests:
                 tag, created = Tags.objects.get_or_create(name=intrst)
                 print(tag)
-                tag.save()
                 user.interests.add(tag)
+                user.save()
 
             user.save()
             return JsonResponse({'message': 'user update success'}, status=200)

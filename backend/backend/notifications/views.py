@@ -2,21 +2,25 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-
+from channels.layers import get_channel_layer
 from admin_auth.utils import admin_only
 from .serializers import NotificationSerilizer
 from .models import Notifications
 from django.db.models import Q
+import json
+from asgiref.sync import async_to_sync
+channel_layer = get_channel_layer()
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @admin_only
-def create_notification(request):
+def create_notification(request) :
     title=request.data.get('title',None)
     description=request.data.get('description',None)
     if title and description:
         notif=Notifications(title=title,description=description)
         notif.save()
+        #send_notification(NotificationSerilizer(notif).data)
         return JsonResponse({'message':'notification is created'})
     return JsonResponse({'message':'title or description is required'},status=400)
 
@@ -26,9 +30,8 @@ def create_notification(request):
 @permission_classes([IsAuthenticated])
 @admin_only
 def get_all_notifications(request):
-
     notifications=NotificationSerilizer(Notifications.objects.all(),many=True).data
-
+    
     return JsonResponse({'notifications':notifications})
 
 

@@ -1,20 +1,8 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
-import Header from '../../../componets/client/Header';
-import Navbar from '../../../componets/client/Navbar';
-import Messages from '../../../componets/client/Messages';
-import '../style.css'
-import { useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react'
 import api from '../../../axios';
-import Search from '../../../componets/client/Search';
-import { Toast } from 'bootstrap';
 import PostItem from '../../../componets/client/PostItem';
-import { Hidden, formHelperTextClasses } from '@mui/material';
-import Recommended from './Recommended';
-const Posts = React.lazy(() => import('../../../componets/client/Posts'))
 
-export function Home() {
-    const [tab, setTab] = useState(0)
-    const { isAuthenticated, user, loading } = useSelector(state => state.user);
+function Recommended() {
     const [posts, setPosts] = useState([])
     const listInnerRef = useRef();
     const [currPage, setCurrPage] = useState(1); 
@@ -24,7 +12,7 @@ export function Home() {
     const fetchData = async () => {
         setLoading(true)
         try {
-            const response = await api.get('/posts', {
+            const response = await api.get('/posts/recommended', {
                 params: {
                     page: currPage,
                 },
@@ -68,8 +56,8 @@ export function Home() {
         }
 
     }, [])
-    const tabs = [
-        <div ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
+  return (
+    <div ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
 
             {posts.map((post, idx) => {
                 return <PostItem id={idx} post={post} />
@@ -79,27 +67,8 @@ export function Home() {
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>}
-        </div>,
-        null, <Recommended/>, <Search />
-    ]
-
-    return (
-
-        Object.keys(user).length > 0 ? <div className='pt-5 h-100 w-100'>
-            <Header />
-            <div className="row w-100 h-100">
-
-                <div className='col-12 col-lg-9 pe-0 h-100 overflow-hidden'>
-                    <Navbar tab={tab} setTab={setTab} />
-                    <Suspense fallback={<div>Loading...</div>}>
-                        {tabs[tab]}
-                    </Suspense>
-
-                </div>
-                <Messages />
-            </div>
-        </div> : <div></div>
-    );
+        </div>
+  )
 }
 
-export default Home
+export default Recommended

@@ -3,6 +3,7 @@ from . import views
 urlpatterns =[
     path('posts/create',views.create_post),
     path('posts',views.get_posts),
+    path('posts/recommended',views.get_recommended),
     path('posts/own',views.get_own_posts),
     path('posts/get',views.get_post),
     path('posts/saved',views.get_saved_post),
@@ -17,5 +18,6 @@ urlpatterns =[
     # admin
     path('admin/post/hide',views.hide_post),
     path('admin/reports',views.get_reports),
+    path('admin/tags',views.get_tags),
     path('admin/report/action',views.take_action),
 ]
