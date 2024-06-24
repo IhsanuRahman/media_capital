@@ -26,15 +26,8 @@ def get_users(request):
             if rooms.filter(users__id=user['id']).exists():
                 message = room.messages.all().order_by('sended_at').last()
                 if message:
-                    now = datetime.datetime.now()
-                    on = ''
-                    if message.sended_at.date() == now.date():
-                        on = 'today'
-                    elif message.sended_at.date() == now.date()-datetime.timedelta(days=1):
-                        on = 'yesterday'
-                    else:
-                        on = message.sended_at.date().strftime("%d/%m/%Y")
-
+                    on = message.sended_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    print('on:',on)
                     data.append({
                         'profile': '/media/'+user['profile'],
                         "username": user['username'],

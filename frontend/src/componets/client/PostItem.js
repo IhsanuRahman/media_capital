@@ -9,6 +9,7 @@ import { Rating, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
 import Report from './Report'
+import formatNumber from '../../NumberFormater';
 
 function PostItem({ post }) {
     const { user } = useSelector(state => state.user)
@@ -42,14 +43,15 @@ function PostItem({ post }) {
                         <Stack spacing={1} className='d-flex flex-row'>
                             <div className="d-flex gap-2 flex-column ">
                                 <h6 className='pt-2'>All over:</h6>
-                                <h6>Your Rating:</h6></div>
+                                {post.user.id !== user.id && <h6>Your Rating:</h6>}
+                               {post.no_raters&&  <p className='text-primary'>{formatNumber(post.no_raters)} raters</p>}</div>
 
                             <div className="d-flex gap-2 flex-column">
                                 <Rating name="half-rating-read" value={overAllRate} precision={0.1} readOnly onChange={(event, newValue) => {
 
                                 }} emptyIcon={
                                     <img src={ratingSvg} alt="" srcset="" />} />
-                                <Rating name="half-rating" defaultValue={post.my_rate} precision={0.1}
+                                {post.user.id !== user.id && <Rating name="half-rating" defaultValue={post.my_rate} precision={0.1}
                                     onChange={(_, newValue) => {
                                         console.log(newValue, 'ratenew')
                                         api.put('/posts/rate/add', {
@@ -68,7 +70,8 @@ function PostItem({ post }) {
                                         post.rating = newValue
                                     }}
                                     emptyIcon={
-                                        <img src={ratingSvg} alt="" srcset="" />} /></div>
+                                        <img src={ratingSvg} alt="" srcset="" />} />}</div>
+
                         </Stack>
                         <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
                             <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />

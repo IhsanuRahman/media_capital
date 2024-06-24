@@ -70,13 +70,14 @@ function Header({ leading }) {
         <div class="popup text-white bg-gradient bg-dark gap-1" onMouseLeave={_ => setPopup(null)}  style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px' }}>
                 <img src={`${baseUrl + user.profile}`} alt="Profile Picture"  class="profile-pic" />
                 <div class="profile-name">{user.username}</div>
-                <button class="btn btn-outline-primary" onClick={_ => navigate('/profile')}><AccountCircleOutlinedIcon/> Profile</button>
-                <button class=" btn btn-outline-danger" 
+                <div className="d-flex gap-1">
+                <button class="btn btn-outline-primary  " onClick={_ => navigate('/profile')}><AccountCircleOutlinedIcon/> Profile</button>
+                <button class=" btn btn-outline-danger  " 
                     onClick={_ => {
                         dispatch(logout())
                         dispatch(checkAuth())
                         navigate('/login')
-                    }}><LogoutIcon/> Logout</button>
+                    }}><LogoutIcon/> Logout</button></div>
                 <button class="btn btn-outline-success"  onClick={_ => navigate('/create-post')}> <AddIcon /> Create Post</button>
             </div>
         // <div className="bg-gradient bg-dark rounded  gap-4 px-2 pt-5 mb-5  d-flex flex-column align-items-center " onMouseLeave={_ => setPopup(null)} style={{ position: 'fixed', zIndex: '3', right: '10px', top: '55px', height: '300px', width: '400px', }}>

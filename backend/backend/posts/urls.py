@@ -4,6 +4,7 @@ urlpatterns =[
     path('posts/create',views.create_post),
     path('posts',views.get_posts),
     path('posts/recommended',views.get_recommended),
+    path('posts/top',views.get_top),
     path('posts/own',views.get_own_posts),
     path('posts/get',views.get_post),
     path('posts/saved',views.get_saved_post),

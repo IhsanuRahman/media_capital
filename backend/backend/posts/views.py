@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from admin_auth.utils import admin_only
+from client_auth.serilizers import UserSerializer
 from .serializers import ReportSerilizer, TagsSerilizer
 from .models import Reports, Tags
 from client_auth.models import UserModel
@@ -382,7 +383,7 @@ def report_post(request):
 @permission_classes([IsAuthenticated])
 def get_recommended(request):
     user=UserModel.objects.get(id=request.user.id)
-    objects = Posts.objects.filter(tags__users=user).exclude(user=user)
+    objects = Posts.objects.filter(tags__users=user).exclude(user=user).exclude(user__in=user.supportings.all())
     print('posts')
     page = Paginator(objects, 10)
     n = request.query_params.get('page', 1)
@@ -414,6 +415,40 @@ def get_recommended(request):
     return JsonResponse({'posts': data})
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_top(request):
+    user=UserModel.objects.get(id=request.user.id)
+    objects = Posts.objects.all().order_by('-rating')
+    print('posts')
+    page = Paginator(objects, 10)
+    n = request.query_params.get('page', 1)
+    if int(page.num_pages) < int(n):
+        return JsonResponse({'posts': []})
+    posts = page.page(n).object_list
+    data = []
+    for post in list(posts):
+        print()
+        myRate = post.ratings.filter(user__id=request.user.id).first()
+        if myRate:
+            myRate = myRate.rate
+        else:
+            myRate = 0
+        comments = Comments.objects.filter(post__id=post.id)
+        commentsFormated = []
+        for comment in comments:
+            commentsFormated.append(
+                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+            print(comment.comment)
+        saved = False
+        if post.saved_users.filter(id=request.user.id).exists():
+            saved = True
+        data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
+                    'description': post.description,
+                     'is_saved': saved,'is_hidded':post.is_hidded,'no_raters':post.ratings.count(),
+                     'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+
+    return JsonResponse({'posts': data})
 
 
 ## admin
@@ -480,4 +515,10 @@ def take_action(request):
 @admin_only
 def get_tags(request):
     tags=TagsSerilizer(Tags.objects.all(),many=True).data
+    tagDict={}
+    for i in range(len(tags)):
+       
+        tags[i]['users']=UserSerializer(UserModel.all.filter(interests__name=tags[i]['name']),many=True).data
+        
+    print(tags)
     return JsonResponse({'tags':tags})

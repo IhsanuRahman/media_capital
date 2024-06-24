@@ -16,6 +16,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from .models import EditEmail
 from client_auth.utils import otp_generator, otp_resender
+
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def edit_profile(request):
@@ -26,12 +28,12 @@ def edit_profile(request):
         if user.is_valid():
             user.save()
             user = UserModel.objects.get(id=request.user.id)
-            print(user)
             interests = json.loads(request.data.get('interests', ''))
-            user.interests.remove()
+            print('\033[93m'+'BEFORE',Tags.objects.all().values())
+            user.interests.clear()
+            print('\033[93m'+' after',Tags.objects.all().values())
             for intrst in interests:
                 tag, created = Tags.objects.get_or_create(name=intrst)
-                print(tag)
                 user.interests.add(tag)
                 user.save()
 
@@ -294,7 +296,7 @@ def edit_user(request):
             user.save()
             print(user)
             interests = json.loads(request.data.get('interests', ''))
-            userObj.interests.all().delete()
+            userObj.interests.clear()
             for intrst in interests:
                 tag, created = Tags.objects.get_or_create(name=intrst)
                 print(tag)

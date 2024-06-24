@@ -3,7 +3,7 @@ import '../style.css'
 import { useSelector } from 'react-redux';
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { useNavigate } from 'react-router-dom';
-import { baseUrl,WSBaseUrl } from '../../../constants';
+import { baseUrl, WSBaseUrl } from '../../../constants';
 function Messages({ username, userId, profile, setMsgPg }) {
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [inputText, setInputText] = useState('')
@@ -88,12 +88,13 @@ function Messages({ username, userId, profile, setMsgPg }) {
                             if (readyState === 0) {
                                 alert('still connecting')
                             } else if (readyState === 1) {
-                                const time=new Date().toLocaleTimeString().split(':')
+                                const time = new Date().toLocaleTimeString().split(':')
+                                console.log('time', time)
                                 const message = {
                                     type: 'send',
                                     message: inputText,
                                     username: user.username,
-                                    sended_at:time[0]+':'+time[1]
+                                    sended_at: time[0] + ':' + time[1]
                                 };
                                 setMessages([...messages, message]);
                                 setInputText('')
@@ -116,10 +117,13 @@ function Messages({ username, userId, profile, setMsgPg }) {
                         if (readyState === 0) {
                             alert('still connecting')
                         } else if (readyState === 1) {
+                            const time = new Date().toLocaleTimeString().split(':')
+                            console.log('time', time)
                             const message = {
                                 type: 'send',
                                 message: inputText,
-                                username: user.username
+                                username: user.username,
+                                sended_at: time[0] + ':' + time[1]
                             };
                             setMessages([...messages, message]);
                             setInputText('')

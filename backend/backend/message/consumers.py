@@ -127,8 +127,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def create_message(self, sender, receiver, message, room_name):
         messageObj = MessageModel(
             sender=sender, receiver=receiver, message=message)
-        room = Rooms.objects.get(groupName=room_name)
-        messageObj.save()
+        room = Rooms.objects.filter(groupName=room_name).first()
+        messageObj.save() 
         room.messages.add(messageObj)
         room.save()
         return messageObj

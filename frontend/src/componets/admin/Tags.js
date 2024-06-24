@@ -39,7 +39,7 @@ function Tags() {
                         <tr className=''>
                             <th className='col-1 bg-transparent text-dark'>id</th>
                             <th className="col bg-transparent text-dark">tag</th>
-                            <th className="col-2  bg-transparent text-dark">action</th>
+                            <th className="col-2  bg-transparent text-dark">interest count</th>
                         </tr></thead>
 
                     <tbody className='w-100 h-100'>
@@ -49,7 +49,7 @@ function Tags() {
                                 <td className='text-dark bg-transparent' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#reportBackdrop${tag.id}`} >
                                     {tag.name}
                                 </td>
-                                <td className='text-dark bg-transparent'>{JSON.stringify(tag.users.length)}</td>
+                                <td className='text-dark bg-transparent'>{tag.users.length}</td>
                                 
                             </tr>)}
 

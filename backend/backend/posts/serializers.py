@@ -9,7 +9,7 @@ class PostsSerilizer(serializers.ModelSerializer):
         fields = "__all__"
 
 class TagsSerilizer(serializers.ModelSerializer):
-    users=UserSerializer(read_only=True, many=True)
+    
     class Meta:
         model=Tags
         fields = "__all__"

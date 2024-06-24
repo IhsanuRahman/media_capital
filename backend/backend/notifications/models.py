@@ -22,7 +22,7 @@ def notification_created(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
         if instance.user is not None:
-            async_to_sync(channel_layer.group_send)("notification_"+instance.user.id, {
+            async_to_sync(channel_layer.group_send)("notification_"+str(instance.user.id), {
                         "type": "send_notification",
                         'data':{"title":instance.title,
                         "description":instance.description}

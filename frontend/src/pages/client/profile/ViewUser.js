@@ -9,6 +9,7 @@ import api from '../../../axios';
 import GridPosts from '../../../componets/client/GridPosts';
 import {Toast} from 'bootstrap'
 import { getUser } from '../../../features/user';
+import formatNumber from '../../../NumberFormater';
 function ViewUser() {
   const { id } = useParams()
   const dispatch =useDispatch()
@@ -74,9 +75,9 @@ function ViewUser() {
             </div>
             <p className='ms-4  text-custom-grey '>{userData.first_name} {userData.last_name}</p>
             <div className='ms-sm-4 gap-2 w-50 d-flex'>
-              <div className="col d-sm-flex fw-light "> <p className='me-1 fw-normal text-center   mb-0'>{posts.length}</p> posts</div>
-              <div className="col  d-sm-flex fw-light "><p className='me-1 fw-normal text-center mb-0'>{userData.supportings}</p>supportings</div>
-              <div className="col  d-sm-flex fw-light "><p className='me-1 fw-normal  text-center mb-0'>{userData.supporters}</p>supporters</div>
+              <div className="col d-sm-flex fw-light "> <p className='me-1 fw-normal text-center   mb-0'>{formatNumber(posts.length)}</p> posts</div>
+              <div className="col  d-sm-flex fw-light "><p className='me-1 fw-normal text-center mb-0'>{formatNumber(userData.supportings)}</p>supportings</div>
+              <div className="col  d-sm-flex fw-light "><p className='me-1 fw-normal  text-center mb-0'>{formatNumber(userData.supporters)}</p>supporters</div>
             </div>
           </div>
         </div>
@@ -84,7 +85,9 @@ function ViewUser() {
           <p className=' text-custom-grey'>{userData.description}</p>
         </div>
       </div>
-      <Posts posts={posts} clearHeight={400}/>
+      <div className='w-100 d-flex justify-content-center'>
+      <h4 className='text-decoration-underline'></h4></div>
+      <GridPosts posts={posts} clearHeight={410}/>
       <div className="toast-container position-fixed bottom-0 end-0 p-3 "  data-bs-theme="dark">
         <div ref={tostRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">
          

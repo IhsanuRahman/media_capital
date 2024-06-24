@@ -14,6 +14,10 @@ import moment from 'moment'
 import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
 import EditComment from '../../../componets/client/EditComment';
+import Report from '../../../componets/client/Report';
+
+
+
 function ViewPost() {
     const { user } = useSelector(state => state.user)
     const { id } = useParams()
@@ -21,6 +25,10 @@ function ViewPost() {
     const [post, setPost] = useState()
     const toastRef = useRef()
     const [toastMsg, setToastMsg] = useState('')
+
+    const [is_saved, setSave] = useState(true)
+    const [visible, setVisible] = useState(true)
+    const [report, setReport] = useState(false)
     const [posted_at, setPostedAt] = useState()
     const [comments, setComments] = useState([])
     console.log(id);
@@ -35,6 +43,7 @@ function ViewPost() {
         }).then(e => {
             console.log('resp', e.data.post);
             setPost(e.data.post)
+            setSave(e.data.is_saved)
             const dateTime = moment.utc(e.data.post.posted_at.replace('+', '00+')).local().startOf('seconds').fromNow()
             setPostedAt(dateTime)
             setAllRate(parseFloat(e.data.post.rating))
@@ -60,8 +69,11 @@ function ViewPost() {
                         <img src={baseUrl + post.image} alt="" style={{ width: '100%', height: '550px' }} />
                     </div>
                     <div className='w-100 justify-content-between d-flex flex-column ps-1' style={{}}>
-                        <h6 className=' mt-1'>All over:</h6>
-                        <Stack spacing={1} >
+
+                        <div className='d-flex'><Stack spacing={1} >
+                            <h6 className=' mt-1'>All over:</h6>
+
+
                             <Rating name="half-rating-read" value={overAllRate} precision={0.1} readOnly onChange={(event, newValue) => {
 
                             }} emptyIcon={
@@ -88,18 +100,67 @@ function ViewPost() {
                                 emptyIcon={
                                     <img src={ratingSvg} alt="" srcset="" />} />
                         </Stack>
-                        {/* <div className='dropdown ms-auto me-1'  data-bs-theme="dark">
-                        <img src={option} alt=""  srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" />
-                        <ul className="dropdown-menu dropdown-center"  aria-labelledby="dropdownMenuButtonDark">
-                            {post.user.id===user.id?
-                            <li className="dropdown-item" >delete post</li>
-                            
-                            :
-                            <>
-                            <li className="dropdown-item" >save post</li>
-                            <li className="dropdown-item">report</li></>}
-                        </ul>
-                    </div> */}
+                            <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
+                                <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
+                                <ul className="dropdown-menu dropdown-center " >
+
+                                    {post.user.id === user.id ?
+                                        <li className="dropdown-item cursor-pointer"
+                                            onClick={_ => {
+                                                api.delete('post/delete', {
+                                                    data: {
+                                                        post_id: post.id
+                                                    },
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+                                                    },
+
+                                                }).then(resp => {
+                                                    setToastMsg('post has been delete')
+                                                    const toastLiveExample = toastRef.current
+                                                    const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                    setVisible(false)
+                                                    toastBootstrap.show()
+
+
+                                                })
+                                            }}
+                                        >delete post</li>
+                                        :
+                                        <>
+                                            <li className="dropdown-item cursor-pointer"
+                                                onClick={_ => {
+                                                    api.patch('post/save', {
+                                                        post_id: post.id
+                                                    }, {
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+                                                        },
+
+                                                    }).then(e => {
+                                                        setToastMsg(`post has been ${is_saved ? 'unsaved' : 'saved'}`)
+                                                        setSave(!is_saved)
+                                                        const toastLiveExample = toastRef.current
+
+                                                        const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                        toastBootstrap.show()
+                                                    })
+                                                }}
+                                            >{is_saved === true && 'un'}save post</li>
+                                            <li className="dropdown-item cursor-pointer" style={{ cursor: 'pointer' }} onClick={_ => setReport(true)}>report</li></>}
+                                </ul>
+                            </div> </div>
+                        {report && <Report post={post} close={_ => setReport(false)} onSuccess={_ => {
+                            setToastMsg('report is submited')
+                            const toastLiveExample = toastRef.current
+                            const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                            toastBootstrap.show()
+                            setReport(false)
+                        }} />}
                         <p className='text-secondary'>{posted_at}</p>
 
                         <Markdown className={`ms-3 text-break `}  >{post.description}</Markdown>
@@ -123,22 +184,22 @@ function ViewPost() {
                                             <p className='mt-1 ms-4 mb-1 text-white text-break  '>{comment.comment}</p>
                                             <div className="d-flex gap-2 ">
                                                 <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`}>replys</p>
-                                                
-                                            {comment.user_id === user.id &&<p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#editBackdrop${comment.id}`}>edit</p>
-                                            }</div>
-                                            
+
+                                                {comment.user_id === user.id && <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#editBackdrop${comment.id}`}>edit</p>
+                                                }</div>
+
                                             <CommentReply comment={comment} />
-                                            <EditComment comment={comment} onSuccess={comment=>{
-                                                
+                                            <EditComment comment={comment} onSuccess={comment => {
+
                                                 setToastMsg('comment has been edited')
 
                                                 const toastLiveExample = toastRef.current
                                                 const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
-                                                comments[idx].comment=comment
+                                                comments[idx].comment = comment
                                                 setComments([...comments])
                                                 toastBootstrap.show()
-                                                
-                                                }}/>
+
+                                            }} />
                                         </div>
                                         <div className='ms-auto d-flex flex-column '>
                                             <p className=' text-secondary mb-0'>{DateTime}</p>
