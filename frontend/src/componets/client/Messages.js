@@ -1,48 +1,50 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import MessagesPage from '../../pages/client/home/MessagesPage'
 import api from './../../axios'
 import { baseUrl, WSBaseUrl } from '../../constants'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { json } from 'react-router-dom'
+import { json, useNavigate } from 'react-router-dom'
 import moment from 'moment'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Offcanvas, Toast } from 'bootstrap'
+import axios from 'axios'
+import CloseIcon from '@mui/icons-material/Close';
+
 function Messages() {
     const [popup, setPopup] = useState(null)
     const [users, setUsers] = useState([])
     const [searchValue, setSearchValue] = useState('')
+    const navigator = useNavigate()
+    const toastRef = useRef()
+    const [msg, setMsg] = useState('')
+    const canvasRef=useRef()
     const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/get-messages/${localStorage.getItem('access')}`), {
         onOpen: () => {
-            console.log("The connection was setup successfully !",);
+            
         },
-        onClose: (e) => {
+        shouldReconnect: async (closeEvent) => {
+            const refreshToken = localStorage.getItem('refresh');
+            if (refreshToken && connectionStatus !== 'Connecting') {
+                try {
+                    const response = await axios.post(`${baseUrl}/token/refresh`, {
+                        refresh: localStorage.getItem('refresh')
+                    }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` } })
+                    const newAccessToken = response.data.access;
+                    localStorage.setItem('access', newAccessToken);
+                    return false;
+                } catch (error) {
+                    return false
+
+                }
+            }
 
         },
+        reconnectAttempts: 10,
+        retryOnError: true,
         onMessage: (e) => {
-            console.log(e, 'date ws')
             const data = JSON.parse(e.data);
             setUsers([data, ...(users.filter(usr => usr.id !== data.id))])
 
-            // if (typeof data.text_data !== 'undefined') {
-            //     if (typeof data.text_data.messages !== 'undefined' && messages.length===0) { 
-            //         data.text_data.messages.map((msg) => {
-            //             setMessages(prevMessages => [...prevMessages, {
-            //                 type: msg.username === user.username ? 'send' : 'receive', message: msg.message ,sended_at:new Date(msg.sended_at).toLocaleTimeString()
-            //             }])
-            //         })
-
-            //     }
-            // } else if (data.username !== user.username) {
-            //     const newMessage = {
-            //         type: data.username === user.username ? 'send' : 'receive', message: data.message 
-            //     }
-
-            //     setMessages(prevMessages => [...prevMessages, newMessage])
-            // }
-            // if (messageView) {
-            //     messageView.current.addEventListener('DOMNodeInserted', event => {
-            //         const { currentTarget: target } = event;
-            //         target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
-            //     });
-            // }
 
         }
     });
@@ -67,25 +69,27 @@ function Messages() {
                 }
             }).then(e => {
                 setUsers(e.data.users)
-                console.log('messages', e.data.users);
             })
         }
     }, [searchValue])
     return (
-        <div className=" col-sm-3 col-10 d-flex  d-block  flex-column offcanvas-lg offcanvas-end bg-black p-0  " tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div ref={canvasRef} className=" col-sm-3 col-10 d-flex  d-block   flex-column offcanvas-lg offcanvas-end bg-black p-0  " tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             {popup}
-            <h3 className='p-4 text-white' >Messages</h3>
+            <div className="d-flex justify-contents-start">
+            <CloseIcon className='d-lg-none text-white '  data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"/>
+            <button type="button" className="btn-close" data-bs-theme='dark' aria-label="Close"></button>
+            <h3 className='p-4 text-white' >Messages</h3></div>
             <input type="search" placeholder='search' value={searchValue}
                 onChange={e => {
                     setSearchValue(e.target.value)
                 }}
                 className='w-75 greyholder text-white ms-auto me-auto rounded-3 ps-2 border-0' style={{ height: '30px', backgroundColor: '#494949' }} />
             <hr className=' ms-auto me-auto ' style={{ width: '85%' }} />
-            <div className='w-auto ps-2 pe-5'>
+            <div className='w-auto ps-2 pe-xl-5'>
 
-                {users.map((user, idx) => {
+                {users?.map((user, idx) => {
                     const time = moment.utc(user.time).local().startOf('seconds').fromNow()
-                    return <div id={idx} className='   w-100 m-0 m-md-3  ps-md-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
+                    return <div key={idx} className='w-100 m-3  ps-xl-3 d-flex' style={{ borderColor: 'grey', borderWidth: '0 0 1px 0 ', borderStyle: 'solid', height: '50px' }}
                         onClick={e =>
                             setPopup(<MessagesPage username={user.username} userId={user.id} profile={user.profile} setMsgPg={setPopup}></MessagesPage>)
 
@@ -95,14 +99,55 @@ function Messages() {
                         <div className='col'>
                             <div className="d-flex w-100 mb-0 justify-content-between" style={{ height: '22px' }}>
                                 <h6 className='ms-3 mb-0 text-white'>{user.username}</h6>
-                                <p className='   text-secondary' style={{ fontSize: '12px' }}>{time === 'Invalid date' ? '' : time}</p>
-                                
+                                <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
+                                    <p className=' mb-0  text-secondary' style={{ fontSize: '12px' }}>{time === 'Invalid date' ? '' : time}</p>
+
+                                    <MoreHorizIcon height={30} style={{ cursor: 'pointer' }} className="ms-4 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' onClick={e => {
+                                        e.stopPropagation();
+                                    }} />
+                                    <ul className="dropdown-menu dropdown-center "  >
+                                        <li className="dropdown-item cursor-pointer" onClick={e => navigator('/user/' + user.id)} >view user</li>
+                                        <li className="dropdown-item cursor-pointer" style={{ cursor: 'pointer' }}
+                                            onClick={e => {
+                                                e.stopPropagation()
+                                                api.put('messages/block', {
+                                                    'user_id': user.id
+                                                }, {
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'Authorization': `Bearer ${localStorage.getItem('access')}`,
+
+                                                    }
+                                                }).then(e => {
+                                                    let data = [...users]
+                                                    data[idx].is_blocked = !data[idx].is_blocked
+                                                    setMsg('')
+                                                    setMsg(user.is_blocked ? 'unblock user succes' : 'block user succes')
+                                                    setUsers([...data])
+                                                    const toastLiveExample = toastRef.current
+                                                    const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+
+                                                    toastBootstrap.show()
+                                                })
+                                            }}
+                                        >{user.is_blocked ? 'unblock' : 'block'} user</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <p className='ms-4   text-secondary' style={{ fontSize: '12px' }}>{user.lastMessage}</p>
+                            <p className='ms-4 text-secondary' style={{ fontSize: '12px' }}>{user.lastMessage}</p>
                         </div>
                     </div>
                 })}
 
+            </div>
+            <div className="toast-container position-fixed bottom-0 end-0 p-3 " data-bs-theme="dark">
+                <div ref={toastRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">
+
+                    <div className="toast-body d-flex">
+                        {msg}
+                        <button type="button" className="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
             </div>
         </div>
     )

@@ -4,6 +4,7 @@ urlpatterns =[
     path('posts/create',views.create_post),
     path('posts',views.get_posts),
     path('posts/recommended',views.get_recommended),
+    path('posts/posts_personilized',views.posts_personilized),
     path('posts/top',views.get_top),
     path('posts/own',views.get_own_posts),
     path('posts/get',views.get_post),
@@ -20,5 +21,6 @@ urlpatterns =[
     path('admin/post/hide',views.hide_post),
     path('admin/reports',views.get_reports),
     path('admin/tags',views.get_tags),
+    path('admin/comments',views.get_comments),
     path('admin/report/action',views.take_action),
 ]

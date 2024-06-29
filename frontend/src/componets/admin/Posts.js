@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import api from '../../axios';
 import PostItem from '../admin/PostItem';
-import Search from '../client/Search';
+import Search from '../../pages/client/home/Search';
 
 function Posts() {
     const [tab, setTab] = useState(0)
@@ -27,10 +27,6 @@ function Posts() {
                 },
 
             })
-            // .then(e => {
-            //     console.log(e.data.posts);
-            //     setPosts(e.data.posts)
-            // })
             if (!response.data.posts.length || response.data.posts.length === 0) {
                 setWasLastList(true);
                 setLoading(false)
@@ -47,7 +43,6 @@ function Posts() {
     const onScroll = () => {
         if (listInnerRef.current) {
             const { scrollTop, scrollHeight, offsetHeight } = listInnerRef.current;
-            console.log(scrollTop + offsetHeight, scrollHeight, offsetHeight)
             if ((scrollTop + offsetHeight) >= scrollHeight && !wasLastList) {
                 fetchData()
             }
@@ -70,11 +65,11 @@ function Posts() {
                 <div ref={listInnerRef} onScroll={onScroll} className='col-12 d-flex row-gap-1 pb-3 flex-column align-items-center pe-0 h-100 overflow-y-scroll' >
 
                         {posts.map((post, idx) => {
-                            return <PostItem post={post} />
+                            return <PostItem post={post} key={idx}/>
                         })}
                         {isLoading && <div className='ps-auto pe-auto'>
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                            <div className="spinner-border" role="status">
+                                <span className="visually-hidden">Loading...</span>
                             </div>
                         </div>}
                    

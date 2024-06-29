@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { useNavigate } from 'react-router-dom';
 import { baseUrl, WSBaseUrl } from '../../../constants';
+import axios from 'axios';
 function Messages({ username, userId, profile, setMsgPg }) {
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     const [inputText, setInputText] = useState('')
@@ -13,9 +14,28 @@ function Messages({ username, userId, profile, setMsgPg }) {
     const navigator = useNavigate()
     const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/chat/${localStorage.getItem('access')}/${userId}`), {
         onOpen: () => {
-            console.log("The connection was setup successfully !",);
             setButton('send')
         },
+        
+        shouldReconnect: async (closeEvent) => {
+            const refreshToken = localStorage.getItem('refresh');
+            if (refreshToken && connectionStatus !== 'Connecting') {
+                try {
+                    const response = await axios.post(`${baseUrl}/token/refresh`, {
+                        refresh: localStorage.getItem('refresh')
+                    }, { headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` } })
+                    const newAccessToken = response.data.access;
+                    localStorage.setItem('access', newAccessToken);
+                    return false;
+                } catch (error) {
+                    return false
+
+                }
+            }
+
+        },
+        reconnectAttempts: 10,
+        retryOnError: true,
         onMessage: (e) => {
 
             const data = JSON.parse(e.data);
@@ -25,14 +45,14 @@ function Messages({ username, userId, profile, setMsgPg }) {
                     data.text_data.messages.map((msg) => {
                         const time = new Date(msg.sended_at).toLocaleTimeString().split(':')
                         setMessages(prevMessages => [...prevMessages, {
-                            type: msg.username === user.username ? 'send' : 'receive', message: msg.message, sended_at: time[0] + ':' + time[1]
+                            type: msg.username==='server'?'server': msg.username === user.username ? 'send' :  'receive', message: msg.message, sended_at: time[0] + ':' + time[1]
                         }])
                     })
 
                 }
             } else if (data.username !== user.username) {
                 const newMessage = {
-                    type: data.username === user.username ? 'send' : 'receive', message: data.message
+                    type: data.username === user.username ? 'send' : data.username==='server'?'server': 'receive', message: data.message
                 }
 
                 setMessages(prevMessages => [...prevMessages, newMessage])
@@ -69,11 +89,11 @@ function Messages({ username, userId, profile, setMsgPg }) {
             </div>
             <div className="d-flex flex-column ps-2 overflow-y-scroll hidescroller mt-auto gap-2 w-100 pt-2" ref={messageView}>
                 {messages.map((message, idx) => {
-                    return <div id={idx} className={message.type === 'receive' ? 'bg-success  rounded ps-3 pe-3  text-break' : 'ms-auto text-end  bg-success  text-break rounded ps-3 pe-2'} style={{ maxWidth: '75%', width: "fit-content", minWidth: '25%' }}>
+                    return <div key={idx} className={message.type === 'receive' ? 'bg-success  rounded ps-3 pe-3  text-break' :message.type === 'server'?'ms-auto me-auto  text-end  bg-warning text-black  text-break rounded ps-3 pe-2' : 'ms-auto text-end  bg-success  text-break rounded ps-3 pe-2'} style={{ maxWidth: '75%', width: "fit-content", minWidth: '25%' }}>
                         <div className='text-start'>
                             {message.message}</div>
 
-                        <p className='ms-auto text-muted mb-1 m-0' style={{ fontSize: '10px', height: '10px' }}>{message.sended_at}</p>
+                        {message.type!=='server'&&<p className='ms-auto text-muted mb-1 m-0' style={{ fontSize: '10px', height: '10px' }}>{message.sended_at}</p>}
                     </div>
                 })}
             </div>
@@ -83,21 +103,16 @@ function Messages({ username, userId, profile, setMsgPg }) {
                         setInputText(e.target.value)
                     }}
                     onKeyDown={e => {
-                        console.log(e.key);
                         if (e.key === "Enter")
-                            if (readyState === 0) {
-                                alert('still connecting')
-                            } else if (readyState === 1) {
+                            if (readyState === 1 && inputText !== '') {
                                 const time = new Date().toLocaleTimeString().split(':')
-                                console.log('time', time)
                                 const message = {
                                     type: 'send',
                                     message: inputText,
                                     username: user.username,
                                     sended_at: time[0] + ':' + time[1]
                                 };
-                                setMessages([...messages, message]);
-                                setInputText('')
+                                
 
                                 sendMessage(JSON.stringify({
                                     message: inputText, username: user.username
@@ -108,6 +123,10 @@ function Messages({ username, userId, profile, setMsgPg }) {
                                         target.scroll({ top: target.scrollHeight, behavior: 'smooth' });
                                     });
                                 }
+                                if (readyState==1){
+                                    setMessages([...messages, message]);
+                                setInputText('')
+                                }
                             }
                     }}
                 />
@@ -116,9 +135,8 @@ function Messages({ username, userId, profile, setMsgPg }) {
                     onClick={_ => {
                         if (readyState === 0) {
                             alert('still connecting')
-                        } else if (readyState === 1) {
+                        } else if (readyState === 1 && inputText !== '') {
                             const time = new Date().toLocaleTimeString().split(':')
-                            console.log('time', time)
                             const message = {
                                 type: 'send',
                                 message: inputText,

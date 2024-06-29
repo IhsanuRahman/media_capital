@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from admin_auth.utils import admin_only
 from client_auth.serilizers import UserSerializer
-from .serializers import ReportSerilizer, TagsSerilizer
+from .serializers import PostsSerilizer, ReplySerilizers, ReportSerilizer, TagsSerilizer,CommentSerilizers
 from .models import Reports, Tags
 from client_auth.models import UserModel
 from .models import Posts, Comments, Ratings, CommentsReply
@@ -21,6 +21,11 @@ from django.db.models import Avg
 from django.core.paginator import Paginator
 import time
 from notifications.models import Notifications
+from django.db.models import Count,Case, When, Value, IntegerField
+
+
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -80,7 +85,7 @@ def get_posts(request):
             saved = True
         data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
                     'description': post.description,
-                     'is_saved': saved,'is_hidded':post.is_hidded,
+                     'is_saved': saved,'is_hidded':post.is_hidded,'no_raters':post.ratings.count(),
                      'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
 
     return JsonResponse({'posts': data})
@@ -130,7 +135,7 @@ def get_post(request):
                 'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
             fData.append(rply['fields'])
         commentsFormated.append(
-            {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S:%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
+            {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
         print(comment.comment)
 
     myRate = post.ratings.filter(user__id=request.user.id).first()
@@ -144,11 +149,55 @@ def get_post(request):
             'id': post.id,
             'tags': [tag.name for tag in post.tags.all()],
             'comments': commentsFormated,
-            'rating': post.rating, 'my_rate': myRate,
-            'posted_at': post.posted_at.strftime('%Y-%m-%d %H:%M:%z')
+            'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(),
+            'is_saved':post.saved_users.filter(id=request.user.id).exists(),
+            'posted_at': post.posted_at.strftime('%Y-%m-%d %H:%M%z')
             }
 
     return JsonResponse({'post': data})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def posts_personilized(request):
+    user=UserModel.objects.get(id=request.user.id)
+    objects=None
+    if user.supportings.filter().exists():
+        objects=Posts.objects.annotate(is_supportings=Case(
+            When(user__id__in=user.supportings.all().values('id'),then=Value(True)),
+            default=Value(False),
+        output_field=IntegerField(),
+            )).order_by('-is_supportings')
+    else:
+        objects = Posts.objects.all()
+    print('posts')
+    page = Paginator(objects, 10)
+    n = request.query_params.get('page', 1)
+    if int(page.num_pages) < int(n):
+        return JsonResponse({'posts': []})
+    posts = page.page(n).object_list
+    data = []
+    for post in list(posts):
+        print()
+        myRate = post.ratings.filter(user__id=request.user.id).first()
+        if myRate:
+            myRate = myRate.rate
+        else:
+            myRate = 0
+        comments = Comments.objects.filter(post__id=post.id)
+        commentsFormated = []
+        for comment in comments:
+            commentsFormated.append(
+                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+            print(comment.comment)
+        saved = False
+        if post.saved_users.filter(id=request.user.id).exists():
+            saved = True
+        data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
+                    'description': post.description,
+                     'is_saved': saved,'is_hidded':post.is_hidded,
+                     'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(), 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+
+    return JsonResponse({'posts': data})
 
 
 @api_view(['POST'])
@@ -170,14 +219,28 @@ def add_comment(request):
 def add_rate(request):
     rate = request.data.get('rate', None)
     post_id = request.data.get('id', None)
-    print(rate)
-    if rate and post_id:
+    if rate!=None and post_id:
+        print(float(rate))
         post = Posts.objects.get(id=post_id)
+        print('add rate on zero worker first',rate in [0,0.0,'0'],rate)
+        
         rate = float(rate)
         rateingObj = Ratings.objects.filter(
             post=post, user=UserModel.objects.get(id=request.user.id))
-        if rateingObj:
+        print(rate)
+        if rateingObj.exists():
             rateingObj = rateingObj.first()
+            print('add rate on zero worker second',rate in [0,0.0,'0'],rate)
+
+            if rate in [0,0.0,'0']:
+                rateingObj.delete()
+                print('add rate on zero worker second')
+                avg_rate=post.ratings.aggregate(Avg('rate'))['rate__avg']
+                if not avg_rate:
+                    avg_rate=0.0
+                post.rating = avg_rate
+                post.save()
+                return JsonResponse({'message': 'added rate', 'rate': post.rating,'no_raters':post.ratings.count()})
         else:
             rateingObj = Ratings(
                 post=post, user=UserModel.objects.get(id=request.user.id))
@@ -185,7 +248,7 @@ def add_rate(request):
         rateingObj.save()
         post.rating = post.ratings.aggregate(Avg('rate'))['rate__avg']
         post.save()
-        return JsonResponse({'message': 'added rate', 'rate': post.rating})
+        return JsonResponse({'message': 'added rate', 'rate': post.rating,'no_raters':post.ratings.count()})
     else:
         return JsonResponse({'message': 'not added'})
 
@@ -217,7 +280,7 @@ def search(request):
         postData.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
                     'description': post.description,
                      'is_saved': saved,
-                     'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+                     'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(), 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
     users = UserModel.objects.filter(Q(username__icontains=search) | Q(
         first_name__icontains=search) | Q(last_name__icontains=search) | Q(description__icontains=search))
     users = UserModel.objects.annotate(
@@ -334,7 +397,7 @@ def get_saved_post(request):
         data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
                     'description': post.description,
                      'is_saved': saved,
-                     'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+                     'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(), 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
 
     return JsonResponse({'posts': data})
 
@@ -383,7 +446,7 @@ def report_post(request):
 @permission_classes([IsAuthenticated])
 def get_recommended(request):
     user=UserModel.objects.get(id=request.user.id)
-    objects = Posts.objects.filter(tags__users=user).exclude(user=user).exclude(user__in=user.supportings.all())
+    objects = Posts.objects.filter(tags__users=user).exclude(user=user,user__in=user.supportings.all(),saved_users__id=request.user.id,ratings__user__id=request.user.id)
     print('posts')
     page = Paginator(objects, 10)
     n = request.query_params.get('page', 1)
@@ -410,7 +473,7 @@ def get_recommended(request):
         data.append({'image': post.content.url, 'user': {'username': post.user.username, 'id': post.user.id, 'profile': post.user.profile.url},
                     'description': post.description,
                      'is_saved': saved,'is_hidded':post.is_hidded,
-                     'rating': post.rating, 'my_rate': myRate, 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
+                     'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(), 'comments': commentsFormated, 'id': post.id, 'tags': [tag.name for tag in post.tags.all()]})
 
     return JsonResponse({'posts': data})
 
@@ -418,8 +481,9 @@ def get_recommended(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_top(request):
+    MINIMUM_RATING=2
     user=UserModel.objects.get(id=request.user.id)
-    objects = Posts.objects.all().order_by('-rating')
+    objects = Posts.objects.all().annotate(no_raters=Count('ratings')).filter(no_raters__gte=MINIMUM_RATING).order_by('-rating','no_raters')
     print('posts')
     page = Paginator(objects, 10)
     n = request.query_params.get('page', 1)
@@ -517,8 +581,21 @@ def get_tags(request):
     tags=TagsSerilizer(Tags.objects.all(),many=True).data
     tagDict={}
     for i in range(len(tags)):
-       
+        
         tags[i]['users']=UserSerializer(UserModel.all.filter(interests__name=tags[i]['name']),many=True).data
+        tags[i]['posts']=PostsSerilizer(Posts.all.filter(tags__name=tags[i]['name']),many=True).data
         
     print(tags)
+    tags.sort(key=lambda x : len(x['users']),reverse=True)
     return JsonResponse({'tags':tags})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@admin_only
+def get_comments(request):
+    comments=CommentSerilizers(Comments.all.all(),many=True).data
+    replys=CommentsReply.all.all()
+    for i in range(len(comments)):
+        comments[i]['replys']=ReplySerilizers(CommentsReply.all.filter(comment__id=comments[i]['id']),many=True).data
+    return JsonResponse({'comments':comments})

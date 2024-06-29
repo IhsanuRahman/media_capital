@@ -5,7 +5,7 @@ import Messages from '../../../componets/client/Messages';
 import '../style.css'
 import { useSelector } from 'react-redux';
 import api from '../../../axios';
-import Search from '../../../componets/client/Search';
+import Search from './Search';
 import { Toast } from 'bootstrap';
 import PostItem from '../../../componets/client/PostItem';
 import { Hidden, formHelperTextClasses } from '@mui/material';
@@ -25,7 +25,7 @@ export function Home() {
     const fetchData = async () => {
         setLoading(true)
         try {
-            const response = await api.get('/posts', {
+            const response = await api.get('/posts/posts_personilized', {
                 params: {
                     page: currPage,
                 },
@@ -36,10 +36,7 @@ export function Home() {
                 },
 
             })
-            // .then(e => {
-            //     console.log(e.data.posts);
-            //     setPosts(e.data.posts)
-            // })
+            
             if (!response.data.posts.length || response.data.posts.length === 0) {
                 setWasLastList(true);
                 setLoading(false)
@@ -56,7 +53,6 @@ export function Home() {
     const onScroll = () => {
         if (listInnerRef.current) {
             const { scrollTop, scrollHeight, offsetHeight } = listInnerRef.current;
-            console.log(scrollTop + offsetHeight, scrollHeight, offsetHeight)
             if ((scrollTop + offsetHeight) >= scrollHeight && !wasLastList) {
                 fetchData()
             }
@@ -70,18 +66,18 @@ export function Home() {
 
     }, [])
     const tabs = [
-        <div ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
+        <div key={0} ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
 
             {posts.map((post, idx) => {
-                return <PostItem id={idx} post={post} />
+                return <PostItem key={idx} post={post} />
             })}
             {isLoading && <div className='ps-auto pe-auto'>
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
                 </div>
             </div>}
         </div>,
-        <TopRated/>, <Recommended/>, <Search />
+        <TopRated key={1}/>, <Recommended key={2}/>, <Search key={3}/>
     ]
 
     return (

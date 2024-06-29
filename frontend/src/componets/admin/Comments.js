@@ -2,9 +2,10 @@ import { Toast } from 'bootstrap'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../axios'
+import CommentReply from './CommentReply'
 
-function Tags() {
-    const [tags, setTags] = useState([])
+function Comments() {
+    const [comments, setComments] = useState([])
     const navigate = useNavigate()
     const toastRef = useRef()
     const [msg, setMsg] = useState('')
@@ -17,14 +18,14 @@ function Tags() {
         }
     }, [msg])
     useEffect(() => {
-        api.get('admin/tags', {
+        api.get('admin/comments', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('access')}`,
 
             },
         }).then(e => {
-            setTags(e.data.tags)
+            setComments(e.data.comments)
         })
     }, [])
   return (
@@ -37,20 +38,27 @@ function Tags() {
                     <thead className='w-100'>
                         <tr className=''>
                             <th className='col-1 bg-transparent text-dark'>id</th>
-                            <th className="col bg-transparent text-dark">tag</th>
-                            <th className="col-2  bg-transparent text-dark">interest count</th>
-                            <th className="col-2  bg-transparent text-dark">post count</th>
+                            <th className="col bg-transparent text-dark">comment</th>
+                            <th className="col-2 bg-transparent text-dark">user</th>
+                            <th className="col-2 bg-transparent text-dark">post</th>
+                            <th className="col-2 bg-transparent text-dark">replay</th>
+                            
                         </tr></thead>
 
                     <tbody className='w-100 h-100'>
-                        {tags?.map((tag, idx) =>
+                        {comments?.map((comment, idx) =>
                             <tr key={idx} >
-                                <th className='text-dark bg-transparent' >{tag.id}</th>
-                                <td className='text-dark bg-transparent' >
-                                    {tag.name}
+                                <th className='text-dark bg-transparent' >{comment.id}</th>
+                                <td className='text-dark bg-transparent'  >
+                                    {comment.comment}
                                 </td>
-                                <td className='text-dark bg-transparent'>{tag.users.length}</td>
-                                <td className='text-dark bg-transparent'>{tag.posts.length}</td>
+                                <th className='text-dark bg-transparent' >{comment.username}</th>
+                                <th className='text-dark bg-transparent' >
+                                    <button className='btn btn-link' onClick={_=>navigate('/admin/post/' + comment.post)}> view post</button>
+                                   </th>
+                                <th className='text-dark bg-transparent' > <button className='btn btn-link'style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`} > view replays</button> </th>
+                                <CommentReply comment={comment} />
+                                
                                 
                             </tr>)}
 
@@ -69,4 +77,4 @@ function Tags() {
   )
 }
 
-export default Tags
+export default Comments

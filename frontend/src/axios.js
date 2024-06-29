@@ -16,7 +16,7 @@ api.interceptors.response.use(
     async (error) => {
 
       const originalRequest = error.config;
-      console.log('og try',originalRequest._retry)
+      
       if (error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         const refreshToken = localStorage.getItem('refresh');
@@ -27,14 +27,11 @@ api.interceptors.response.use(
             },{ headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` }})
             const newAccessToken = response.data.access;
             const newRefreshToken = response.data.refresh;
-            console.log('tok',newAccessToken)
-            localStorage.setItem('access', newAccessToken);  
-            localStorage.setItem('refresh', newRefreshToken);  
+            localStorage.setItem('access', newAccessToken);   
             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
             
             return axios(originalRequest);
           } catch (error) {
-            console.log('eerr',error.config,originalRequest)
             return Promise.reject(error)
             
           }

@@ -26,7 +26,6 @@ function Reports() {
             },
         }).then(e => {
             setReports(e.data.reports)
-            console.log('report', e)
         })
     }, [])
     const actionhandler=(id,action)=>{
@@ -48,7 +47,6 @@ function Reports() {
                 },
             }).then(e => {
                 setReports(e.data.reports)
-                console.log('report', e)
             })
         })
     }
@@ -68,7 +66,7 @@ function Reports() {
 
                     <tbody className='w-100 h-100'>
                         {reports?.map((report, idx) =>
-                            <tr id={idx} >
+                            <tr key={idx} >
                                 <th className='text-dark bg-transparent' >{report.id}</th>
                                 <td className='text-dark bg-transparent' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#reportBackdrop${report.id}`} >
                                     <div className='d-flex flex-column mb-0 ' style={{ height: '70px' }}>

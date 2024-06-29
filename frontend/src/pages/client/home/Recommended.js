@@ -23,10 +23,6 @@ function Recommended() {
                 },
 
             })
-            // .then(e => {
-            //     console.log(e.data.posts);
-            //     setPosts(e.data.posts)
-            // })
             if (!response.data.posts.length || response.data.posts.length === 0) {
                 setWasLastList(true);
                 setLoading(false)
@@ -43,7 +39,6 @@ function Recommended() {
     const onScroll = () => {
         if (listInnerRef.current) {
             const { scrollTop, scrollHeight, offsetHeight } = listInnerRef.current;
-            console.log(scrollTop + offsetHeight, scrollHeight, offsetHeight)
             if ((scrollTop + offsetHeight) >= scrollHeight && !wasLastList) {
                 fetchData()
             }
@@ -59,12 +54,12 @@ function Recommended() {
   return (
     <div ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
 
-            {posts.map((post, idx) => {
-                return <PostItem id={idx} post={post} />
+            {posts?.length===0 &&!isLoading?<h1 className='text-secondary'>no posts</h1>:posts.map((post, idx) => {
+                return <PostItem key={idx} post={post} />
             })}
             {isLoading && <div className='ps-auto pe-auto'>
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
                 </div>
             </div>}
         </div>

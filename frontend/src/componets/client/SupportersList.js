@@ -19,10 +19,10 @@ function SupportersList({ list, setList, type }) {
                         <h5 className="modal-title">{type}</h5>
                         <button type="button" className="btn-close " data-bs-dismiss="modal" aria-label="Close" onClick={_=>dispatch(getUser())}></button>
                     </div>
-                    <div class="modal-body">
+                    <div className="modal-body">
                         <div className='d-flex flex-column'>
                             {list.length > 0 ? list.map((user, idx) => {
-                                return <div className='  rounded-2 d-flex p-2 mb-2  w-100' style={{ borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
+                                return <div key={idx} className='  rounded-2 d-flex p-2 mb-2  w-100' style={{ borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
                                     <div className='bg-light rounded-5' onClick={e => navigator('/user/' + user.id)} style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url('${baseUrl + user.profile}')` }}>
                                     </div>
                                     <div>
@@ -56,7 +56,7 @@ function SupportersList({ list, setList, type }) {
 
 
                     </div>
-                    <div class="modal-footer">
+                    <div className="modal-footer">
 
                         <button type="button" className="btn btn-primary" data-bs-dismiss="modal">Close</button>
 

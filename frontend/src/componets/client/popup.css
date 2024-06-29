@@ -64,3 +64,9 @@
 .popup .profile-btn:hover {
     background-color: #0056b3;
 }
+
+@media screen and (min-width: 540px){
+    .end-lg-25{
+    right: 25%;
+}
+}

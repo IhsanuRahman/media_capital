@@ -1,6 +1,5 @@
 export function CreateUserValidator(errors, userData) {
     let is_valid = true
-    console.log('firstname',userData.first_name);
     if (userData.username.trim() === '') {
         errors.username = 'username is required'
         is_valid = false
@@ -9,7 +8,6 @@ export function CreateUserValidator(errors, userData) {
         if (userData.username.trim().includes(' ')) {
             errors.username = 'space is not allowed in username'
         } else {
-            console.log(errors.username);
             if (errors.username.length > 15) {
                 errors.username = 'only maximum 15 chacters is allowed in first name'
             } else

@@ -46,7 +46,7 @@ function Notifications() {
 
                     <tbody className='w-100 h-100'>
                         {notifications?.map((notification, idx) =>
-                            <tr id={idx} >
+                            <tr key={idx} >
                                 <th className='  text-dark bg-transparent' >{notification.id}</th>
                                 <td className='text-dark bg-transparent'   data-bs-toggle="modal" data-bs-target={`#notificationBackdrop${notification.id}`}>
                                     <div className='d-flex flex-column mb-0 ' style={{ height: '70px' }}>

@@ -15,7 +15,6 @@ function PostItem({ post }) {
     const [visible, setVisible] = useState(true)
     const [hide, setHide] = useState(post.is_hidded)
 
-    console.log(post, 'post');
     return (
         <>
             {visible ? <div className='  rounded-1 ' style={{ width: '400px', borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
@@ -45,7 +44,7 @@ function PostItem({ post }) {
 
                         </Stack>
                         <div className="dropdown ms-auto me-1 " data-bs-theme="light" >
-                            <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
+                            <img src={option} alt="" srcSet="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
                             <ul className="dropdown-menu dropdown-center " >
                                 
                                     <li className="dropdown-item cursor-pointer"
@@ -68,8 +67,7 @@ function PostItem({ post }) {
                                                 toastBootstrap.show()
                                                 
 
-                                            }).catch(e=>
-                                                {console.log(e)}
+                                            }).catch(e=>{console.log('error post')}
                                             )
                                         }}
                                     >delete post</li>
@@ -94,7 +92,7 @@ function PostItem({ post }) {
                                                 
 
                                             }).catch(e=>
-                                                {console.log(e)}
+                                                {console.log('error on post')}
                                             )
                                         }}
                                     >{hide?'unhide':'hide'} post</li>
@@ -105,7 +103,7 @@ function PostItem({ post }) {
                     </div>
                     {<Markdown className={`ms-3 text-break `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.description}</Markdown>}
                     <div className="w-100 ps-3 row mb-2 gap-2 clearfix mt-2">
-                        {post.tags.map(tag => <div className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
+                        {post.tags.map((tag,idx) => <div key={idx} className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                             {'#' + tag}
                         </div>)}
                     </div>

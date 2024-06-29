@@ -28,3 +28,4 @@ class Rooms(models.Model):
     ) 
     objects=RoomBanManager()
     all=models.Manager()
+

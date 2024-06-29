@@ -13,7 +13,6 @@ function ForgotPassword() {
     const handleSubmit = () => {
         setSpinner(true)
             api.post('/forgot-password',{'email':email},{headers:{'Authorization':''}}).then((e) => {
-                console.log(e.data.token);
                 localStorage.setItem('FStoken',e.data.token)
                 localStorage.removeItem('FStokenTime' )
 
@@ -23,7 +22,6 @@ function ForgotPassword() {
             }).catch(e => {
              setAlert(e.response.data.message)
              setSpinner(false)
-             console.log(e.response.data.detail);
              
             })
             
@@ -38,7 +36,7 @@ function ForgotPassword() {
     
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert &&<div class="alert alert-danger alert-dismissible fade show pe-0 w-75 d-flex align-items-center justify-content-between " role="alert">
+            {alert &&<div className="alert alert-danger alert-dismissible fade show pe-0 w-75 d-flex align-items-center justify-content-between " role="alert">
                 {alert}
                 <button className='btn mt-auto me-0' type="button" data-dismiss="alert" aria-label="Close"
                  onClick={_=>setAlert('')}
@@ -56,7 +54,7 @@ function ForgotPassword() {
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 mt-3" style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >
-                      {spinner? <span class="spinner-border" aria-hidden="true"></span>:'submit'}
+                      {spinner? <span className="spinner-border" aria-hidden="true"></span>:'submit'}
                     </button>
                 </div>
             </div>

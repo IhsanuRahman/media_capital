@@ -31,7 +31,7 @@ function Users() {
     return (
         <div className='w-100  d-flex flex-column  ' style={{ maxHeight: 'calc(100% - 50px)' }}>
             <div className='d-flex mt-3'>
-                <h3 >Users</h3> <button className="btn btn-success ms-auto me-1" onClick={_ => navigate('/admin/user/create')}>create user</button></div>
+                <h3 >Users </h3> </div>
             <div className='d-flex ps-5 '>
                 <select value={selectOption} onChange={e => {
                     setSelectOption(e.target.value)
@@ -107,7 +107,7 @@ function Users() {
 
                     <tbody className='w-100 h-100'>
                         {users?.map((user, idx) =>
-                            <tr id={idx} >
+                            <tr key={idx} >
                                 <th className='  text-dark bg-transparent' ><input type="checkbox" name="" id="" className='c-12'
                                     checked={selectedList.includes(user.id)}
                                     
@@ -117,10 +117,8 @@ function Users() {
 
                                             selectedList.splice(ind, 1)
                                             setSelected([...selectedList])
-                                            console.log(selectedList, 'del', ind)
                                         } else {
                                             setSelected([...selectedList, user.id])
-                                            console.log(selectedList, 'add', ind)
                                         }
                                     }
                                     }

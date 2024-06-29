@@ -1,11 +1,13 @@
-import React from 'react'
-import { useSelector } from "react-redux"
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from "react-redux"
 import { Navigate, useLocation } from "react-router-dom"
+import { checkAuth } from './features/user';
 
 const ProtectedRoute = ({ children }) => {
+    
+      
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     let location = useLocation();
-    console.log('pro rout',isAuthenticated,loading,user)
     if (loading){
         return
     }

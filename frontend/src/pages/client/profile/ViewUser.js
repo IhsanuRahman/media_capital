@@ -70,7 +70,7 @@ function ViewUser() {
                       
                   })
                 }}>{userData.is_supporting ? 'un' : ''}support</button>
-                <img src={three_dots} className='' alt="" srcset="" height={'40'} width={'60'} style={{ rotate: '90deg' }} />
+                
               </div>
             </div>
             <p className='ms-4  text-custom-grey '>{userData.first_name} {userData.last_name}</p>

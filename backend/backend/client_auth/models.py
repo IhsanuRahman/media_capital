@@ -25,6 +25,7 @@ class UserModel(AbstractUser):
     description=models.TextField(null=True)
     dob=models.DateField(null=False)
     supportings=models.ManyToManyField('UserModel',related_name='supporters')
+    blocked_users=models.ManyToManyField('UserModel',related_name='blocker')
     objects=BanManager()
     all=models.Manager()
  

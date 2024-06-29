@@ -13,6 +13,7 @@ class Notifications(models.Model):
     is_active=models.BooleanField(default=True)
     sended_at=models.DateTimeField(auto_now_add=True)
     user=models.ForeignKey(UserModel,on_delete=models.CASCADE,null=True)
+    
     class Meta:
         ordering = ['-sended_at']
     
@@ -33,6 +34,9 @@ def notification_created(sender, instance, created, **kwargs):
                 async_to_sync(channel_layer.group_send)("notification_"+str(user['id']), {
                         "type": "send_notification",
                         'data':{"title":instance.title,
-                        "description":instance.description}
+                        "description":instance.description,
+                        
+                        }
                                 
                         })
+        

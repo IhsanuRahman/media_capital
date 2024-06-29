@@ -24,7 +24,9 @@ body{
 .h-max {
     max-height: calc(100px-20px);
 }
-
+.hidescroller{
+    scrollbar-width: none;
+}
 .hidescroller::-webkit-scrollbar {
     display: none;
 }
@@ -60,9 +62,11 @@ input[type=number]::-webkit-outer-spin-button {
     appearance: none;
     margin: 0; 
 }
+
 .w-max{
     width: calc(100% - 200px);
 }
+
 .text-custom-grey{
     color: #ACACAC;
 }
@@ -86,6 +90,7 @@ input[type=number]::-webkit-outer-spin-button {
 .post-item{
     width: 400px;
 }
+
 @media screen and (max-width: 400px){
     .post-item{
         width: 100%;
@@ -93,4 +98,11 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .zoom:hover{
     transform: scale(1.1);
+}
+
+@media screen and (min-width: 768px){
+      
+    .w-max-edit{
+    width: calc(100% - 200px);
+}
 }

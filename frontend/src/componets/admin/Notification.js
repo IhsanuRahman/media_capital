@@ -11,17 +11,17 @@ function Notification({ notification, setMsg ,update}) {
 
     return (
         <div className="modal  fade bg-transparent" id={`notificationBackdrop${notification.id}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="notificationBackdropLabel" aria-hidden="false">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " >
-                <div class="modal-content  text-dark">
-                    <div class="modal-header">
+            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable " >
+                <div className="modal-content  text-dark">
+                    <div className="modal-header">
 
-                        <h5 class="modal-title">Notification</h5>
+                        <h5 className="modal-title">Notification</h5>
                         <button type="button" className="btn-close " data-bs-dismiss="modal" aria-label="Close" ></button>
                     </div>
-                    <div class="modal-body">
+                    <div className="modal-body">
 
                         <div className="mb-3">
-                            <label for="recipient-name" class="col-form-label">title:</label>
+                            <label for="recipient-name" className="col-form-label">title:</label>
                             <input type="text"  className="form-control" id="reson" value={title}
                                 onChange={e=>{
                                     setTitle(e.target.value)
@@ -30,7 +30,7 @@ function Notification({ notification, setMsg ,update}) {
                         </div>
 
                         <div className="mb-3">
-                            <label for="recipient-name" class="col-form-label">description:</label>
+                            <label for="recipient-name" className="col-form-label">description:</label>
                             <textarea type="text"  className="form-control" id="detail" value={description}
                                 onChange={e=>{
                                     setDescription(e.target.value)
@@ -39,7 +39,7 @@ function Notification({ notification, setMsg ,update}) {
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" class="col-form-label"><b>on</b>: {notification.sended_at}</label>
+                            <label for="recipient-name" className="col-form-label"><b>on</b>: {notification.sended_at}</label>
                         </div>
                         <div className="mb-3 d-flex align-items-center justify-content-between">
 
@@ -47,7 +47,7 @@ function Notification({ notification, setMsg ,update}) {
                         </div>
 
                     </div>
-                    <div class="modal-footer">
+                    <div className="modal-footer">
                         <button className='btn btn-danger me-auto'
                             onClick={e => {
                                 api.put('admin/notification/activate', { id: notification.id }, {

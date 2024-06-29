@@ -46,21 +46,18 @@ function EditUser() {
             setUserData(e.data.userData)
         })
     }, [])
-    console.log(typeof userData.profile);
     const submitHandler = () => {
 
         setSpinner(true)
         if (ProfileValidator(errors, userData)) {
             let form_data = new FormData();
             if (typeof userData.profile !== 'string') {
-                console.log('passing image')
                 form_data.append("profile", userData.profile, userData.profile.name);
             }
             form_data.append("username", userData.username);
             form_data.append("id", id);
             form_data.append("first_name", userData.first_name);
             form_data.append("last_name", userData.last_name);
-            console.log(typeof userData.banner);
             if (typeof userData.banner !== 'string' && userData.banner !== null)
                 form_data.append('banner', userData.banner)
             if (typeof userData.profile !== 'string' && userData.profile !== null)
@@ -80,12 +77,11 @@ function EditUser() {
                 setSpinner(false)
                 return navigator('/admin')
             }).catch(e => {
-                console.log(e)
                 try {
                     const serverErrors = e.response.data.message
                     setErrors({ ...errors, ...serverErrors })
                 } catch {
-                    console.log(e)
+                    console.log('error on edit user')
                 }
                 setSpinner(false)
             })
@@ -167,7 +163,7 @@ function EditUser() {
                             <h4 className='mb-3'>Interests</h4>
                             <div className='row clearfix gap-3 '>
 
-                                {userData?.interests?.map((intreset, i) => <div className='rounded-5 col d-flex align-items-center ps-2 border-dark border  p-1 text-center' >
+                                {userData?.interests?.map((intreset, i) => <div key={i} className='rounded-5 col d-flex align-items-center ps-2 border-dark border  p-1 text-center' >
                                     {intreset} <b className='btn ms-auto mb-1   ms-2 text-dark ' onClick={
                                         e => {
                                             let interests = [...userData.interests]
@@ -201,7 +197,7 @@ function EditUser() {
                 </div>
                 <div className='d-flex'>
                 
-               <button className="btn btn-success me-3 ms-auto" style={{ height: '50px', width: '110px' }} onClick={submitHandler}>{spinner ? <span class="spinner-border" aria-hidden="true"></span> : 'save'}</button>
+               <button className="btn btn-success me-3 ms-auto" style={{ height: '50px', width: '110px' }} onClick={submitHandler}>{spinner ? <span className="spinner-border" aria-hidden="true"></span> : 'save'}</button>
 
                 
                 </div>

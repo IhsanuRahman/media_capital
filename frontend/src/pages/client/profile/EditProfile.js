@@ -7,6 +7,8 @@ import {ProfileValidator} from '../auth/helpers/Validations';
 import { useNavigate } from 'react-router-dom';
 import { baseUrl } from '../../../constants';
 
+
+
 function EditProfile() {
     const [spinner, setSpinner] = useState(false)
     const {  user } = useSelector(state => state.user);
@@ -34,16 +36,14 @@ function EditProfile() {
         password: '',
         confirm_password: ''
     })
-    console.log(typeof userData.profile);
     const submitHandler = () => {
-        if (JSON.stringify(initialData)==JSON.stringify(userData)){
+        if (JSON.stringify(initialData)===JSON.stringify(userData)){
             return navigator('/profile')
         }
         setSpinner(true)
         if (ProfileValidator(errors, userData)) {
             let form_data = new FormData();
             if (typeof userData.profile !== 'string') {
-                console.log('passing image')
                 form_data.append("profile", userData.profile, userData.profile.name);
             }
             form_data.append("username", userData.username);
@@ -86,15 +86,24 @@ function EditProfile() {
         <div className='w-100 h-100  overflow-y-scroll overflow-x-hidden ' style={{  maxWidth: '100%',paddingTop: '50px' ,paddingBottom: '100px'  }} >
             <Header />
             <div className="w-100 bg-white h-25">
+                
             <input type="file" accept=".jpg,.jpeg,.svg,.avif,.gif,.png" name="" id="" placeholder='' className='w-100 h-100 mt-auto m-0 file-input ' style={{ cursor: 'pointer', color: 'transparent', backgroundImage: `${userData.banner!==null&&`url(${typeof userData.banner === 'string' ? userData.banner : URL.createObjectURL(userData.banner)})`}` }}
                             onChange={(e) => {
                                 setUserData({ ...userData, banner: e.target.files[0] })
                             }}
                         />
             </div>
+            <div className=' rounded-circle d-flex flex-column d-block d-md-none   bg-secondary  ' style={{ cursor: 'pointer', height: '150px', width: '150px ', backgroundSize: 'cover', marginTop: '-50px', backgroundImage: `url(${typeof userData.profile === 'string' ? userData.profile : URL.createObjectURL(userData.profile)})` }}  >
+                        <input type="file" accept=".jpg,.jpeg,.svg,.avif,.gif,.png" name="" id="" placeholder='' className='w-100 h-100 mt-auto m-0  rounded-circle  file-input ' style={{ cursor: 'pointer', color: 'transparent' }}
+                            onChange={(e) => {
+                                setUserData({ ...userData, profile: e.target.files[0] })
+                            }}
+                        />
+
+                    </div>
             <div className='w-100 h-75  d-flex row ' >
-                <div className="align-items-center d-flex flex-column ps-5 hover-change " style={{ width: '200px' }}>
-                    <div className=' rounded-circle d-flex flex-column    bg-secondary  ' style={{ cursor: 'pointer', height: '150px', minWidth: '150px ', backgroundSize: 'cover', marginTop: '-50px', backgroundImage: `url(${typeof userData.profile === 'string' ? userData.profile : URL.createObjectURL(userData.profile)})` }}  >
+                <div className="align-items-center d-flex d-none d-md-block  flex-column ps-5 hover-change " style={{ width: '200px' }}>
+                    <div className=' rounded-circle d-flex flex-column d-none d-md-block   bg-secondary  ' style={{ cursor: 'pointer', height: '150px', minWidth: '150px ', backgroundSize: 'cover', marginTop: '-50px', backgroundImage: `url(${typeof userData.profile === 'string' ? userData.profile : URL.createObjectURL(userData.profile)})` }}  >
                         <input type="file" accept=".jpg,.jpeg,.svg,.avif,.gif,.png" name="" id="" placeholder='' className='w-100 h-100 mt-auto m-0  rounded-circle  file-input ' style={{ cursor: 'pointer', color: 'transparent' }}
                             onChange={(e) => {
                                 setUserData({ ...userData, profile: e.target.files[0] })
@@ -103,8 +112,8 @@ function EditProfile() {
 
                     </div>
                 </div>
-                <div className=' w-max d-flex'>
-                    <div className='d-flex gap-3  flex-column w-75 p-5'>
+                <div className='mx-md-0 mx-auto w-max-edit d-flex flex-md-row flex-column'>
+                    <div className='d-flex gap-3  flex-column  p-5 col-md-9 col-12'>
                         
                         <input type="text" value={userData.username} className='form-control bg-black text-white whiteholder' placeholder='username' style={{ height: '35px', Top: '45px' }}
                             onChange={(e) => {
@@ -146,12 +155,12 @@ function EditProfile() {
                         ></textarea>
 
                     </div>
-                    <div className="w-25 p-3">
-                        <div className='border border-white rounded h-75 p-4'>
+                    <div className=" p-3 col-10 col-md-3 mx-auto">
+                        <div className='border border-white rounded  p-4 w-100'>
                             <h4 className='mb-3'>Interests</h4>
                             <div className='row clearfix gap-3 '>
 
-                               {userData?.interests?.map((intreset,i)=> <div className='rounded-5 col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
+                               {userData?.interests?.map((intreset,i)=> <div key={i} className='rounded-5 col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                                {intreset} <b className='btn ms-auto mb-1   ms-2 text-white ' onClick={
                                 e=>{
                                     let interests=[...userData.interests]
@@ -183,7 +192,7 @@ function EditProfile() {
                 <div className='d-flex mb-5 w-100 ms-3 '>
                     <button className="btn btn-warning" style={{ height: '50px' }} onClick={_=>navigator('/profile/change-password')}>change password</button>
                     <button className="btn btn-danger ms-2 me-2" style={{ height: '50px', width: '110px' }} onClick={e=>{navigator('/profile/change-email')}}>edit email</button>
-                    <button className="btn btn-success ms-auto me-3" style={{ height: '50px', width: '110px' }} onClick={submitHandler}>{spinner? <span class="spinner-border" aria-hidden="true"></span>:JSON.stringify(initialData)==JSON.stringify(userData)?'back':'save'}</button>
+                    <button className="btn btn-success ms-auto me-3" style={{ height: '50px', width: '110px' }} onClick={submitHandler}>{spinner? <span className="spinner-border" aria-hidden="true"></span>:JSON.stringify(initialData)===JSON.stringify(userData)?'back':'save'}</button>
                 </div>
             </div>
         </div>

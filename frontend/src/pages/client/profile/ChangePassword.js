@@ -65,7 +65,6 @@ function ChangePassword() {
             
 
             }).then((e) => {
-                console.log(e);
                 setSpinner(false)
                 dispatch(logout())
                 dispatch(checkAuth())
@@ -74,7 +73,6 @@ function ChangePassword() {
             }).catch(e => {
              setAlert(e.response.data.message)
              setSpinner(false)
-             console.log(e.response.data);
              
             })
         }else{
@@ -85,7 +83,7 @@ function ChangePassword() {
     
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert &&<div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert &&<div className="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                  onClick={_=>setAlert('')}
@@ -106,7 +104,7 @@ function ChangePassword() {
                    <button className="w-75 mt-5 me-auto ms-auto mb-5 rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >
-                      {spinner? <span class="spinner-border" aria-hidden="true"></span>:'submit'}
+                      {spinner? <span className="spinner-border" aria-hidden="true"></span>:'submit'}
                     </button>
                 </div>
             </div>

@@ -5,7 +5,7 @@ import { Navigate, useLocation } from "react-router-dom"
 const AdminProtectedRoute = ({ children }) => {
     const { isAuthenticated, user, loading } = useSelector(state => state.user);
     let location = useLocation();
-    console.log('pro rout',isAuthenticated,loading,user)
+    
     if (loading){
         return
     }

@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
 import EditComment from '../../../componets/client/EditComment';
 import Report from '../../../componets/client/Report';
+import formatNumber from '../../../NumberFormater';
 
 
 
@@ -31,7 +32,6 @@ function ViewPost() {
     const [report, setReport] = useState(false)
     const [posted_at, setPostedAt] = useState()
     const [comments, setComments] = useState([])
-    console.log(id);
     const navigator = useNavigate()
     const getPost = () => {
         api.get('/posts/get', {
@@ -41,7 +41,6 @@ function ViewPost() {
             },
             params: { 'id': id },
         }).then(e => {
-            console.log('resp', e.data.post);
             setPost(e.data.post)
             setSave(e.data.is_saved)
             const dateTime = moment.utc(e.data.post.posted_at.replace('+', '00+')).local().startOf('seconds').fromNow()
@@ -58,6 +57,7 @@ function ViewPost() {
     return (
         <div className='pt-5 h-100 w-100'>
             <Header />
+            
             {post && <div className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2' style={{ maxHeight: (window.innerHeight - 90) + 'px', }}>
                 <div className='  rounded-1 ' style={{ width: '600px', borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
                     <div className='d-flex align-items-center ps-2   w-100 ' style={{ minHeight: "45px", maxHeight: "45px", borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
@@ -77,7 +77,7 @@ function ViewPost() {
                             <Rating name="half-rating-read" value={overAllRate} precision={0.1} readOnly onChange={(event, newValue) => {
 
                             }} emptyIcon={
-                                <img src={ratingSvg} alt="" srcset="" />} />
+                                <img src={ratingSvg} alt="" srcSet="" />} />
                             <h6>Your Rating:</h6>
                             <Rating name="half-rating" defaultValue={post.my_rate} precision={0.1}
                                 onChange={(event, newValue) => {
@@ -98,10 +98,10 @@ function ViewPost() {
                                     })
                                 }}
                                 emptyIcon={
-                                    <img src={ratingSvg} alt="" srcset="" />} />
+                                    <img src={ratingSvg} alt="" srcSet="" />} />
                         </Stack>
                             <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
-                                <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
+                                <img src={option} alt="" srcSet="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
                                 <ul className="dropdown-menu dropdown-center " >
 
                                     {post.user.id === user.id ?
@@ -142,15 +142,15 @@ function ViewPost() {
                                                         },
 
                                                     }).then(e => {
-                                                        setToastMsg(`post has been ${is_saved ? 'unsaved' : 'saved'}`)
-                                                        setSave(!is_saved)
+                                                        setToastMsg(`post has been ${post.is_saved ? 'unsaved' : 'saved'}`)
+                                                        getPost()
                                                         const toastLiveExample = toastRef.current
 
                                                         const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
                                                         toastBootstrap.show()
                                                     })
                                                 }}
-                                            >{is_saved === true && 'un'}save post</li>
+                                            >{post.is_saved === true ? 'un':''}save post {is_saved}</li>
                                             <li className="dropdown-item cursor-pointer" style={{ cursor: 'pointer' }} onClick={_ => setReport(true)}>report</li></>}
                                 </ul>
                             </div> </div>
@@ -161,11 +161,12 @@ function ViewPost() {
                             toastBootstrap.show()
                             setReport(false)
                         }} />}
+                        {post.no_raters&&  <p className='text-primary'>{formatNumber(post.no_raters)} raters</p>}
                         <p className='text-secondary'>{posted_at}</p>
 
                         <Markdown className={`ms-3 text-break `}  >{post.description}</Markdown>
                         <div className="w-100 ps-3 row gap-2 mt-2 clearfix mt-2">
-                            {post.tags.map(tag => <div className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
+                            {post.tags.map((tag,idx) => <div key={idx}  className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                                 {'#' + tag}
                             </div>)}
                         </div>
@@ -173,7 +174,7 @@ function ViewPost() {
                         <h5 className='ps-2'>Comments</h5>
                         <div className='d-flex flex-column'>
                             {comments.map((comment, idx) => {
-                                const DateTime = moment.utc(comment.posted_at).local().startOf('seconds').fromNow()
+                                const DateTime = moment.utc(comment.posted_at.replace(':+','+')).local().startOf('seconds').fromNow()
 
                                 return <div id={idx} className="d-flex border  rounded ms-2 mb-1 me-2 p-1 align-items-center ps-2">
                                     <div className='d-flex w-100 ps-1 pt-1'>

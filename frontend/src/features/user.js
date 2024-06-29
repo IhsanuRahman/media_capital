@@ -7,32 +7,12 @@ const initialState = {
     loading: false,
     isAuthenticated: false
 }
-// export const setAuthed =state=>{
-//     state.isAuthenticated=true
-// }
 
-// export const refresh=createAsyncThunk('user/refresh',async (_,thunkAPI)=>{
-
-//     api.post('token/refresh',{
-//         'refresh':localStorage.getItem('refresh'),
-//     }).then(e=>{
-//         console.log('REFRESH',e.data.access)
-//         const { dispatch } = thunkAPI;
-//         localStorage.setItem('access',e.data.access)
-//         localStorage.removeItem('access')
-//         localStorage.removeItem('refresh')
-//         dispatch(checkAuth());
-//     }).catch(e=>{
-//         console.log('REFRESH',e)
-
-//     })
-// })
 export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
     if (!(localStorage.getItem('refresh') && localStorage.getItem('access'))) {
         return thunkAPI.rejectWithValue('no token');
     }
     try {
-        console.log();
         const res = await api.post('user', {
             'token': localStorage.getItem('refresh')
         }, {
@@ -47,38 +27,11 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
         if (res.status === 200) {
             return data;
         } else {
-            // api.post('token/refresh',{
-            //     'refresh':localStorage.getItem('refresh'),
-            // }).then(e=>{
-            //     console.log('REFRESH',e.data.access)
-            //     const { dispatch } = thunkAPI;
-            //     localStorage.setItem('access',e.data.access)
-            //     localStorage.removeItem('access')
-            //     localStorage.removeItem('refresh')
-            //     dispatch(checkAuth());
-            // }).catch(e=>{
-            //     console.log('REFRESH',e)
-
-            // })
-            console.log(data)
+            
             return thunkAPI.fulfillWithValue(data);
         }
     } catch (err) {
-        // api.post('token/refresh',{
-        //     'refresh':localStorage.getItem('refresh'),
-        //     'access':localStorage.getItem('access'),
-        // }).then(e=>{
-        //     console.log('REFRESH',e)
-        //     const { dispatch } = thunkAPI;
-        //     localStorage.setItem('access',e.data.access)
-        //     return thunkAPI.fulfillWithValue(dispatch(checkAuth()));
-        // }).catch(e=>{
-        //     localStorage.removeItem('access')
-        //     localStorage.removeItem('refresh')
-        //     console.log('REFRESH',e)
-
-        // })
-        console.log('from   j',err)
+        
         return thunkAPI.rejectWithValue(err.response.data);
     }
 });
@@ -88,39 +41,17 @@ export const checkAuth = createAsyncThunk(
 
         try {
             if (localStorage.getItem('access') == null || localStorage.getItem('refresh') == null) {
-                console.log('token is null')
+                
                 return thunkAPI.rejectWithValue('token is null');
 
             }
-            // const response = await api.post('token/verify', JSON.stringify({
-            //     'token': localStorage.getItem('access')
-            // }), {
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'Authorization': `Bearer ${localStorage.getItem('access')}`,
-
-            //     },
-
-            // })
-
-            // if (response.status == 200) {
-
-            //     return response
-            // }
+            
                 const { dispatch } = thunkAPI;
                 dispatch(getUser());
             
         }
         catch (e) {
-            // api.post('token/refresh',{
-            //     'refresh_token':localStorage.getItem('refresh'),
-            //     'access_token':localStorage.getItem('access'),
-            // }).then(e=>{
-            //     console.log('REFRESH',e)
-            // }).catch(e=>{
-            //     console.log('REFRESH',e)
-
-            // })
+           
             return thunkAPI.rejectWithValue(e.response.data);
         }
     },
@@ -164,11 +95,8 @@ const userSlice = createSlice({
         builder => {
             builder.addCase(checkAuth.fulfilled, state => {
                 const s1 = state.isAuthenticated
-                console.log();
                 state.isAuthenticated = true;
                 state.loading = false;
-                console.log('changed =', s1 !== state.isAuthenticated)
-                console.log("checkAuth");
             }).addCase(checkAuth.pending, state => {
                 state.loading = true;
             })
@@ -176,7 +104,6 @@ const userSlice = createSlice({
                     state.isAuthenticated = false;
                     state.user = {}
                     state.loading = false;
-                    console.log('checkauth rejected');
 
                 }).addCase(getUser.pending, state => {
                     state.loading = true;
@@ -185,7 +112,6 @@ const userSlice = createSlice({
 
                     state.user = action.payload;
                     state.loading = false;
-                    console.log('from silice',state.user)
 
 
                 }).addCase(getUser.rejected, state => {

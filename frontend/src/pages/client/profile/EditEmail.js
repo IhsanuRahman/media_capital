@@ -12,7 +12,7 @@ function EditEmail() {
     localStorage.removeItem('EETokenTime')
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert && <div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert && <div className="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                     onClick={_ => setAlert('')}
@@ -41,19 +41,17 @@ function EditEmail() {
                             }
                             )
                             .then(resp=>{
-                                console.log(resp)
                                 localStorage.setItem('EEToken',resp.data.token)
                                 navigator('/profile/change-email/verify')
                                 setSpinner(false)
                             })
                             .catch(e=>{
-                                console.log(e)
                                 setAlert(e.response.data.message)
                                 setSpinner(false)
                             })}
                         }}
                     >
-                        {spinner ? <span class="spinner-border" aria-hidden="true"></span> : 'submit'}
+                        {spinner ? <span className="spinner-border" aria-hidden="true"></span> : 'submit'}
                     </button>
                 </div>
             </div>

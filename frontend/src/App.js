@@ -26,13 +26,11 @@ import ViewPost from './pages/client/posts/ViewPost';
 import AdminViewPost from './pages/admin/posts/ViewPost';
 import ViewUser from './pages/client/profile/ViewUser';
 import EditEmail from './pages/client/profile/EditEmail';
-import CreateUser from './pages/admin/user/CreateUser';
 import EditUser from './pages/admin/user/EditUser';
 import AdminProtectedRoute from './AdminProtectedRoute';
 import CreateNotification from './pages/admin/notifications/CreateNotifications';
 function App() {
   const dispatch = useDispatch();
-
 
   useEffect(() => {
     dispatch(checkAuth())
@@ -45,7 +43,7 @@ function App() {
         <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path='/forgotpassword/verify-email' element={<OTPPage isAuth={false} apiUrl={'forgot-password/verify'} redirection={'/forgotpassword/change-password'} resendUrl={'/forgot-password/verify-resend'} keyName={'FStoken'} success={
           e => {
-            console.log('token', e.data.token)
+            
             localStorage.setItem('FStoken', e.data.token)
           }
         } />} />
@@ -104,10 +102,8 @@ function App() {
         <Route path='/admin' element={
           <AdminProtectedRoute>
           <AdminHome />
-          </AdminProtectedRoute>} />
-        <Route path='/admin/user/create' element={
-          <AdminProtectedRoute>
-          <CreateUser /></AdminProtectedRoute>} />
+          </AdminProtectedRoute>} /> 
+        
         <Route path='/admin/user/:id' element={
            <AdminProtectedRoute>
           <EditUser /></AdminProtectedRoute>} />

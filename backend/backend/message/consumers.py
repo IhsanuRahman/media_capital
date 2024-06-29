@@ -42,19 +42,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
         receiver_id = self.scope['url_route']['kwargs']['receiver_id']
         receiver = await self.get_user_by_id(receiver_id)
         sender = await self.get_user_object(token=token)
+        block_status= await self.get_block_status(sender, receiver)
+        is_blocker=await self.is_blocker(sender,receiver)
+        print('block stauts',block_status)
         gname = await self.get_room(sender, receiver)
+
         self.roomGroupName = gname
 
         await self.channel_layer.group_add(
-            self.roomGroupName,
-            self.channel_name
+                self.roomGroupName,
+                self.channel_name
         )
+        if not block_status:
+            messages = await self.get_messages(gname)
+            await self.accept()
+            await self.send(json.dumps({'text_data': {'messages': messages}}))
+            if is_blocker:
+                await self.send(json.dumps({'text_data':{'messages':[{"message": "you blocked the user ", 'username': 'server',
+                         'sended_at': ''}]}}))
+                await self.close()
 
-        messages = await self.get_messages(gname)
-        await self.accept()
-        await self.send(json.dumps({'text_data': {'messages': messages}}))
-
+        else:
+            await self.accept()
+            await self.send(json.dumps({'text_data':{'messages':[{"message": "can't chat with this user", 'username': 'server',
+                         'sended_at': ''}]}}))
+            await self.close()
+    
     async def disconnect(self, close_code):
+        
+            
         await self.channel_layer.group_discard(
             self.roomGroupName,
             self.channel_layer
@@ -64,14 +80,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         username = text_data_json["username"]
+        is_blocked= text_data_json.get('is_blocked',False)
         print(self.roomGroupName,
               self.channel_name)
         user = await self.get_user_object(token=(self.scope['url_route']['kwargs']['token']))
         await self.channel_layer.group_send(
             self.roomGroupName, {
-                "type": "sendMessage",
+                "type": 'sendMessage',
                 "message": message,
                 "username": username,
+                "is_blocked":is_blocked,
             })
 
     async def sendMessage(self, event):
@@ -79,8 +97,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = event["username"]
         user_id = self.scope['url_route']['kwargs']['receiver_id']
         receiver = await self.get_user_by_id(user_id)
+
         token = self.scope['url_route']['kwargs']['token']
         user = await self.get_user_object(token)
+        block_status= await self.get_block_status(user, receiver)
+        if block_status:
+            
+            await self.send(json.dumps({"message": "can't chat with this user", 'username': 'server',
+                         'sended_at': ''}))
+            await self.close()
+            return
         print(username, receiver.id)
         channel_layer = get_channel_layer()
         msgObj = await self.create_message(sender=user, message=message, room_name=self.roomGroupName, receiver=receiver)
@@ -117,6 +143,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if user is None:
             raise KeyError()
         return user
+    
+    @database_sync_to_async
+    def get_block_status(self,sender,receiver)  :
+        return receiver.blocked_users.filter(id=sender.id).exists()
+    
+    @database_sync_to_async
+    def is_blocker(self,sender,receiver):
+        return receiver.blocker.filter(id=sender.id).exists()
+    @database_sync_to_async
+    def get_user_block_list(self, user):
+        
+        return user.blocked_users.all()
+    
+    @database_sync_to_async
+    def get_user_blockers(self, user):
+        user = User.objects.filter(id=user.id).first()
+        if user is None:
+            raise KeyError()
+        return user.blocker.all()
 
     @database_sync_to_async
     def get_user_object(self, token):

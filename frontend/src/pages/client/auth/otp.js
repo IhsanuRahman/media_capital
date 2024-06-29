@@ -13,14 +13,13 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl ,isAuth}) {
     const handleSubmit = () => {
         setSendSpin(true)
         api.post(apiUrl, { 'otp': OTP, 'token': localStorage.getItem(keyName) }, { headers: !isAuth?{ 'Authorization': '' } :{'Authorization': `Bearer ${localStorage.getItem('access')}`} },).then(e => {
-            console.log(e);
+           
             localStorage.removeItem(keyName)
             localStorage.removeItem(keyName+'Time')
             success(e)
             navigator(redirection)
             setSendSpin(false)
         }).catch(e => {
-            console.log('from otp',e)
             try {
                 setAlert(e.response.data.message)
             }
@@ -64,7 +63,7 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl ,isAuth}) {
 
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert && <div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert && <div className="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                     onClick={_ => setAlert('')}
@@ -97,7 +96,6 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl ,isAuth}) {
                                     setResendSpin(false)
 
                                 }).catch(e => {
-                                    console.log(e);
                                     try {
                                         setAlert(e.response.data.message)
                                     }
@@ -109,12 +107,12 @@ function OTPPage({ apiUrl, redirection, keyName, success, resendUrl ,isAuth}) {
                             }
                         }}
                     >{resendSpin ? <>
-                        <div class="spinner-border text-primary spinner-border-sm mt-2 " role="status">
-                        </div> <span class="text-primary " role="status">resending...</span></> : 'resend in (' + minutes + ':' + seconds + ')'}  </p>
+                        <div className="spinner-border text-primary spinner-border-sm mt-2 " role="status">
+                        </div> <span className="text-primary " role="status">resending...</span></> : 'resend in (' + minutes + ':' + seconds + ')'}  </p>
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
-                    >{sendSpin ? <><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        <span class="sr-only">&nbsp;Loading...</span></> : 'Send'}</button>
+                    >{sendSpin ? <><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span className="sr-only">&nbsp;Loading...</span></> : 'Send'}</button>
                 </div>
             </div>
 

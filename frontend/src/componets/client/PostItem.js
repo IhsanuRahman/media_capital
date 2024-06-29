@@ -16,12 +16,13 @@ function PostItem({ post }) {
     const navigator = useNavigate()
     const [commentInput, setCommentInput] = useState('')
     const [overAllRate, setAllRate] = useState(post.rating)
+    const [no_raters, setRaters] = useState(post.no_raters)
+
     const [is_saved, setSave] = useState(post.is_saved)
     const toastRef = useRef()
     const [toastMsg, setToastMsg] = useState('')
     const [visible, setVisible] = useState(true)
     const [report, setReport] = useState(false)
-    console.log(post, 'post');
     return (
         <>
             {visible ? <div className='  rounded-1 post-item' style={{ borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
@@ -44,16 +45,15 @@ function PostItem({ post }) {
                             <div className="d-flex gap-2 flex-column ">
                                 <h6 className='pt-2'>All over:</h6>
                                 {post.user.id !== user.id && <h6>Your Rating:</h6>}
-                               {post.no_raters&&  <p className='text-primary'>{formatNumber(post.no_raters)} raters</p>}</div>
+                               {post.no_raters&&  <p className='text-primary'>{formatNumber(no_raters)} raters</p>}</div>
 
                             <div className="d-flex gap-2 flex-column">
                                 <Rating name="half-rating-read" value={overAllRate} precision={0.1} readOnly onChange={(event, newValue) => {
 
                                 }} emptyIcon={
-                                    <img src={ratingSvg} alt="" srcset="" />} />
+                                    <img src={ratingSvg} alt="" srcSet="" />} />
                                 {post.user.id !== user.id && <Rating name="half-rating" defaultValue={post.my_rate} precision={0.1}
                                     onChange={(_, newValue) => {
-                                        console.log(newValue, 'ratenew')
                                         api.put('/posts/rate/add', {
                                             id: post.id,
                                             rate: newValue === null ? 0 : newValue
@@ -66,15 +66,16 @@ function PostItem({ post }) {
 
                                         }).then(e => {
                                             setAllRate(e.data.rate)
+                                            setRaters(e.data.no_raters)
                                         })
                                         post.rating = newValue
                                     }}
                                     emptyIcon={
-                                        <img src={ratingSvg} alt="" srcset="" />} />}</div>
+                                        <img src={ratingSvg} alt="" srcSet="" />} />}</div>
 
                         </Stack>
                         <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
-                            <img src={option} alt="" srcset="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
+                            <img src={option} alt="" srcSet="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
                             <ul className="dropdown-menu dropdown-center " >
 
                                 {post.user.id === user.id ?
@@ -138,7 +139,7 @@ function PostItem({ post }) {
                     </div>
                     {<Markdown className={`ms-3 text-break `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.description}</Markdown>}
                     <div className="w-100 ps-3 row mb-2 gap-2 clearfix mt-2">
-                        {post.tags.map(tag => <div className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
+                        {post.tags.map((tag,idx) => <div key={idx} className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                             {'#' + tag}
                         </div>)}
                     </div>

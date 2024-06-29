@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from client_auth.serilizers import UserSerializer
-from .models import Posts, Reports, Tags
+from .models import Comments, CommentsReply, Posts, Reports, Tags
 
 class PostsSerilizer(serializers.ModelSerializer):
     class Meta:
@@ -19,3 +19,20 @@ class ReportSerilizer(serializers.ModelSerializer):
     class Meta:
         model=Reports
         fields=('reson','detail','id','user','post','reported_username','is_action_taked','suspect_username','reported_at','action_type','is_action_taked') 
+
+class ReplySerilizers(serializers.ModelSerializer):
+    username=serializers.CharField(source='user.username')
+    user=UserSerializer()
+    
+    class Meta:
+        model=CommentsReply
+        fields = "__all__"
+
+class CommentSerilizers(serializers.ModelSerializer):
+    username=serializers.CharField(source='user.username')
+    user=serializers.CharField(source='user.username')
+    profile=serializers.CharField(source='user.profile.url')
+
+    class Meta:
+        model=Comments
+        fields = "__all__"

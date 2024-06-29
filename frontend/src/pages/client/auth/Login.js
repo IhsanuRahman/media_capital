@@ -35,7 +35,6 @@ function Login() {
         setErrors({ ...errors })
         if (errors.username === '' && errors.password === '') {
             api.post('/login', userData, { headers: { 'Authorization': '' } }).then((e) => {
-                console.log('logsuces',e);
                 localStorage.setItem('access', e.data.access)
                 localStorage.setItem('refresh', e.data.refresh)
                 dispatch(setAuthed())
@@ -64,7 +63,7 @@ function Login() {
 
     return (
         <div className=" d-flex flex-column  align-items-center  m-0 h-100" >
-            {alert && <div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert && <div className="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                     onClick={_ => setAlert('')}
@@ -85,7 +84,7 @@ function Login() {
                     <button className="w-75  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '40px', fontSize: '20px' }}
                         onClick={handleSubmit}
                     >
-                        {spinner ? <span class="spinner-border" aria-hidden="true"></span> : 'login'}
+                        {spinner ? <span className="spinner-border" aria-hidden="true"></span> : 'login'}
                     </button>
                 </div>
             </div>

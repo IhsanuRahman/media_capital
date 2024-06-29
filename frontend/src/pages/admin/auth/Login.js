@@ -40,7 +40,6 @@ function AdminLogin() {
         setErrors({ ...errors })
         if (errors.username === '' && errors.password === '') {
             api.post('admin/login', userData).then((e) => {
-                console.log(e);
                 localStorage.setItem('access', e.data.access)
                 localStorage.setItem('refresh', e.data.refresh)
                 dispatch(setAuthed())
@@ -48,7 +47,6 @@ function AdminLogin() {
                 
             }).catch(e => {
                 setAlert(e.response.data.detail)
-                console.log(e.response.data.detail);
 
             })
         }
@@ -56,7 +54,7 @@ function AdminLogin() {
     return (
         <div className='bg-main text-dark d-flex flex-column  justify-content-center align-items-center' style={{ height: '100%', weight: '100%' }}>
             <Header />
-            {alert && <div class="alert alert-danger alert-dismissible fade show pe-0" role="alert">
+            {alert && <div className="alert alert-danger alert-dismissible fade show pe-0" role="alert">
                 {alert}
                 <button className='btn mt-auto ' type="button" data-dismiss="alert" aria-label="Close"
                     onClick={_ => setAlert('')}
@@ -69,12 +67,12 @@ function AdminLogin() {
                 <h2 className='mt-auto fw-bold text-main' >Login</h2>
                 <div className='w-100 ps-5 pe-5 mt-auto'>
                     <label for="username">Username</label>
-                    <input type="text" name='username' onChange={handleinput} class="form-control border-black bg-main" id="username" aria-describedby="emailHelp" placeholder="Enter Username"></input>
+                    <input type="text" name='username' onChange={handleinput} className="form-control border-black bg-main" id="username" aria-describedby="emailHelp" placeholder="Enter Username"></input>
                     {errors.username !== '' && <li className="text-danger ms-2">{errors.username}</li>}
                 </div>
                 <div className='w-100 ps-5 pe-5 mt-3 mb-auto'>
                     <label for="password">Password</label>
-                    <input type="password" name='password' onChange={handleinput}  class="form-control border-black bg-main" id="password" aria-describedby="emailHelp" placeholder="Enter Password"></input>
+                    <input type="password" name='password' onChange={handleinput}  className="form-control border-black bg-main" id="password" aria-describedby="emailHelp" placeholder="Enter Password"></input>
                     {errors.password !== '' && <li className="text-danger ms-2">{errors.password}</li>}
                 </div>
                 <button className='btn-success btn w-25 ms-auto me-3 mb-5 mt-auto' onClick={handleSubmit}>Login</button>

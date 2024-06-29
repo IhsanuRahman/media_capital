@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import Header from '../../../componets/admin/Header'
 import { useDispatch, useSelector } from 'react-redux';
-import { json, useNavigate } from 'react-router-dom';
+import {  json, useNavigate, useSearchParams } from 'react-router-dom';
 import { logout } from '../../../features/user';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Users from '../../../componets/admin/Users';
@@ -9,26 +9,28 @@ import Posts from '../../../componets/admin/Posts';
 import Reports from '../../../componets/admin/Reports';
 import Notifications from '../../../componets/admin/Notifications';
 import Tags from '../../../componets/admin/Tags';
+import Comments from '../../../componets/admin/Comments';
+
+
 function AdminHome() {
+  let [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [tab, setTab] = useState(0)
-  const { isAuthenticated, user, loading } = useSelector(state => state.user);
-  useEffect(() => {
-    // if (!isAuthenticated && !loading && Object.keys(user).length === 0) {
-    //   console.log('loading', loading, user)
-    //   return navigate('/admin/login')
-    // } else if (!loading && user.is_staff === false) {
-    //   return navigate('/admin/login')
-
-    // }
-  })
+  const {  user } = useSelector(state => state.user);
+  const [tab, setTab] = useState(Number(searchParams.get('tab',0)))
+  useEffect(()=>{
+    searchParams.set('tab',tab)
+    setSearchParams(searchParams)
+  },[tab])
+  
   const Tab=({idx,name})=>{return (<tr className=' cursor-pointer'><td className={tab===idx?'rounded bg-primary text-white':'bg-transparent'}  
     onClick={_=>{
       tab!==idx&&setTab(idx)
+      
+
     }}
   >{name}</td></tr>)}
-  const Tabs=[<Users/>,<Posts/>,<Tags/>,<Reports/>,<Notifications/>]
+  const Tabs=[<Users/>,<Posts/>,<Tags/>,<Reports/>,<Notifications/>,<Comments/>]
   return (
 
     user.is_staff === true ? <div className='bg-main text-dark d-flex justify-content-center align-items-center' style={{ height: '100%', weight: '100%' }}>
@@ -43,6 +45,7 @@ function AdminHome() {
              <Tab idx={2} name={'tags '}/>
              <Tab idx={3} name={'reports '}/>
              <Tab idx={4} name={'notifications '}/>
+             <Tab idx={5} name={'comments '}/>
                   
             </tbody>
           </table>

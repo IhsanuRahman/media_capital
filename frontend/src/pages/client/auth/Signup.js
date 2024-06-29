@@ -38,7 +38,6 @@ function Signup() {
         '/signup',
         userData,{headers:{'Authorization':''}}
       ).then(e => {
-        console.log(e);
         localStorage.setItem('RToken', e.data.token)
         localStorage.removeItem('RTokenTime')
         navigator('/verify-email')
@@ -47,8 +46,6 @@ function Signup() {
       }).catch(e => {
         if (e.response.status === 403) {
           const serverErrors = e.response.data
-
-          console.log(e)
           setErrors({ ...errors, ...serverErrors })
         }
         setSending(false)
@@ -79,7 +76,6 @@ function Signup() {
               if (userData.username.trim().includes(' ')) {
                 errors.username = 'space is not allowed in username'
               } else {
-                console.log(errors.username);
                 if (userData.username.length > 15) {
                   errors.username = 'only maximum 15 chacters is allowed in username'
                 } else
