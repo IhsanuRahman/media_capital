@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from "react-redux"
+import React from 'react'
+import {  useSelector } from "react-redux"
 import { Navigate, useLocation } from "react-router-dom"
-import { checkAuth } from './features/user';
 
 const ProtectedRoute = ({ children }) => {
     
@@ -12,6 +11,7 @@ const ProtectedRoute = ({ children }) => {
         return
     }
     if (!isAuthenticated && !loading && user && Object.keys(user).length === 0) {
+        
         return <Navigate to="/login" state={{ from: location }} replace />
     }
     return children

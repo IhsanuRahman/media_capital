@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { baseUrl } from '../../constants'
-import api from '../../axios'
 
 function CommentReply({comment}) {
     const [replys, setReplys] = useState(comment.replys)

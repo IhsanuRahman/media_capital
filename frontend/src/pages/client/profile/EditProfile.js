@@ -68,7 +68,6 @@ function EditProfile() {
                 setSpinner(false)
                 return navigator('/profile')
             }).catch(e => {
-                console.log(e)
                 try{
                     const serverErrors = e.response.data.message
                     setErrors({ ...errors, ...serverErrors })

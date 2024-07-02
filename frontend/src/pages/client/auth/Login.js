@@ -57,6 +57,7 @@ function Login() {
     const { isAuthenticated, user, loading } = useSelector(state => state.user)
     useEffect(() => {
         if (isAuthenticated && !loading) {
+            
             return navigator('/')
         }
     })

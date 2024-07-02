@@ -2,12 +2,14 @@ import React, { useMemo, useState } from 'react'
 import Header from '../../../componets/client/Header'
 import MarkdownEditor from '@uiw/react-markdown-editor';
 import api from '../../../axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './post.css'
 
 
 function CreatePosts() {
+    const location = useLocation();
     const navigator = useNavigate()
+    const supportedFormats=['image/jpeg','image/png','image/webp','image/gif']
     const [alert, setAlert] = useState('')
     const [tags, setTags] = useState([])
     const [tag, setTag] = useState('')
@@ -16,8 +18,16 @@ function CreatePosts() {
     const [spinner, setSpinner] = useState(false)
     const Image = useMemo(() => {
         return <div className=' border rounded-3 align-content-center post-item mx-3' style={{ height: '600px', backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundImage: `url(${image && URL.createObjectURL(image)})` }} >
-            <input type="file" name="" id="d" placeholder='' className='h-100  file-input w-100 hover ' onChange={e => {
-                setImage(e.target.files[0])
+            <input type="file" accept=".jpg,.jpeg,.svg,.gif,.png,.webp" name="" id="d" placeholder='' className='h-100  file-input w-100 hover ' onChange={e => {
+                if (e.target.files.length >= 1) {
+                        
+                    if (supportedFormats.includes(e.target.files[0].type)) {
+                        setImage(e.target.files[0])
+                        setAlert('')
+                    }else{
+                        setAlert('format of image is not supported')
+                    }
+                }
             }} style={image && { color: 'transparent' }} />
         </div>
     }, [image]);
@@ -26,22 +36,36 @@ function CreatePosts() {
         if (image === null) {
             setAlert('image is required')
         } else if (alert === '') {
-            setSpinner(true)
-            const formData = new FormData()
-            formData.append('image', image)
-            formData.append('tags', JSON.stringify(tags))
-            formData.append('description', description)
-            api.post('/posts/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${localStorage.getItem('access')}`,
-                },
-            }).then(e => {
-                setSpinner(false)
-                navigator('/')
-            }).catch(e => {
-                setSpinner(false)
-            })
+            if (supportedFormats.includes(image.type)) {
+                setSpinner(true)
+                const formData = new FormData()
+                formData.append('image', image)
+                formData.append('tags', JSON.stringify(tags))
+                formData.append('description', description)
+                api.post('/posts/create', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${localStorage.getItem('access')}`,
+                    },
+                }).then(e => {
+                    setSpinner(false)
+                    if (location.key !== "default") {
+                        
+                        window.history.go(-1)
+                        
+
+                    } else {
+
+                        navigator('/');
+                    }
+
+                }).catch(e => {
+                    setSpinner(false)
+                    setAlert(e.response.statusText)
+                })
+            } else {
+                setAlert('format of image is not supported')
+            }
         }
     }
     return (
@@ -101,15 +125,15 @@ function CreatePosts() {
                                 setDescription(value)
                             }}
                         /></div><div className='w-100 ps-auto mt-5 ms-auto pe-3 d-flex'
-                onClick={handleSubmit}
-            >
-                <button className='btn btn-success ms-auto p-1 ' style={{ width: '80px', height: '40px' }}>{spinner ? <span className=" spinner-border" aria-hidden="true"></span> : 'create'}</button>
-            </div>
+                            onClick={handleSubmit}
+                        >
+                        <button className='btn btn-success ms-auto p-1 ' style={{ width: '80px', height: '40px' }}>{spinner ? <span className=" spinner-border" aria-hidden="true"></span> : 'create'}</button>
+                    </div>
                 </div>
 
             </div>
 
-            
+
         </div>
     )
 }

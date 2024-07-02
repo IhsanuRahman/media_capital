@@ -31,15 +31,33 @@ from django.db.models import Count,Case, When, Value, IntegerField
 @permission_classes([IsAuthenticated])
 def create_post(request):
     print(request.data)
-    post = Posts.objects.create(id=uuid.uuid4(),
+    post = Posts(id=uuid.uuid4(),
                                 description=request.data['description'],
                                 user=request.user)
     im = Image.open(request.data['image'])
 
     thumb_io = BytesIO()
-    im.save(thumb_io, "WEBP", quality=100)
-    post.content.save(f'{uuid.uuid4()}.webp', ContentFile(
-        thumb_io.getvalue()), save=False)
+    print('type:',im.format)
+    if (im.format=="GIF" and im.is_animated):
+        frames = []
+        try:
+            while True:
+                im.seek(im.tell() + 1)
+                frame = im.copy()
+                frames.append(frame)
+        except EOFError:
+            pass
+
+        if frames:
+            frames[0].save(thumb_io, format="GIF", save_all=True, append_images=frames[1:], loop=0)
+        else:
+            im.save(thumb_io, format="GIF", save_all=True)
+
+        post.content.save(f'{uuid.uuid4()}.gif', ContentFile(thumb_io.getvalue()), save=True)
+    else:
+        im.save(thumb_io, "WEBP", quality=100)
+        post.content.save(f'{uuid.uuid4()}.webp', ContentFile(
+            thumb_io.getvalue()), save=False)
     tags = request.data.get('tags')
     print(tags)
     tags = json.loads(tags)

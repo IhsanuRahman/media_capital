@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '../../../axios'
 import { checkAuth, setAuthed } from '../../../features/user'
 function AdminLogin() {
+    
     const [alert, setAlert] = useState('')
     const dispatch =useDispatch()
     const navigator = useNavigate()

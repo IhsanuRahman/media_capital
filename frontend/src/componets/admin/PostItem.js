@@ -5,7 +5,6 @@ import Markdown from 'markdown-to-jsx'
 import { useNavigate } from 'react-router-dom';
 import api from '../../axios';
 import { Rating, Stack } from '@mui/material';
-import { useSelector } from 'react-redux';
 import { Toast } from 'bootstrap';
 
 function PostItem({ post }) {
@@ -35,7 +34,8 @@ function PostItem({ post }) {
                     <div className="d-flex w-100  ps-1 mt-2">
                         <Stack spacing={1} className='d-flex flex-row'>
                             <div className="d-flex gap-2  ">
-                                <h6 className='pt-2'>All over:</h6><Rating name="half-rating-read" value={post.rating} precision={0.1} readOnly onChange={(event, newValue) => {
+                                <h6 className='pt-2'>All over:</h6>
+                                <Rating name="half-rating-read" value={post.rating} precision={0.1} readOnly onChange={(event, newValue) => {
 
                                 }} 
                                  />

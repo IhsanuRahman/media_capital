@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { baseUrl } from '../../../constants'
 import ratingSvg from '../../../assets/Star.svg';
-import ratingHalfSvg from '../../../assets/Half_filled_star.svg';
 import deleteIcon from '../../../assets/delete.svg';
 import option from '../../../assets/options.svg';
 import Markdown from 'markdown-to-jsx'
 import api from '../../../axios';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../../../componets/client/Header';
 import { Stack, Rating } from '@mui/material';
 import CommentReply from '../../../componets/client/CommentReply';
@@ -28,10 +27,10 @@ function ViewPost() {
     const [toastMsg, setToastMsg] = useState('')
 
     const [is_saved, setSave] = useState(true)
-    const [visible, setVisible] = useState(true)
     const [report, setReport] = useState(false)
     const [posted_at, setPostedAt] = useState()
     const [comments, setComments] = useState([])
+    const location = useLocation();
     const navigator = useNavigate()
     const getPost = () => {
         api.get('/posts/get', {
@@ -47,6 +46,10 @@ function ViewPost() {
             setPostedAt(dateTime)
             setAllRate(parseFloat(e.data.post.rating))
             setComments(e.data.post.comments)
+        }).catch(e=>{
+            if (e.response.status==400){
+                navigator('/')
+            }
         })
 
     }
@@ -57,7 +60,7 @@ function ViewPost() {
     return (
         <div className='pt-5 h-100 w-100'>
             <Header />
-            
+
             {post && <div className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2' style={{ maxHeight: (window.innerHeight - 90) + 'px', }}>
                 <div className='  rounded-1 ' style={{ width: '600px', borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
                     <div className='d-flex align-items-center ps-2   w-100 ' style={{ minHeight: "45px", maxHeight: "45px", borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
@@ -121,8 +124,14 @@ function ViewPost() {
                                                     setToastMsg('post has been delete')
                                                     const toastLiveExample = toastRef.current
                                                     const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
-                                                    setVisible(false)
+                                                    
                                                     toastBootstrap.show()
+                                                    if (location.key !== "default") {
+                                                        navigator(-1,{ replace: true });
+                                                      } else {
+                                                        // Handle case where there's no previous page
+                                                        navigator('/'); // Or any other default route
+                                                      }
 
 
                                                 })

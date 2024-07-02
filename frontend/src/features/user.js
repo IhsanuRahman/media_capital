@@ -38,7 +38,6 @@ export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
 export const checkAuth = createAsyncThunk(
     'users/verify',
     async (_, thunkAPI) => {
-
         try {
             if (localStorage.getItem('access') == null || localStorage.getItem('refresh') == null) {
                 
