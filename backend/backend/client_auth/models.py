@@ -2,7 +2,7 @@ import datetime
 import uuid
 from django.db import models
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,UserManager
 from django.db.models.signals import pre_init
 from django.dispatch import receiver
 
@@ -10,11 +10,13 @@ from posts import models as postModels
 
 
 
-class BanManager(models.Manager):
+class BanManager(UserManager):
     def get_queryset(self) :
         return super().get_queryset().filter(is_banned=False)
     def get_by_natural_key(self, username):
         return self.get(username=username)
+   
+    
 
 # Create your models here.
 class UserModel(AbstractUser):
@@ -28,7 +30,7 @@ class UserModel(AbstractUser):
     blocked_users=models.ManyToManyField('UserModel',related_name='blocker')
     objects=BanManager()
     all=models.Manager()
- 
+    REQUIRED_FIELDS=['dob','email']
 
 class OTP(models.Model):
     id=models.CharField(default=uuid.uuid4(), editable=False, unique=True,max_length=120,primary_key=True)

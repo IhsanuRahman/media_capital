@@ -37,6 +37,7 @@ CHANNEL_LAYERS = {
 }
 # Application definition
 INSTALLED_APPS = [
+    'client_auth',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,7 +48,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'user_profile',
     'posts',
-    'client_auth',
     'notifications',
     'message',
     'corsheaders',
