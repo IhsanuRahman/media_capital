@@ -180,11 +180,14 @@ def posts_personilized(request):
     user=UserModel.objects.get(id=request.user.id)
     objects=None
     if user.supportings.filter().exists():
-        objects=Posts.objects.annotate(is_supportings=Case(
-            When(user__id__in=user.supportings.all().values('id'),then=Value(True)),
-            default=Value(False),
-        output_field=IntegerField(),
+        try:
+            objects=Posts.objects.annotate(is_supportings=Case(
+                When(user__id__in=user.supportings.all().values('id'),then=Value(True)),
+                default=Value(False),
+            output_field=IntegerField(),
             )).order_by('-is_supportings')
+        except:
+            return JsonResponse({'posts': data})
     else:
         objects = Posts.objects.all()
     print('posts')

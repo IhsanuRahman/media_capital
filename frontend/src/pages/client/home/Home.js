@@ -68,7 +68,7 @@ export function Home() {
     const tabs = [
         <div key={0} ref={listInnerRef} onScroll={onScroll} className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2 ' style={{ maxHeight: 'calc(100% - 95px)' }}  >
 
-            {posts.map((post, idx) => {
+            {posts?.length===0 &&!isLoading?<h1 className='text-secondary'>no posts</h1>:posts.map((post, idx) => {
                 return <PostItem key={idx} post={post} />
             })}
             {isLoading && <div className='ps-auto pe-auto'>
