@@ -1,7 +1,5 @@
 import axios, { Axios } from "axios";
 import { baseUrl } from "./constants";
-import { checkAuth } from "./features/user";
-import { useDispatch } from "react-redux";
 
 
 const api = axios.create({
