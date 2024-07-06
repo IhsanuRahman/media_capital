@@ -73,7 +73,7 @@ function Messages() {
         }
     }, [searchValue])
     return (
-        <div ref={canvasRef} className=" col-sm-3 col-10 d-flex  d-block   flex-column offcanvas-lg offcanvas-end bg-black p-0  " tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div ref={canvasRef} data-bs-backdrop="static" className=" col-sm-3 col-10 d-flex  d-block   flex-column offcanvas-lg offcanvas-end bg-black p-0  " tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
             {popup}
             <div className="d-flex justify-contents-start">
             <CloseIcon className='d-lg-none text-white '  data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"/>

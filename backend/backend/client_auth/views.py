@@ -42,7 +42,7 @@ def signup(request):
     if user.is_valid():
         user = user.save()
         if user:
-            otpObj = otp_generator( user)
+            otpObj = otp_generator( user,user.email)
             user.otp=otpObj
             user.stored_time=datetime.datetime.now()
             otpObj.save()

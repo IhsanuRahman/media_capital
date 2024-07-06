@@ -37,12 +37,12 @@ def get_users(request):
                         "id": user['id'],
                         'lastMessage': message.message,
                         'time': on,
-                        'is_blocked':block_list.filter(id=user['id']).exists()
+                        'is_blocked':block_list.filter(id=user.id).exists()
                     })
     else:
         search = request.query_params['search']
         users = UserModel.objects.filter(Q(username__icontains=search) | Q(
-            first_name__icontains=search) | Q(last_name__icontains=search)).exclude(id=request.user.id).exclude(blockers)
+            first_name__icontains=search) | Q(last_name__icontains=search)).exclude(id=request.user.id).exclude(id__in=blockers.values('id'))
         for user in users:
             data.append({
                         'profile': user.profile.url,
@@ -50,7 +50,7 @@ def get_users(request):
                         'id': user.id,
                         'message': '',
                         'time': '',
-                        'is_blocked':block_list.filter(id=user['id']).exists()
+                        'is_blocked':block_list.filter(id=user.id).exists()
                         })
     return JsonResponse({'users': data})
 
