@@ -61,6 +61,7 @@ def create_post(request):
     tags = request.data.get('tags')
     print(tags)
     tags = json.loads(tags)
+    post.save()
     for tag in tags:
         tagObj, created = Tags.objects.get_or_create(name=tag)
         print(tagObj)

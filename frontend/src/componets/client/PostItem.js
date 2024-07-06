@@ -17,7 +17,7 @@ function PostItem({ post }) {
     const [commentInput, setCommentInput] = useState('')
     const [overAllRate, setAllRate] = useState(post.rating)
     const [no_raters, setRaters] = useState(post.no_raters)
-
+    const [view, setView] = useState(false)
     const [is_saved, setSave] = useState(post.is_saved)
     const toastRef = useRef()
     const [toastMsg, setToastMsg] = useState('')
@@ -137,7 +137,8 @@ function PostItem({ post }) {
                         }} />}
 
                     </div>
-                    {<Markdown className={`ms-3 text-break `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.description}</Markdown>}
+                    {<Markdown className={`ms-3 text-break mb-0 pb-0 `} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: view?'wrap':'nowrap' }}>{post.description}</Markdown>}
+                    <p onClick={_=>setView(!view)} className="text-primary pt-0 mt-0 cursor-pointer pb-0 mb-0">view {view?'less':'more'}</p>
                     <div className="w-100 ps-3 row mb-2 gap-2 clearfix mt-2">
                         {post.tags.map((tag,idx) => <div key={idx} className='rounded-5 ps-2  col d-flex align-items-center ps-1 border-white border  p-1 text-center' >
                             {'#' + tag}
