@@ -29,6 +29,7 @@ import EditEmail from './pages/client/profile/EditEmail';
 import EditUser from './pages/admin/user/EditUser';
 import AdminProtectedRoute from './AdminProtectedRoute';
 import CreateNotification from './pages/admin/notifications/CreateNotifications';
+import NotFound from './pages/client/NotFound';
 function App() {
   const dispatch = useDispatch();
 
@@ -114,7 +115,12 @@ function App() {
           <AdminProtectedRoute>
           <CreateNotification />
           </AdminProtectedRoute>} />
+          <Route path='*' element={
+
+          <NotFound/>
+          }/>
       </Routes>
+
     </Router>
   );
 }
