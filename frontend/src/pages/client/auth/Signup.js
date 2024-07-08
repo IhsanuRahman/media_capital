@@ -209,7 +209,7 @@ function Signup() {
           }} />
 
         {errors.confirm_password !== '' && <li className="text-danger ms-2">{errors.confirm_password}</li>}
-        <p className="text-primary" style={{ cursor: 'pointer' }} onClick={_ => navigator('/login')}>already have account?</p>
+        <p className="text-primary me-auto" style={{ cursor: 'pointer' }} onClick={_ => navigator('/login')}>already have account?</p>
         <button className="w-50  me-auto ms-auto rounded fw-bold text-white border-0 " style={{ backgroundColor: '#233543', height: '35px' }}
           onClick={submit}
         >{sending ?
