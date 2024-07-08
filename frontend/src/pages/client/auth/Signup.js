@@ -3,6 +3,10 @@ import api from "../../../axios"
 import SignupValidator from "./helpers/Validations"
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
+import moment from "moment";
+
+
+
 function Signup() {
   const { isAuthenticated, loading } = useSelector(state => state.user)
   const [sending, setSending] = useState(false)
@@ -36,7 +40,7 @@ function Signup() {
     if (SignupValidator(errors, userData)) {
       api.post(
         '/signup',
-        userData,{headers:{'Authorization':''}}
+        userData, { headers: { 'Authorization': '' } }
       ).then(e => {
         localStorage.setItem('RToken', e.data.token)
         localStorage.removeItem('RTokenTime')
@@ -44,14 +48,14 @@ function Signup() {
         setSending(false)
 
       }).catch(e => {
-        if (e.response.status === 403) {
+        if (e.response.status === 400) {
           const serverErrors = e.response.data
           setErrors({ ...errors, ...serverErrors })
         }
         setSending(false)
       })
     } else {
-      setData({...userData,password:'',confirm_password:''})
+      setData({ ...userData, password: '', confirm_password: '' })
       setErrors({ ...errors })
       setSending(false)
     }
@@ -141,12 +145,18 @@ function Signup() {
             setErrors({ ...errors })
           }} />
         {errors.email !== '' && <li className="text-danger ms-2">{errors.email}</li>}
-        <input type="date" name="dob" id="" className="form-control fw-bold " max={`${today.getFullYear() + '-' + ((today.getMonth()) < 10 ? '0' + today.getMonth() : today.getMonth()) + '-' + ((today.getDate()) < 10 ? '0' + today.getDate() : today.getDate())}`} style={{ minHeight: '35px' }} value={userData.dob}
+        <label htmlFor="#dob">Date of birth</label>
+        <input
+          type="date"
+
+          name="dob" id="#dob" className="form-control fw-bold " max={`${today.getFullYear() + '-' + ((today.getMonth()) < 10 ? '0' + today.getMonth() : today.getMonth()) + '-' + ((today.getDate()) < 10 ? '0' + today.getDate() : today.getDate())}`} style={{ minHeight: '35px' }} value={userData.dob}
           onChange={handleinput}
-          onBlur={_ => {
+          onBlur={e => {
 
             if (userData.dob === '' || userData.dob === null) {
               errors.dob = 'date of birth is required'
+            } else if (moment(userData.dob, "YYYY/MM/DD").isAfter()) {
+              errors.dob = 'enter your real date of birth'
             } else {
               errors.dob = ''
             }
@@ -158,6 +168,8 @@ function Signup() {
           onBlur={_ => {
             if (userData.password.trim() === '') {
               errors.password = 'password is required'
+            } else if (userData.password.length < 4) {
+              errors.password = 'password needs atleast 4 characters'
             } else {
               errors.password = ''
             }
@@ -173,7 +185,7 @@ function Signup() {
             } else if (userData.password !== userData.confirm_password) {
               errors.confirm_password = 'passwords are not match'
 
-            }else {
+            } else {
               errors.confirm_password = ''
             }
             setErrors({ ...errors })

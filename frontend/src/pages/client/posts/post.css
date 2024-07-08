@@ -12,9 +12,17 @@
     min-width: 400px;
     
 }
-
+.view-post{
+    width:600px ;
+}
 @media screen and (max-width: 400px){
     .min-400{
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .view-post{
         width: 100%;
     }
 }

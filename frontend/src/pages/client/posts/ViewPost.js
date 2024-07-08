@@ -15,7 +15,7 @@ import { Toast } from 'bootstrap';
 import EditComment from '../../../componets/client/EditComment';
 import Report from '../../../componets/client/Report';
 import formatNumber from '../../../NumberFormater';
-
+import './post.css'
 
 
 function ViewPost() {
@@ -62,7 +62,7 @@ function ViewPost() {
             <Header />
 
             {post && <div className='w-100 reponsive-border flex-column gap-2  d-flex overflow-y-scroll align-items-center hidescroller pt-2' style={{ maxHeight: (window.innerHeight - 90) + 'px', }}>
-                <div className='  rounded-1 ' style={{ width: '600px', borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
+                <div className='view-post  rounded-1 mx-2' style={{  borderColor: '#494949', borderWidth: '2px ', borderStyle: 'solid' }}>
                     <div className='d-flex align-items-center ps-2   w-100 ' style={{ minHeight: "45px", maxHeight: "45px", borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
                         <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + post.user.profile})` }}>
                         </div>

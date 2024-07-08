@@ -1,3 +1,4 @@
+import moment from "moment"
 
 function SignupValidator(errors, userData) {
     let is_valid = true
@@ -51,12 +52,16 @@ function SignupValidator(errors, userData) {
     if (userData.dob === '' || userData.dob === null) {
         errors.dob = 'date of birth is required'
         is_valid = false
-    } else {
+    } else if ( moment(userData.dob, "YYYY/MM/DD").isAfter()){
+        errors.dob = 'enter your real date of birth'
+    }else {
         errors.dob = ''
     }
     if (userData.password.trim() === '') {
         errors.password = 'password is required'
         is_valid = false
+    }else if (userData.password.length<4){
+        errors.password='password needs atleast 4 characters'
     } else {
         errors.password = ''
     }
@@ -70,6 +75,7 @@ function SignupValidator(errors, userData) {
         errors.confirm_password ='passwords are not match'
         is_valid=false
     }
+    
     return is_valid
 }
 

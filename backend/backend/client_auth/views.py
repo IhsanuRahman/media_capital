@@ -52,7 +52,7 @@ def signup(request):
                 'token': otpObj.id
             }, status=200)
     else:
-        return JsonResponse(user.errors, status=403)
+        return JsonResponse(user.errors, status=400)
 
 
 @api_view(['GET', 'POST'])
