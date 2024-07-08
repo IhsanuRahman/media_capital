@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import api from "../../../axios"
 import SignupValidator from "./helpers/Validations"
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { Toast } from "bootstrap";
 
 
 
@@ -11,6 +12,9 @@ function Signup() {
   const { isAuthenticated, loading } = useSelector(state => state.user)
   const [sending, setSending] = useState(false)
   const navigator = useNavigate()
+  const toastRef = useRef()
+  const [toastMsg, setToastMsg] = useState('')
+  console.log('status', window.navigator.onLine)
   useEffect(() => {
     if (isAuthenticated && !loading) {
       return navigator('/')
@@ -42,13 +46,26 @@ function Signup() {
         '/signup',
         userData, { headers: { 'Authorization': '' } }
       ).then(e => {
-        localStorage.setItem('RToken', e.data.token)
-        localStorage.removeItem('RTokenTime')
-        navigator('/verify-email')
-        setSending(false)
+        if (window.navigator.onLine) {
+          localStorage.setItem('RToken', e.data.token)
+          localStorage.removeItem('RTokenTime')
+          navigator('/verify-email')
+          setSending(false)
+        }else {
+          setToastMsg('network connection is lost')
+          const toast=Toast.getOrCreateInstance(toastRef.current)
+          toast.show()
+          setSending(false)
+        }
 
       }).catch(e => {
-        if (e.response.status === 400) {
+        if (!window.navigator.onLine){
+          setToastMsg('network connection is lost')
+          const toast=Toast.getOrCreateInstance(toastRef.current)
+          toast.show()
+          setSending(false)
+
+        }else if (e.response.status === 400) {
           const serverErrors = e.response.data
           setErrors({ ...errors, ...serverErrors })
         }
@@ -200,6 +217,15 @@ function Signup() {
           </div>
           : 'Sign up'}</button>
       </div>
+      <div className="toast-container position-fixed bottom-0 end-0 p-3 " data-bs-theme="dark">
+                <div ref={toastRef} id="liveToast" className="toast " role="alert" aria-live="assertive" aria-atomic="true">
+
+                    <div className="toast-body d-flex">
+                        {toastMsg}
+                        <button type="button" className="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
     </div>
   )
 }
