@@ -170,7 +170,7 @@ def get_post(request):
             'comments': commentsFormated,
             'rating': post.rating, 'my_rate': myRate,'no_raters':post.ratings.count(),
             'is_saved':post.saved_users.filter(id=request.user.id).exists(),
-            'posted_at': post.posted_at.strftime('%Y-%m-%d %H:%M%z')
+            'posted_at': post.posted_at.strftime('%Y-%m-%d %H:%M:%S%z')
             }
 
     return JsonResponse({'post': data})

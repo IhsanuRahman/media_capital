@@ -44,11 +44,15 @@ export const checkAuth = createAsyncThunk(
                 return thunkAPI.rejectWithValue('token is null');
 
             }
-            
+                return await api.post('/token/verify',
+                    {
+                        token:localStorage.getItem('access')
+                    }).then(_=>{
                 const { dispatch } = thunkAPI;
                 dispatch(getUser());
-            
-        }
+            }).catch((e)=> {
+                return thunkAPI.rejectWithValue(e.response.detail);
+            })        }
         catch (e) {
            
             return thunkAPI.rejectWithValue(e.response.data);
@@ -92,14 +96,12 @@ const userSlice = createSlice({
     },
     extraReducers:
         builder => {
-            builder.addCase(checkAuth.fulfilled, state => {
-                const s1 = state.isAuthenticated
+            builder.addCase(checkAuth.pending, state => {
+                state.loading = true;
+            }).addCase(checkAuth.fulfilled, state => {
                 state.isAuthenticated = true;
                 state.loading = false;
-            }).addCase(checkAuth.pending, state => {
-                state.loading = true;
-            })
-                .addCase(checkAuth.rejected, (state) => {
+            }).addCase(checkAuth.rejected, (state) => {
                     state.isAuthenticated = false;
                     state.user = {}
                     state.loading = false;
