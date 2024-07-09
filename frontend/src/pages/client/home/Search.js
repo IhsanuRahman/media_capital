@@ -102,8 +102,8 @@ function Search() {
                 </div>
                 <div className='d-flex justify-content-center ' >
                     {suggestions.length > 0 && focused && <div className="position-absolute mt-1 rounded mb-1 pb-1 bg-white w-50 ms-auto me-auto ">
-                        {suggestions.map(suggestion =>
-                            <div className="col text-dark border-bottom border-2 cursor-pointer" style={{ height: '25px' }}
+                        {suggestions.map((suggestion,idx) =>
+                            <div key={idx} className="col text-dark border-bottom border-2 text-break cursor-pointer" style={{ height: '25px' ,overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'  }}
                                 onClick={e => {
                                     setPrevent(false)
                                     setSearchValue(suggestion[0])
