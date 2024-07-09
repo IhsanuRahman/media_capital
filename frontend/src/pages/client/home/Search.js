@@ -125,7 +125,7 @@ function Search() {
                 </div>
             </div>
             <div className='w-100 d-flex justify-content-center '>
-                <div className='d-flex w-25' style={{ height: '40px' }}>
+                <div className='d-flex col-12 col-sm-6 ' style={{ height: '40px' }}>
                     <button className={`border-0 w-50 tab-btn-secondary border-end border-secondary rounded-start text-white bg-secondary bg-opacity-${tab == 0 ? '50' : '25'}`}
                         onClick={e => {
                             if (tab !== 0) {
