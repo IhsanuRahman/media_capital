@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes
@@ -11,8 +10,6 @@ from .utils import otp_generator, otp_resender
 from .models import OTP, ForgotPassword, TempUser, UserModel
 from posts.models import Tags
 import pytz
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 utc=pytz.UTC
 
 @api_view(['POST'])
@@ -82,13 +79,6 @@ def get_user(request):
     for i in intrsts:
         intlist.append(Tags.objects.get(id=i).name)
     data['interests']=intlist
-    
-    # for i in range(len(data['interests'])):
-    #     print(data['interests'][i].name)
-    # if UserImage.objects.filter(creator=request.user).exists():
-    #     imageUrl=UserImage.objects.filter(creator=request.user).first().image.url
-    #     data['image']='http://127.0.0.1:8000'+imageUrl
-    # data['is_admin']=request.user.is_superuser
     return JsonResponse(data, status=200)
 
 

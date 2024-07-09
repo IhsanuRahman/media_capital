@@ -37,7 +37,7 @@ def get_users(request):
                         "id": user['id'],
                         'lastMessage': message.message,
                         'time': on,
-                        'is_blocked':block_list.filter(id=user.id).exists()
+                        'is_blocked':block_list.filter(id=user['id']).exists()
                     })
     else:
         search = request.query_params['search']
