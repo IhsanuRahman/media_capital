@@ -26,7 +26,7 @@ function Report({ post, onSuccess ,close}) {
                     <div className="modal-body">
 
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">Reson:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">Reson:</label>
                             <input type="text" className="form-control" id="reson" value={reson}
                                 onChange={e => {
                                     setReson(e.target.value)
@@ -34,7 +34,7 @@ function Report({ post, onSuccess ,close}) {
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">Detail:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">Detail:</label>
                             <textarea type="text" className="form-control" id="detail" value={detail}
 
                                 onChange={e => {

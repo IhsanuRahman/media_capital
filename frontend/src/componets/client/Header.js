@@ -85,7 +85,6 @@ function Header({ leading }) {
                 <button className=" btn btn-outline-danger  " 
                     onClick={_ => {
                         dispatch(logout())
-                        dispatch(checkAuth())
                         navigate('/login')
                     }}><LogoutIcon/> Logout</button></div>
                 <button className="btn btn-outline-success"  onClick={_ => navigate('/create-post')}> <AddIcon /> Create Post</button>

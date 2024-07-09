@@ -67,12 +67,12 @@ function AdminLogin() {
 
                 <h2 className='mt-auto fw-bold text-main' >Login</h2>
                 <div className='w-100 ps-5 pe-5 mt-auto'>
-                    <label for="username">Username</label>
+                    <label htmlFor="username">Username</label>
                     <input type="text" name='username' onChange={handleinput} className="form-control border-black bg-main" id="username" aria-describedby="emailHelp" placeholder="Enter Username"></input>
                     {errors.username !== '' && <li className="text-danger ms-2">{errors.username}</li>}
                 </div>
                 <div className='w-100 ps-5 pe-5 mt-3 mb-auto'>
-                    <label for="password">Password</label>
+                    <label htmlFor="password">Password</label>
                     <input type="password" name='password' onChange={handleinput}  className="form-control border-black bg-main" id="password" aria-describedby="emailHelp" placeholder="Enter Password"></input>
                     {errors.password !== '' && <li className="text-danger ms-2">{errors.password}</li>}
                 </div>

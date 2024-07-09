@@ -17,7 +17,7 @@ function EditComment({ comment ,onSuccess}) {
                     <div className="modal-body">
 
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">Comment:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">Comment:</label>
                             <input type="text" className="form-control" id="recipient-name" value={input}
                                 onChange={e => {
                                     setInput(e.target.value)

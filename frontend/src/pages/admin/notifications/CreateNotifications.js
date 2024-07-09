@@ -49,14 +49,14 @@ function CreateNotification() {
                         <div className='d-flex mt-3 w-100 ps-5 mb-5' style={{ height: '80px' }}>
                             <h3 >Create Notification</h3></div>
                         <div className='d-flex h-auto flex-column justify-content-center align-content-center w-75 mx-auto'>
-                            <label for="title" className="col-form-label">Title:</label>
+                            <label htmlFor="title" className="col-form-label">Title:</label>
 
                             <input type="text" className="form-control" id="title"
                                 onChange={e => {
                                     setTitle(e.target.value)
                                 }}
                             />
-                            <label for="description" className="col-form-label">Description:</label>
+                            <label htmlFor="description" className="col-form-label">Description:</label>
 
                             <textarea type="text" className="form-control" id="description"
                                 rows={5}

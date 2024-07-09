@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../axios';
-import { useDispatch } from 'react-redux';
 
 const initialState = {
     user: {},
     loading: false,
-    isAuthenticated: false
+    isAuthenticated: false,
+    initial:true
 }
 
 export const getUser = createAsyncThunk('users/me', async (_, thunkAPI) => {
@@ -47,9 +47,10 @@ export const checkAuth = createAsyncThunk(
                 return await api.post('/token/verify',
                     {
                         token:localStorage.getItem('access')
-                    }).then(_=>{
+                    }).then(resp=>{
                 const { dispatch } = thunkAPI;
                 dispatch(getUser());
+                return resp.data
             }).catch((e)=> {
                 return thunkAPI.rejectWithValue(e.response.detail);
             })        }
@@ -97,19 +98,24 @@ const userSlice = createSlice({
     extraReducers:
         builder => {
             builder.addCase(checkAuth.pending, state => {
+                state.initial=false
                 state.loading = true;
             }).addCase(checkAuth.fulfilled, state => {
+                state.initial=false
                 state.isAuthenticated = true;
                 state.loading = false;
             }).addCase(checkAuth.rejected, (state) => {
+                state.initial=false
                     state.isAuthenticated = false;
                     state.user = {}
                     state.loading = false;
+                    console.log('from get user')
 
                 }).addCase(getUser.pending, state => {
                     state.loading = true;
                 })
                 .addCase(getUser.fulfilled, (state, action) => {
+                    state.isAuthenticated = true;
 
                     state.user = action.payload;
                     state.loading = false;
@@ -119,6 +125,7 @@ const userSlice = createSlice({
                     state.loading = false;
                     state.isAuthenticated = false;
                     state.user = {}
+                    console.log('from get user')
                     
 
                 }).addCase(logout.pending, state => {
@@ -129,6 +136,7 @@ const userSlice = createSlice({
                     state.user = {};
                     localStorage.clear()
                     state.loading = false;
+                    console.log('from get user')
 
                 })
                 .addCase(logout.rejected, state => {

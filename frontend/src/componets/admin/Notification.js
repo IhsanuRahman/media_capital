@@ -21,7 +21,7 @@ function Notification({ notification, setMsg ,update}) {
                     <div className="modal-body">
 
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">title:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">title:</label>
                             <input type="text"  className="form-control" id="reson" value={title}
                                 onChange={e=>{
                                     setTitle(e.target.value)
@@ -30,7 +30,7 @@ function Notification({ notification, setMsg ,update}) {
                         </div>
 
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">description:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">description:</label>
                             <textarea type="text"  className="form-control" id="detail" value={description}
                                 onChange={e=>{
                                     setDescription(e.target.value)
@@ -39,7 +39,7 @@ function Notification({ notification, setMsg ,update}) {
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label"><b>on</b>: {notification.sended_at}</label>
+                            <label htmlFor="recipient-name" className="col-form-label"><b>on</b>: {notification.sended_at}</label>
                         </div>
                         <div className="mb-3 d-flex align-items-center justify-content-between">
 

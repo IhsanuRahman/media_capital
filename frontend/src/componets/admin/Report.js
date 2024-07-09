@@ -21,32 +21,32 @@ function Report({ report,actionhandler}) {
                     <div className="modal-body">
 
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">from:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">from:</label>
                             <input type="text" readOnly className="form-control" id="reson" value={report.reported_username}
                                 
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">suspect:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">suspect:</label>
                             <input type="text" readOnly className="form-control" id="reson" value={report.suspect_username}
                                 
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">problem:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">problem:</label>
                             <input type="text" readOnly className="form-control" id="reson" value={report.reson}
                                 
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label">Detail:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">Detail:</label>
                             <textarea type="text" readOnly className="form-control" id="detail" value={report.detail}
 
                                 
                             />
                         </div>
                         <div className="mb-3">
-                            <label for="recipient-name" className="col-form-label"><b>on</b>: { report.reported_at}</label>
+                            <label htmlFor="recipient-name" className="col-form-label"><b>on</b>: { report.reported_at}</label>
                         </div>
                         <div className="mb-3 d-flex align-items-center justify-content-between">
                             <button type="text" readOnly className="btn btn-outline-info" id="detail"  data-bs-dismiss="modal" onClick={_=>navigator('/admin/post/' + report.post)} 

@@ -13,7 +13,7 @@ import AdminLogin from './pages/admin/auth/Login';
 import AdminHome from './pages/admin/dashboard/Home';
 import { useDispatch } from 'react-redux';
 import { checkAuth, getUser } from './features/user'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import OTPPage from './pages/client/auth/otp';
 import ForgotPassword from './pages/client/auth/ForgotPassword';
 import ChangePassword from './pages/client/profile/ChangePassword';
@@ -30,21 +30,22 @@ import EditUser from './pages/admin/user/EditUser';
 import AdminProtectedRoute from './AdminProtectedRoute';
 import CreateNotification from './pages/admin/notifications/CreateNotifications';
 import NotFound from './pages/client/NotFound';
+
+
 function App() {
   const dispatch = useDispatch();
-
   useEffect(() => {
     dispatch(checkAuth())
-  },[]);
+  }, []);
   return (
     <Router>
       <Routes>
         <Route path='/signup' element={<Signup />} />
-        <Route path='/verify-email' element={<OTPPage  isAuth={false} apiUrl={'/otp/send'} redirection={'/login'} keyName={'RToken'} resendUrl={'/otp/resend'} />} />
+        <Route path='/verify-email' element={<OTPPage isAuth={false} apiUrl={'/otp/send'} redirection={'/login'} keyName={'RToken'} resendUrl={'/otp/resend'} />} />
         <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path='/forgotpassword/verify-email' element={<OTPPage isAuth={false} apiUrl={'forgot-password/verify'} redirection={'/forgotpassword/change-password'} resendUrl={'/forgot-password/verify-resend'} keyName={'FStoken'} success={
           e => {
-            
+
             localStorage.setItem('FStoken', e.data.token)
           }
         } />} />
@@ -81,11 +82,11 @@ function App() {
         } />
         <Route path="/profile/change-email/verify" element={
           <ProtectedRoute>
-            <OTPPage apiUrl={'profile/edit-email/verify'} redirection={'/profile'} keyName={'EEToken'} 
-            success={_=>{
-              dispatch(getUser())
-            }}
-            isAuth={true}  resendUrl={'/profile/edit-email/resend'}/>
+            <OTPPage apiUrl={'profile/edit-email/verify'} redirection={'/profile'} keyName={'EEToken'}
+              success={_ => {
+                dispatch(getUser())
+              }}
+              isAuth={true} resendUrl={'/profile/edit-email/resend'} />
           </ProtectedRoute>
         } />
         <Route path="/post/:id" element={
@@ -102,23 +103,23 @@ function App() {
         <Route path='/admin/login' element={<AdminLogin />} />
         <Route path='/admin' element={
           <AdminProtectedRoute>
-          <AdminHome />
-          </AdminProtectedRoute>} /> 
-        
+            <AdminHome />
+          </AdminProtectedRoute>} />
+
         <Route path='/admin/user/:id' element={
-           <AdminProtectedRoute>
-          <EditUser /></AdminProtectedRoute>} />
-          <Route path='/admin/post/:id' element={
-           <AdminProtectedRoute>
-          <AdminViewPost /></AdminProtectedRoute>} />
+          <AdminProtectedRoute>
+            <EditUser /></AdminProtectedRoute>} />
+        <Route path='/admin/post/:id' element={
+          <AdminProtectedRoute>
+            <AdminViewPost /></AdminProtectedRoute>} />
         <Route path='/admin/notification/create' element={
           <AdminProtectedRoute>
-          <CreateNotification />
+            <CreateNotification />
           </AdminProtectedRoute>} />
-          <Route path='*' element={
+        <Route path='*' element={
 
-          <NotFound/>
-          }/>
+          <NotFound />
+        } />
       </Routes>
 
     </Router>

@@ -185,7 +185,7 @@ function ViewPost() {
                             {comments.map((comment, idx) => {
                                 const DateTime = moment.utc(comment.posted_at.replace(':+','+')).local().startOf('seconds').fromNow()
 
-                                return <div id={idx} className="d-flex border  rounded ms-2 mb-1 me-2 p-1 align-items-center ps-2">
+                                return <div key={idx} className="d-flex border  rounded ms-2 mb-1 me-2 p-1 align-items-center ps-2">
                                     <div className='d-flex w-100 ps-1 pt-1'>
                                         <div className='bg-light rounded-5' style={{ height: '35px', width: '35px ', backgroundSize: 'cover', backgroundImage: `url(${baseUrl + comment.profile})` }}>
                                         </div>
