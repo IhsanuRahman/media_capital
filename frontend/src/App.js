@@ -13,7 +13,7 @@ import AdminLogin from './pages/admin/auth/Login';
 import AdminHome from './pages/admin/dashboard/Home';
 import { useDispatch } from 'react-redux';
 import { checkAuth, getUser } from './features/user'
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import OTPPage from './pages/client/auth/otp';
 import ForgotPassword from './pages/client/auth/ForgotPassword';
 import ChangePassword from './pages/client/profile/ChangePassword';

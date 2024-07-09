@@ -1,15 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
-import logoutIcon from '../../assets/Sign_Out.svg'
-import ProfileIcon from '../../assets/User.svg'
+import React, {  useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { checkAuth, getUser, logout } from '../../features/user';
-import { useNavigate , json } from 'react-router-dom';
+import {  logout } from '../../features/user';
+import { useNavigate  } from 'react-router-dom';
 import { baseUrl,WSBaseUrl } from '../../constants';
 import { Toast } from 'bootstrap';
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import api from '../../axios';
 import useWebSocket,{ReadyState} from 'react-use-websocket'
 import './popup.css'
 import axios from 'axios';
@@ -20,14 +17,14 @@ import CloseIcon from '@mui/icons-material/Close';
 function Header({ leading }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { isAuthenticated, user, loading } = useSelector(state => state.user);
+    const {  user } = useSelector(state => state.user);
     const [popup, setPopup] = useState(null)
     const [spinner, setSpinner] = useState(true)
     const notificationRef = useRef()
     const [notifications, setNotifications] = useState([])
     const [newSpoted,setNew]=useState(false)
 
-    const { sendMessage, lastMessage, readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/get-notifications/${localStorage.getItem('access')}`),{
+    const {  readyState } = useWebSocket(encodeURI(`${WSBaseUrl}/get-notifications/${localStorage.getItem('access')}`),{
         onOpen: () =>{
             setSpinner(false)
         },
