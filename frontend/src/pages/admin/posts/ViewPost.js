@@ -33,7 +33,7 @@ function ViewPost() {
             params: { 'id': id },
         }).then(e => {
             setPost(e.data.post)
-            const dateTime = moment.utc(e.data.post.posted_at.replace('+', '00+')).local().startOf('seconds').fromNow()
+            const dateTime = moment.utc(e.data.post.posted_at).local().startOf('seconds').fromNow()
             setPostedAt(dateTime)
             setAllRate(parseFloat(e.data.post.rating))
             setComments(e.data.post.comments)
