@@ -1,21 +1,22 @@
-import datetime
-import uuid
-from django.shortcuts import render
 from django.http import JsonResponse
-import json
-import pytz
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from admin_auth.utils import admin_only
 from client_auth.models import OTP, UserModel
-from posts.models import Tags, Posts
+from posts.models import Tags, Posts,Comments,CommentsReply,Ratings
 from user_profile.serializers import UserUpdateSerilizer
 from .serializers import  UserSerializer
 from .serializers import CreateUserSerializer
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from .models import EditEmail
 from client_auth.utils import otp_generator, otp_resender
+from message.models import Rooms,MessageModel
+from .models import EditEmail
+import datetime
+import uuid
+import json
+import pytz
+
 
 
 @api_view(['PUT'])
@@ -242,6 +243,10 @@ def users_ops(request):
     ids=request.data.get('users')
     users=UserModel.all.filter(id__in=ids)
     if op=='del':
+        MessageModel.all.filter(sender__id__in=ids).delete()
+        MessageModel.all.filter(sender__id__in=ids,receiver__id__in=ids).delete()
+        Rooms.all.filter(users__id__in=ids).delete()
+        Posts.all.filter(user__id__in=ids).delete()
         users.delete()
         return JsonResponse({"message":'success'})
     elif op=='ban':

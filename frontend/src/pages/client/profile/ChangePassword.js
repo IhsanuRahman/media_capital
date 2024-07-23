@@ -67,7 +67,6 @@ function ChangePassword() {
             }).then((e) => {
                 setSpinner(false)
                 dispatch(logout())
-                dispatch(checkAuth())
                 navigator('/login')
                 
             }).catch(e => {

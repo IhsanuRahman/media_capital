@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -7,8 +6,6 @@ from admin_auth.utils import admin_only
 from .serializers import NotificationSerilizer
 from .models import Notifications
 from django.db.models import Q
-import json
-from asgiref.sync import async_to_sync
 channel_layer = get_channel_layer()
 
 @api_view(['POST'])

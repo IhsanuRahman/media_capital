@@ -12,6 +12,8 @@ from posts.models import Tags
 import pytz
 utc=pytz.UTC
 
+
+
 @api_view(['POST'])
 def login(request):
         username = request.data.get('username')

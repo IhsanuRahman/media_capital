@@ -22,9 +22,9 @@ class RoomBanManager(models.Manager):
 
 class Rooms(models.Model):
     groupName = models.CharField(default=uuid.uuid4(), editable=False, unique=True,max_length=120)
-    users = models.ManyToManyField(User,max_length=2,related_name='users')
+    users = models.ManyToManyField(User,max_length=2,related_name='rooms')
     messages = models.ManyToManyField(
-       MessageModel,related_name='messages'
+       MessageModel,related_name='rooms'
     ) 
     objects=RoomBanManager()
     all=models.Manager()

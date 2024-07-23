@@ -1,12 +1,9 @@
-import datetime
 import uuid
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser,UserManager
 from django.db.models.signals import pre_init
 from django.dispatch import receiver
 
-from posts import models as postModels
 
 
 

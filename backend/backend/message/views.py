@@ -1,4 +1,3 @@
-import datetime
 from django.shortcuts import render
 from .models import Rooms
 from client_auth.models import UserModel
@@ -10,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+
 
 # Create your views here.
 @api_view(['GET'])

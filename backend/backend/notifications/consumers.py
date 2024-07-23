@@ -1,17 +1,11 @@
-import datetime
 import json
-from channels.layers import get_channel_layer
-from channels.consumer import AsyncConsumer
-from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
+from channels.generic.websocket import  AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from rest_framework.authtoken.models import Token
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from asgiref.sync import async_to_sync
+from rest_framework_simplejwt.tokens import  AccessToken
 from client_auth.models import UserModel as User
 from .models import Notifications
 from .serializers import NotificationSerilizer
 from django.db.models import Q
-import uuid
 
 
 class Notifier(AsyncWebsocketConsumer):

@@ -1,4 +1,3 @@
-
 from django.core import serializers
 from django.contrib.postgres.search import SearchVector
 from io import BytesIO
@@ -7,7 +6,6 @@ import uuid
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-
 from admin_auth.utils import admin_only
 from client_auth.serilizers import UserSerializer
 from .serializers import PostsSerilizer, ReplySerilizers, ReportSerilizer, TagsSerilizer,CommentSerilizers
@@ -19,7 +17,6 @@ from django.db.models import Q
 from django.core.files.base import ContentFile
 from django.db.models import Avg
 from django.core.paginator import Paginator
-import time
 from notifications.models import Notifications
 from django.db.models import Count,Case, When, Value, IntegerField
 

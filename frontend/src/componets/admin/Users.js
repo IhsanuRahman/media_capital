@@ -74,10 +74,11 @@ function Users() {
                                     tlist[idxs.indexOf(id)].is_banned = false
                                 })
                                 setUsers([...tlist])
+                                setMsg('users is unban success')
                             }
-                            setSelectOption('none')
-                            setSelected([])
-                            setMsg('users is unban success')
+                                setSelectOption('none')
+                                setSelected([])
+                            
                         })
                     }}
                 >DO</button>
