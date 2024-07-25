@@ -67,7 +67,13 @@ function PostItem({ post }) {
                                                 toastBootstrap.show()
                                                 
 
-                                            }).catch(e=>{console.log('error post')}
+                                            }).catch(e=>{
+                                                setToastMsg('delete post is failed')
+                                                const toastLiveExample = toastRef.current
+                                                const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                toastBootstrap.show()
+
+                                            }
                                             )
                                         }}
                                     >delete post</li>
@@ -92,7 +98,11 @@ function PostItem({ post }) {
                                                 
 
                                             }).catch(e=>
-                                                {console.log('error on post')}
+                                                {setToastMsg('post hide is failed')
+                                                    const toastLiveExample = toastRef.current
+                                                    const toastBootstrap = Toast.getOrCreateInstance(toastLiveExample)
+                                                    
+                                                    toastBootstrap.show()}
                                             )
                                         }}
                                     >{hide?'unhide':'hide'} post</li>

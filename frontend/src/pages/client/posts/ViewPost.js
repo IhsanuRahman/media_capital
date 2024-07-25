@@ -82,7 +82,7 @@ function ViewPost() {
 
                                 }} emptyIcon={
                                     <img src={ratingSvg} alt="" srcSet="" />} />
-                                <h6>Your Rating:</h6>
+                                {post.user.id !== user.id  && <><h6>Your Rating:</h6>
                                 <Rating name="half-rating" defaultValue={post.my_rate} precision={0.1}
                                     onChange={(event, newValue) => {
                                         api.put('/posts/rate/add', {
@@ -102,7 +102,7 @@ function ViewPost() {
                                         })
                                     }}
                                     emptyIcon={
-                                        <img src={ratingSvg} alt="" srcSet="" />} />
+                                        <img src={ratingSvg} alt="" srcSet="" />} /></>}
                             </Stack>
                                 <div className="dropdown ms-auto me-1 " data-bs-theme="dark" >
                                     <img src={option} alt="" srcSet="" style={{ cursor: 'pointer' }} className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded='false' />
@@ -130,8 +130,7 @@ function ViewPost() {
                                                         if (location.key !== "default") {
                                                             navigator(-1, { replace: true });
                                                         } else {
-                                                            // Handle case where there's no previous page
-                                                            navigator('/'); // Or any other default route
+                                                            navigator('/'); 
                                                         }
 
 

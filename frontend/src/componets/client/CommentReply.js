@@ -49,8 +49,6 @@ function CommentReply({comment}) {
                                             'Authorization': `Bearer ${localStorage.getItem('access')}`,
                                         },}).then(e => {
                                             setReplys([e.data.reply,...replys])
-                                        }).catch(e=>{
-                                            console.log('error on comment reply');
                                         })
                                     setReply('')
                                     }

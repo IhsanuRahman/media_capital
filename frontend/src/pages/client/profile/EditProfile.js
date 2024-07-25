@@ -49,7 +49,6 @@ function EditProfile() {
             form_data.append("username", userData.username);
             form_data.append("first_name", userData.first_name);
             form_data.append("last_name", userData.last_name);
-            console.log(typeof userData.banner);
             if (typeof userData.banner!=='string' && userData.banner!==null)
                 form_data.append('banner', userData.banner)
             if (typeof userData.profile!=='string' && userData.profile!==null)
@@ -72,7 +71,8 @@ function EditProfile() {
                     const serverErrors = e.response.data.message
                     setErrors({ ...errors, ...serverErrors })
                 }catch{
-                    console.log(e)
+                    setSpinner(false)
+                    
                 }
                 setSpinner(false)
             })

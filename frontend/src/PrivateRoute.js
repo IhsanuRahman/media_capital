@@ -8,9 +8,6 @@ const ProtectedRoute = ({ children }) => {
       
     const { isAuthenticated, user, loading,initial } = useSelector(state => state.user);
     let location = useLocation();
-    console.log("isAuthenticated:", isAuthenticated);
-    console.log("user:", user);
-    console.log("loading:", loading);
 
     if (loading || initial){
         return <div>Loading...</div>;

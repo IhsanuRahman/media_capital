@@ -47,7 +47,7 @@ export function Home() {
             setCurrPage(currPage + 1)
             setLoading(false)
         }catch{
-            console.log('error');
+            setLoading(false)
         }
     }
     const onScroll = () => {

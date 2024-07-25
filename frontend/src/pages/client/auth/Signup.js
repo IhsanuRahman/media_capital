@@ -14,7 +14,7 @@ function Signup() {
   const navigator = useNavigate()
   const toastRef = useRef()
   const [toastMsg, setToastMsg] = useState('')
-  console.log('status', window.navigator.onLine)
+  
   useEffect(() => {
     if (isAuthenticated && !loading) {
       return navigator('/')

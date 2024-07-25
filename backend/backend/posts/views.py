@@ -93,8 +93,16 @@ def get_posts(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():
@@ -205,8 +213,16 @@ def posts_personilized(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():
@@ -290,8 +306,16 @@ def search(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():
@@ -407,8 +431,16 @@ def get_saved_post(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():
@@ -483,8 +515,16 @@ def get_recommended(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():
@@ -520,8 +560,16 @@ def get_top(request):
         comments = Comments.objects.filter(post__id=post.id)
         commentsFormated = []
         for comment in comments:
+            replyData = serializers.serialize('json', comment.replys.all())
+            fData = []
+            for rply in json.loads(replyData):
+                print(rply)
+                userObj = UserModel.objects.get(id=rply['fields']['user'])
+                rply['fields']['user'] = {
+                    'id': userObj.id, 'username': userObj.username, 'profile': userObj.profile.url}
+                fData.append(rply['fields'])
             commentsFormated.append(
-                {'comment': comment.comment, 'user': comment.user.username, 'profile': comment.user.profile.url})
+                {'id': comment.id, 'comment': comment.comment, 'posted_at': comment.posted_at.strftime('%Y-%m-%d %H:%M:%S%z'), 'user': comment.user.username, 'user_id': comment.user.id, 'profile': comment.user.profile.url, 'replys': fData})
             print(comment.comment)
         saved = False
         if post.saved_users.filter(id=request.user.id).exists():

@@ -19,6 +19,8 @@ def login(request):
         username = request.data.get('username')
         password = request.data.get('password')
         user = UserModel.all.all().filter(username=username).first() 
+        if not user:
+            user=UserModel.all.all().filter(email=username).first()
         if user is not None and user.check_password(password):
             if user.is_banned:
                 return JsonResponse({

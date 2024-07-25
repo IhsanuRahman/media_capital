@@ -109,7 +109,6 @@ const userSlice = createSlice({
                     state.isAuthenticated = false;
                     state.user = {}
                     state.loading = false;
-                    console.log('from get user')
 
                 }).addCase(getUser.pending, state => {
                     state.loading = true;
@@ -125,7 +124,6 @@ const userSlice = createSlice({
                     state.loading = false;
                     state.isAuthenticated = false;
                     state.user = {}
-                    console.log('from get user')
                     
 
                 }).addCase(logout.pending, state => {
@@ -136,7 +134,6 @@ const userSlice = createSlice({
                     state.user = {};
                     localStorage.clear()
                     state.loading = false;
-                    console.log('from get user')
 
                 })
                 .addCase(logout.rejected, state => {

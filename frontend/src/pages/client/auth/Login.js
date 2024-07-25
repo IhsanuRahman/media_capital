@@ -77,7 +77,7 @@ function Login() {
             <div className='col-sm-8 col-md-7 col-10 flex-column d-flex pt-4 rounded-4 align-items-center mb-auto' style={{ backgroundColor: '#494949', height: '400px' }}>
                 <div className='col-sm-8 col-md-8  col-10 flex-column d-flex   align-items-center'>
                     <h3 className='pb-5 fw-bold  '>Login</h3>
-                    <input type="text" onChange={handleinput} name="username" id="" className='form-control w-100  bg-black border-black greayholder' placeholder='username' style={{ color: '#ffff', height: '40px' }} />
+                    <input type="text" onChange={handleinput} name="username" id="" className='form-control w-100  bg-black border-black greayholder' placeholder='username or email' style={{ color: '#ffff', height: '40px' }} />
                     {errors.username !== '' && <li className="text-danger ms-2">{errors.username}</li>}
                     <input type="password" onChange={handleinput} name="password" id="" className='form-control w-100 mt-4 bg-black border-black greayholder' placeholder='password' style={{ color: '#fff', height: '40px' }} />
                     {errors.password !== '' && <li className="text-danger ms-2">{errors.password}</li>}

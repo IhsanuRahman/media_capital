@@ -81,7 +81,6 @@ function EditUser() {
                     const serverErrors = e.response.data.message
                     setErrors({ ...errors, ...serverErrors })
                 } catch {
-                    console.log('error on edit user')
                 }
                 setSpinner(false)
             })
