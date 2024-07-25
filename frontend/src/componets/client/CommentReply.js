@@ -5,6 +5,11 @@ import api from '../../axios'
 function CommentReply({comment}) {
     const [reply, setReply] = useState('')
     const [replys, setReplys] = useState(comment.replys)
+    useEffect(() => {
+      
+    
+        setReplys(comment.replys)
+      }, [comment.replys])
     return (
         <div className="modal fade" id={`staticBackdrop${comment.id}`} data-bs-backdrop="static"  data-bs-theme="dark" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable " >

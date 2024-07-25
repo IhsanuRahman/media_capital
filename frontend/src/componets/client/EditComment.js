@@ -1,9 +1,15 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { baseUrl } from '../../constants'
 import api from '../../axios'
 import { Modal } from 'bootstrap'
 function EditComment({ comment ,onSuccess}) {
     const [input, setInput] = useState(comment.comment)
+    useEffect(() => {
+      
+    
+      setInput(comment.comment)
+    }, [comment.comment])
+    
     const ref=useRef()
     return (
         <div ref={ref}  className="modal fade" id={`editBackdrop${comment.id}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" data-bs-theme="dark" aria-labelledby="editBackdropLabel" aria-hidden="true">
@@ -17,7 +23,7 @@ function EditComment({ comment ,onSuccess}) {
                     <div className="modal-body">
 
                         <div className="mb-3">
-                            <label htmlFor="recipient-name" className="col-form-label">Comment:</label>
+                            <label htmlFor="recipient-name" className="col-form-label">Comment</label>
                             <input type="text" className="form-control" id="recipient-name" value={input}
                                 onChange={e => {
                                     setInput(e.target.value)

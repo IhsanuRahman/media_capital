@@ -196,14 +196,13 @@ function PostItem({ post }) {
                                             <p className='ms-3 mb-0  text-secondary' style={{ fontSize: '12px' }}> {comment.user}</p>
                                             <p className='mt-1 ms-4 mb-1 text-white text-break  '>{comment.comment}</p>
                                             <div className="d-flex gap-2 ">
-                                                <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`}>replys</p>
+                                                <p className='text-primary mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#staticBackdrop${comment.id}`}>replys</p>
 
                                                 {comment.user_id === user.id && <p className='text-primary  mt-0' style={{ cursor: 'pointer' }} data-bs-toggle="modal" data-bs-target={`#editBackdrop${comment.id}`}>edit</p>
                                                 }</div>
 
                                             <CommentReply comment={comment} />
-                                            <EditComment comment={comment} onSuccess={comment => {
-
+                                            <EditComment comment={{...comment}} onSuccess={comment => {
                                                 setToastMsg('comment has been edited')
 
                                                 const toastLiveExample = toastRef.current
@@ -214,7 +213,7 @@ function PostItem({ post }) {
 
                                             }} />
                                         </div>
-                                        <div className='ms-auto d-flex flex-column '>
+                                        <div className='ms-auto d-flex flex-column'>
                                             <p className=' text-secondary mb-0'>{DateTime}</p>
                                             {comment.user_id === user.id && <button className='btn  ms-auto mt-0'
                                                 onClick={_ => {
@@ -267,8 +266,28 @@ function PostItem({ post }) {
 
                                         },
 
-                                    })
+                                    }).then(e=>{
+                                        const now=new Date()
+                                        console.log([{
+                                            id:e.data.id,
+                                            user_id:user.id,
+                                            user:user.username,
+                                            profile:user.profile,
+                                            comment:commentInput,
+                                            posted_at:now.toISOString(),
+                                            replys:[],
+                                        },...comments])
+                                        setComments([{
+                                            id:e.data.id,
+                                            user_id:user.id,
+                                            user:user.username,
+                                            profile:user.profile,
+                                            comment:commentInput,
+                                            posted_at:now.toISOString(),
+                                            replys:[],
+                                        },...comments])
                                     setCommentInput('')
+                                    })
                                 }}
                             >post</button>
                         </div>

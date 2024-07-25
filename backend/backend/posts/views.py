@@ -245,7 +245,7 @@ def add_comment(request):
         if comment:
             commentObj = Comments(user=user, post=post, comment=comment)
             commentObj.save()
-            return JsonResponse({'message': 'comment is added'}, status=201)
+            return JsonResponse({'message': 'comment is added','id':commentObj.id}, status=201)
     return JsonResponse({'message': 'creadential error'}, status=400)
 
 
