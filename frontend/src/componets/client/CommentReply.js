@@ -7,7 +7,6 @@ function CommentReply({comment}) {
     const [replys, setReplys] = useState(comment.replys)
     useEffect(() => {
       
-    
         setReplys(comment.replys)
       }, [comment.replys])
     return (

@@ -268,15 +268,6 @@ function PostItem({ post }) {
 
                                     }).then(e=>{
                                         const now=new Date()
-                                        console.log([{
-                                            id:e.data.id,
-                                            user_id:user.id,
-                                            user:user.username,
-                                            profile:user.profile,
-                                            comment:commentInput,
-                                            posted_at:now.toISOString(),
-                                            replys:[],
-                                        },...comments])
                                         setComments([{
                                             id:e.data.id,
                                             user_id:user.id,
