@@ -36,9 +36,11 @@ def get_users(request):
                         "username": user['username'],
                         "id": user['id'],
                         'lastMessage': message.message,
+                        'is_new':message.is_new and message.receiver.id==request.user.id,
                         'time': on,
                         'is_blocked':block_list.filter(id=user['id']).exists()
                     })
+        data.sort(key=lambda m : m['time'],reverse=True)            
     else:
         search = request.query_params['search']
         users = UserModel.objects.filter(Q(username__icontains=search) | Q(

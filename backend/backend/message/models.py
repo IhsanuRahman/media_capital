@@ -12,6 +12,7 @@ class MessageModel(models.Model):
     sender=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name='sender')
     receiver=models.ForeignKey(User,on_delete=models.DO_NOTHING)
     sended_at=models.DateTimeField(auto_now_add=True)
+    is_new=models.BooleanField(default=True)
     
     objects=BanManger()
     all=models.Manager()

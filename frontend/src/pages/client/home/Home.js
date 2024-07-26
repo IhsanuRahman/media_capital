@@ -22,6 +22,7 @@ export function Home() {
     const [prevPage, setPrevPage] = useState(0);
     const [wasLastList, setWasLastList] = useState(false);
     const [isLoading, setLoading] = useState(false)
+    const [newMsg,setNew]=useState(false)
     const fetchData = async () => {
         setLoading(true)
         try {
@@ -87,13 +88,13 @@ export function Home() {
             <div className="row w-100 h-100">
 
                 <div className='col-12 col-lg-9 pe-0 h-100 overflow-hidden'>
-                    <Navbar tab={tab} setTab={setTab} />
+                    <Navbar tab={tab} setTab={setTab} newMsg={newMsg} setNewPass={setNew}/>
                     <Suspense fallback={<div>Loading...</div>}>
                         {tabs[tab]}
                     </Suspense>
 
                 </div>
-                <Messages />
+                <Messages setNew={setNew}/>
             </div>
         </div> : <div></div>
     );

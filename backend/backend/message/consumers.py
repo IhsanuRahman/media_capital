@@ -193,10 +193,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_messages(self, room_name):
+        token = (self.scope['url_route']['kwargs']['token'])
+        token = AccessToken(token=token)
+        user_id=token.payload['user_id']
         messages = Rooms.objects.filter(groupName=room_name).first()
         datas = []
         print(messages.messages.all().order_by('sended_at').values())
         for msg in messages.messages.all().order_by('sended_at'):
             datas.append({"message": msg.message, 'username': msg.sender.username,
                          'sended_at': msg.sended_at.strftime('%Y-%m-%d %H:%M:%z')})
+        messages.messages.filter(receiver__id=user_id).update(is_new=False)
         return datas

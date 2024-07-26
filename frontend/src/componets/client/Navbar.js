@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import messageIcon from '../../assets/Messages.svg'
-function Navbar({ tab, setTab }) {
+function Navbar({ tab, setTab, newMsg,setNewPass }) {
+  const [newState, setNew] = useState(newMsg)
+  useEffect(()=>{
+    setNew(newMsg)
+  },[newMsg])
   return (
     <div className='d-flex ' style={{ height: '80px', borderColor: '#494949', borderWidth: '0 0 2px 0', borderStyle: 'solid' }}>
       <div className='col-12 d-flex  justify-content-center align-content-center ' >
@@ -34,8 +38,15 @@ function Navbar({ tab, setTab }) {
             }}
           >search</div>
         </div>
-        <a className='btn d-block  col-1 d-lg-none mt-3 ms-sm-auto ' data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+        <a className='btn d-block  col-1 d-lg-none mt-3 ms-sm-auto ' data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"
+         onClick={_=>{
+          setNewPass(false)
+         }}
+        >
           <img src={messageIcon} alt="" srcSet="" />
+          {newState && <span className="position-absolute  translate-middle p-2 bg-danger border border-light rounded-circle">
+
+          </span>}
         </a>
 
       </div>
