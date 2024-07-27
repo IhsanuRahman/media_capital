@@ -55,7 +55,7 @@ function PostItem({ post }) {
                                     <div className="d-flex gap-2 flex-column ">
                                         <h6 className='pt-2'>All over:</h6>
                                         {post.user.id !== user.id && <h6>Your Rating:</h6>}
-                                        {post.no_raters ? <p className='text-primary'>{formatNumber(no_raters)} raters</p> : <p className='text-primary'>no raters</p>}</div>
+                                        {no_raters || no_raters!=0 ? <p className='text-primary'>{formatNumber(no_raters)} raters</p> : <p className='text-primary'>no raters</p>}</div>
 
                                     <div className="d-flex gap-2 flex-column">
                                         <Rating name="half-rating-read" value={overAllRate} precision={0.1} readOnly onChange={(event, newValue) => {

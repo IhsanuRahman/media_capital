@@ -61,7 +61,6 @@ function ViewUser() {
 
                     },
                   }).then(e => {
-                    dispatch(getUser())
                     setData()
                     const toastLiveExample = tostRef.current
 
